@@ -2501,6 +2501,28 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
 
 <script>
 (function() {
+  // iOS/Low-Power autoplay rescue: command the background player to play,
+  // and retry on first touch (a user gesture unlocks playback)
+  var iframe = document.querySelector('#reelVimeo iframe');
+  if (!iframe) return;
+  function play() {
+    try {
+      iframe.contentWindow.postMessage(JSON.stringify({ method: 'setMuted', value: true }), '*');
+      iframe.contentWindow.postMessage(JSON.stringify({ method: 'play' }), '*');
+    } catch (e) {}
+  }
+  window.addEventListener('load', function() { setTimeout(play, 800); setTimeout(play, 2500); });
+  ['touchstart', 'click'].forEach(function(ev) {
+    window.addEventListener(ev, function once() {
+      play();
+      window.removeEventListener(ev, once);
+    }, { passive: true });
+  });
+})();
+</script>
+
+<script>
+(function() {
   // size the background reel to cover the hero, using the video's true aspect ratio
   var wrap = document.querySelector('.reel-wrap');
   var iframe = document.querySelector('#reelVimeo iframe');
