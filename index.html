@@ -817,6 +817,13 @@ nav .nav-logo-img { filter: invert(1) !important; }
   scroll-snap-align: start;
 }
 @media (max-width: 768px) {
+  .top-frost::before, .top-frost::after { display: none; }
+  .top-frost {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.3) 60%, transparent 90%);
+    mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.3) 60%, transparent 90%);
+  }
   .work-strip {
     grid-auto-columns: calc((100% - 0.4rem) / 2);
     padding: 60px 40px 60px;
@@ -2408,8 +2415,10 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
     center.style.filter = e > 0.01 ? 'blur(' + (e * 14).toFixed(1) + 'px)' : '';
     // parallax: the CTA floats up ahead of the scroll, foreground-style
     if (cta) cta.style.transform = 'translateY(' + (-window.scrollY * 0.28).toFixed(1) + 'px)';
-    // frost fades in over the first 250px of scroll
-    frost.style.opacity = Math.min(1, window.scrollY / 250).toFixed(2);
+    // frost fades in over the first 250px of scroll; fully detached at rest
+    var fo = Math.min(1, window.scrollY / 250);
+    frost.style.opacity = fo.toFixed(2);
+    frost.style.display = fo > 0.01 ? '' : 'none';
   }
   window.addEventListener('scroll', function() {
     cancelAnimationFrame(raf);
