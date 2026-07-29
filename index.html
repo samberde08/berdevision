@@ -1586,7 +1586,8 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
     HIGHLIGHT REEL — paste your Vimeo video ID below (the number in the URL, e.g. vimeo.com/123456789)
     Set VIMEO_REEL_ID to your ID and uncomment the iframe block
   -->
-  <video class="reel-video" id="reelVideo" src="https://player.vimeo.com/progressive_redirect/playback/1213766454/rendition/1080p/file.mp4%20%281080p%29.mp4?loc=external&signature=69412310adb1d2968decaed490761c412655e4d9b60d40a0b2299fe3e6a7f297" muted autoplay loop playsinline preload="auto"></video>
+  <video class="reel-video" id="reelVideo" src="https://player.vimeo.com/progressive_redirect/playback/1213766454/rendition/1080p/file.mp4%20%281080p%29.mp4?loc=external&signature=69412310adb1d2968decaed490761c412655e4d9b60d40a0b2299fe3e6a7f297" muted autoplay loop playsinline webkit-playsinline preload="auto" disableremoteplayback></video>
+  <script>(function(){var v=document.getElementById("reelVideo");v.muted=true;v.defaultMuted=true;var p=v.play();if(p&&p.catch)p.catch(function(){});})();</script>
   <div class="reel-center">
     <div class="reel-slogan">Vision, elevated.</div>
   </div>
@@ -2511,12 +2512,28 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
 
 <script>
 (function() {
-  // ensure the native reel is always rolling (Low Power Mode resumes on first touch)
+  // the reel must be rolling from the moment of entry: retry hard, then hold
   var v = document.getElementById('reelVideo');
   if (!v) return;
-  function go() { if (v.paused) { var p = v.play(); if (p && p.catch) p.catch(function(){}); } }
-  window.addEventListener('load', go);
+  function go() {
+    if (!v.paused) return;
+    v.muted = true;
+    var p = v.play();
+    if (p && p.catch) p.catch(function(){});
+  }
+  // burst of attempts across the first ten seconds of page life
+  var tries = 0;
+  var burst = setInterval(function() {
+    if (!v.paused || ++tries > 25) { clearInterval(burst); return; }
+    go();
+  }, 400);
   v.addEventListener('loadedmetadata', go);
+  v.addEventListener('canplay', go);
+  window.addEventListener('load', go);
+  window.addEventListener('pageshow', go);           // back/forward cache restore
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) go();                       // returning from another app/tab
+  });
   ['touchstart', 'click', 'scroll'].forEach(function(ev) {
     window.addEventListener(ev, go, { passive: true });
   });
