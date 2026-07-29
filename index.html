@@ -300,6 +300,11 @@ nav .nav-logo-img { filter: invert(1) !important; }
 }
 /* the footage itself dissolves at its bottom edge — no black band */
 .reel-video { pointer-events: none; }
+.reel-video::-webkit-media-controls,
+.reel-video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
 .reel-vimeo,
 .reel-video,
 .reel-placeholder {
@@ -1588,9 +1593,7 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
   <div class="reel-cta">
     <a href="#" data-page="home" data-anchor="work" class="btn-reel">See our work ↓</a>
   </div>
-  <div class="reel-bar">
-    <button class="reel-mute" id="muteBtn">Unmute</button>
-  </div>
+
 </div>
 
 
