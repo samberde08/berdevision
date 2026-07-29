@@ -826,6 +826,10 @@ nav .nav-logo-img { filter: invert(1) !important; }
   scroll-snap-align: start;
 }
 @media (max-width: 768px) {
+  .work-overlay { padding: 0.85rem; }
+  .work-tag { font-size: 0.5rem; margin-bottom: 0.2rem; }
+  .work-name { font-size: 1.02rem; line-height: 1.12; }
+  .work-subtitle { font-size: 0.5rem; margin-top: 0.2rem; }
   .top-frost::before, .top-frost::after { display: none; }
   .top-frost {
     backdrop-filter: blur(5px);
@@ -898,6 +902,8 @@ nav .nav-logo-img { filter: invert(1) !important; }
 
 .work-overlay {
   position: absolute; inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
   background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 50%, transparent 100%);
   padding: 1.4rem;
   display: flex; flex-direction: column; justify-content: flex-end;
