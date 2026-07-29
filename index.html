@@ -299,7 +299,9 @@ nav .nav-logo-img { filter: invert(1) !important; }
   overflow: hidden;
 }
 /* the footage itself dissolves at its bottom edge — no black band */
+.reel-video { pointer-events: none; }
 .reel-vimeo,
+.reel-video,
 .reel-placeholder {
   -webkit-mask-image: linear-gradient(to bottom, black 0%, black 74%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 0%, black 74%, transparent 100%);
@@ -1579,14 +1581,7 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
     HIGHLIGHT REEL — paste your Vimeo video ID below (the number in the URL, e.g. vimeo.com/123456789)
     Set VIMEO_REEL_ID to your ID and uncomment the iframe block
   -->
-  <div class="reel-vimeo" id="reelVimeo">
-    <iframe
-      src="https://player.vimeo.com/video/1213766454?autoplay=1&muted=1&loop=1&autopause=0&controls=0&playsinline=1&title=0&byline=0&portrait=0&dnt=1"
-      frameborder="0"
-      allow="autoplay; fullscreen"
-      allowfullscreen>
-    </iframe>
-  </div>
+  <video class="reel-video" id="reelVideo" src="https://player.vimeo.com/progressive_redirect/playback/1213766454/rendition/1080p/file.mp4%20%281080p%29.mp4?loc=external&signature=69412310adb1d2968decaed490761c412655e4d9b60d40a0b2299fe3e6a7f297" muted autoplay loop playsinline preload="auto"></video>
   <div class="reel-center">
     <div class="reel-slogan">Vision, elevated.</div>
   </div>
@@ -2513,54 +2508,19 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
 
 <script>
 (function() {
-  // iOS/Low-Power autoplay rescue: command the background player to play,
-  // and retry on first touch (a user gesture unlocks playback)
-  var iframe = document.querySelector('#reelVimeo iframe');
-  if (!iframe) return;
-  function play() {
-    try {
-      iframe.contentWindow.postMessage(JSON.stringify({ method: 'setMuted', value: true }), '*');
-      iframe.contentWindow.postMessage(JSON.stringify({ method: 'play' }), '*');
-    } catch (e) {}
-  }
-  window.addEventListener('load', function() { setTimeout(play, 800); setTimeout(play, 2500); setTimeout(play, 6000); });
-  // keep nudging on interaction — a tap before the player loads must not spend the rescue
-  var last = 0;
-  function nudge() {
-    var now = Date.now();
-    if (now - last > 1200) { last = now; play(); }
-  }
+  // ensure the native reel is always rolling (Low Power Mode resumes on first touch)
+  var v = document.getElementById('reelVideo');
+  if (!v) return;
+  function go() { if (v.paused) { var p = v.play(); if (p && p.catch) p.catch(function(){}); } }
+  window.addEventListener('load', go);
+  v.addEventListener('loadedmetadata', go);
   ['touchstart', 'click', 'scroll'].forEach(function(ev) {
-    window.addEventListener(ev, nudge, { passive: true });
+    window.addEventListener(ev, go, { passive: true });
   });
 })();
 </script>
 
-<script>
-(function() {
-  // size the background reel to cover the hero, using the video's true aspect ratio
-  var wrap = document.querySelector('.reel-wrap');
-  var iframe = document.querySelector('#reelVimeo iframe');
-  if (!wrap || !iframe) return;
-  var ar = 16 / 9; // fallback until Vimeo tells us the real ratio
 
-  function sizeReel() {
-    var w = wrap.clientWidth, h = wrap.clientHeight;
-    var iw = w, ih = w / ar;
-    if (ih < h) { ih = h; iw = h * ar; }
-    iframe.style.width = Math.ceil(iw) + 'px';
-    iframe.style.height = Math.ceil(ih) + 'px';
-  }
-
-  fetch('https://vimeo.com/api/oembed.json?url=' + encodeURIComponent('https://vimeo.com/1213766454'))
-    .then(function(r) { return r.json(); })
-    .then(function(d) { if (d.width && d.height) ar = d.width / d.height; sizeReel(); })
-    .catch(sizeReel);
-
-  window.addEventListener('resize', sizeReel);
-  sizeReel();
-})();
-</script>
 
 <script>
 (function() {
