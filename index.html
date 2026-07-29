@@ -829,13 +829,7 @@ nav .nav-logo-img { filter: invert(1) !important; }
   .work-strip { scroll-snap-type: none; }  /* free momentum scroll on touch */
   .work-overlay { padding: 0.8rem; }
   .work-tag { font-size: 0.48rem; margin-bottom: 0.18rem; }
-  .work-name {
-    font-size: 0.88rem; line-height: 1.15;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
-    overflow: hidden;
-  }
+  .work-name { font-size: 0.88rem; line-height: 1.15; }
   .work-subtitle { display: none; }
   .top-frost::before, .top-frost::after { display: none; }
   .top-frost {
@@ -2652,6 +2646,29 @@ footer p { color: rgba(236,234,228,0.5); }
 </style>
 
 
+
+<script>
+(function() {
+  // fit every tile title: shrink each until its overlay content fits its tile
+  function fitTitles() {
+    document.querySelectorAll('.work-item').forEach(function(t) {
+      var name = t.querySelector('.work-name');
+      var overlay = t.querySelector('.work-overlay');
+      if (!name || !overlay) return;
+      name.style.fontSize = '';
+      var size = parseFloat(getComputedStyle(name).fontSize);
+      var guard = 0;
+      while (overlay.scrollHeight > overlay.clientHeight && size > 9 && guard++ < 40) {
+        size -= 0.5;
+        name.style.fontSize = size + 'px';
+      }
+    });
+  }
+  window.addEventListener('load', fitTitles);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitles);
+  var rt; window.addEventListener('resize', function() { clearTimeout(rt); rt = setTimeout(fitTitles, 150); });
+})();
+</script>
 
 </body>
 </html>
