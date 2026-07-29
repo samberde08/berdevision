@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Berdevision</title>
 <meta name="description" content="Berdevision is a creative studio specializing in video, VFX, and post-production. Commercials, live events, and AI-driven creative — based in Dallas, available worldwide.">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -211,13 +211,14 @@ nav {
   justify-content: space-between;
   align-items: center;
   padding: 0.8rem 3rem;
+  padding-top: calc(0.8rem + env(safe-area-inset-top, 0px));
   background: transparent;
 }
 /* progressive frost under the floating nav: content blurs as it nears the top */
 .top-frost {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: 210px;
+  height: calc(210px + env(safe-area-inset-top, 0px));
   z-index: 90;
   pointer-events: none;
   backdrop-filter: blur(7px);
@@ -1409,7 +1410,7 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
   /* nav */
-  nav { padding: 0.6rem 1.25rem; }
+  nav { padding: 0.6rem 1.25rem; padding-top: calc(0.6rem + env(safe-area-inset-top, 0px)); }
   .nav-logo-img { width: 80px; }
   .nav-links { gap: 1.2rem; }
 
