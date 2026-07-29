@@ -2521,12 +2521,15 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
       iframe.contentWindow.postMessage(JSON.stringify({ method: 'play' }), '*');
     } catch (e) {}
   }
-  window.addEventListener('load', function() { setTimeout(play, 800); setTimeout(play, 2500); });
-  ['touchstart', 'click'].forEach(function(ev) {
-    window.addEventListener(ev, function once() {
-      play();
-      window.removeEventListener(ev, once);
-    }, { passive: true });
+  window.addEventListener('load', function() { setTimeout(play, 800); setTimeout(play, 2500); setTimeout(play, 6000); });
+  // keep nudging on interaction — a tap before the player loads must not spend the rescue
+  var last = 0;
+  function nudge() {
+    var now = Date.now();
+    if (now - last > 1200) { last = now; play(); }
+  }
+  ['touchstart', 'click', 'scroll'].forEach(function(ev) {
+    window.addEventListener(ev, nudge, { passive: true });
   });
 })();
 </script>
