@@ -826,10 +826,17 @@ nav .nav-logo-img { filter: invert(1) !important; }
   scroll-snap-align: start;
 }
 @media (max-width: 768px) {
-  .work-overlay { padding: 0.85rem; }
-  .work-tag { font-size: 0.5rem; margin-bottom: 0.2rem; }
-  .work-name { font-size: 1.02rem; line-height: 1.12; }
-  .work-subtitle { font-size: 0.5rem; margin-top: 0.2rem; }
+  .work-strip { scroll-snap-type: none; }  /* free momentum scroll on touch */
+  .work-overlay { padding: 0.8rem; }
+  .work-tag { font-size: 0.48rem; margin-bottom: 0.18rem; }
+  .work-name {
+    font-size: 0.88rem; line-height: 1.15;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+  }
+  .work-subtitle { display: none; }
   .top-frost::before, .top-frost::after { display: none; }
   .top-frost {
     backdrop-filter: blur(5px);
@@ -1479,6 +1486,7 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
     cursor: auto !important;
   }
   #glassCursor { display: none !important; }
+  .work-item { transform: none !important; }
 }
 
 
