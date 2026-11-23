@@ -68,8 +68,10 @@
         im.style.cssText='left:'+(c[1]-PAD)+'px;bottom:'+(c[3]-PAD)+'px;height:'+(c[2]+PAD*2)+'px;z-index:'+z+';transform:rotate('+c[4]+'deg)';
         p.appendChild(im); maxTop=Math.max(maxTop, c[3]+c[2]);
       });
-      plates.push({el:p, drop: maxTop - Math.min(topStart, 60) + 80, t:[0.03,0.07,0.11][gi], dur:[0.8,0.78,0.76][gi], depth:[-0.6,0.1,0.8][gi]});
+      plates.push({el:p, drop: maxTop - Math.min(topStart, 60) + 80, t:0.04, dur:0.82, depth:[-0.6,0.1,0.8][gi]});
     });
+    // the whole pyramid rises as ONE piece, so the arrangement (and its overlaps) is identical at every scroll position
+    var dmax = Math.max.apply(null, plates.map(function(o){ return o.drop; })); plates.forEach(function(o){ o.drop = dmax; });
     earthEl=document.createElement('img'); earthEl.className='earth'; earthEl.alt=''; earthEl.src='collage2/ye_earth1.png';
     earthEl.style.cssText='left:'+E.x+'px;bottom:'+E.b+'px;height:'+E.h+'px;z-index:30;transform-origin:50% 100%';
     col.appendChild(earthEl);

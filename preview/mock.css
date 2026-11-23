@@ -59,3 +59,39 @@
 .reel-slogan.m-lock span + span { margin-top:.035em; }
 .m-hero-sub { margin-top:1.4rem; }
 @media (max-width:768px){ .m-hero-sub { letter-spacing:.2em; font-size:.62rem; margin-top:1rem; } }
+
+/* ===== ONE TYPE SYSTEM: Manrope 800 caps for every title, DM Sans spaced caps for every label ===== */
+.work-title, .contact-big, .about-page-title, .about-body .work-label, #work .work-label, .m-credits .m-title {
+  font-family:'Manrope',sans-serif !important; font-weight:800 !important; text-transform:uppercase; letter-spacing:-.01em !important; line-height:.9 !important; color:#f1eee8 !important; }
+.work-title { font-size:clamp(2.6rem,6vw,5.2rem) !important; }
+.about-body p.work-label, .about-body .work-label { font-size:clamp(2rem,4.4vw,3.4rem) !important; margin:2.2rem 0 1.6rem !important; display:block !important; }
+.about-body .work-label::before, .about-body .work-label::after { display:none !important; }
+.contact-big.contact-big-inform { font-size:clamp(2rem,4.4vw,3.4rem) !important; margin-bottom:1.6rem; }
+.service-title { font-family:'Manrope',sans-serif !important; font-weight:800 !important; text-transform:uppercase; letter-spacing:0 !important; }
+.work-tag, .form-label, .service-num, .m-f-h, .m-clients .work-label {
+  font-family:'DM Sans',sans-serif !important; font-weight:500 !important; text-transform:uppercase; letter-spacing:.24em !important; }
+/* stacked lockups */
+.m-stack { display:flex; flex-direction:column; align-items:center; }
+.m-stack span { display:block; font-family:'Manrope',sans-serif; font-weight:800; line-height:.76; letter-spacing:0; white-space:nowrap; color:#f1eee8; }
+.m-stack span + span { margin-top:.04em; }
+.m-statement { margin:2.6rem auto 2.4rem; }
+/* client strip under the hero */
+.m-clients { padding:1.6rem 0 .4rem; position:relative; z-index:2; }
+.m-clients .work-label { font-size:.62rem !important; line-height:1 !important; color:rgba(236,234,228,.5) !important; text-align:center; margin:0 0 1.1rem !important; display:block !important; }
+.m-clients .work-label::before, .m-clients .work-label::after { display:none !important; }
+.m-clients .logo-track { gap:3.4rem !important; }
+.m-clients .logo-track img { height:38px !important; opacity:.6 !important; }
+@media (max-width:768px){ .m-clients .logo-track img { height:28px !important; } .m-clients .logo-track { gap:2.2rem !important; } }
+/* footer */
+footer.m-footer { display:block !important; padding:3.5rem 1.5rem 1.6rem !important; background:#0b0b0c !important; border-top:1px solid rgba(236,234,228,.1) !important; box-shadow:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+.m-f-mark { opacity:.94; }
+.m-f-cols { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; max-width:1500px; margin:3rem auto 0; font-family:'DM Sans',sans-serif; }
+.m-f-cols > div { display:flex; flex-direction:column; gap:.55rem; }
+.m-f-h { font-size:.6rem; color:rgba(236,234,228,.45); margin-bottom:.4rem; }
+.m-f-cols a, .m-f-cols span { font-size:.95rem; color:rgba(236,234,228,.88); text-decoration:none; }
+.m-f-cols a:hover { color:#fff; text-decoration:underline; text-underline-offset:4px; }
+.m-f-base { max-width:1500px; margin:2.6rem auto 0; padding-top:1.2rem; border-top:1px solid rgba(236,234,228,.1); font-family:'DM Sans',sans-serif; font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:rgba(236,234,228,.4); }
+@media (max-width:768px){ .m-f-cols { grid-template-columns:1fr; gap:1.6rem; margin-top:2rem; } footer.m-footer { padding:2.4rem 1.25rem 1.4rem !important; } }
+/* phone: nav gets its own dark band so it never sits on top of the collage */
+@media (max-width:768px){ nav { mix-blend-mode:normal !important; background:linear-gradient(to bottom, rgba(12,12,13,.96) 0%, rgba(12,12,13,.82) 62%, rgba(12,12,13,0) 100%) !important; }
+  nav .nav-logo-img { filter:invert(1) !important; } }
