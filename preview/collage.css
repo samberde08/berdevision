@@ -12,3 +12,8 @@
 .bvc .jl { position:absolute; font-family:'Manrope',sans-serif; font-weight:800; line-height:.8; color:#efece6; pointer-events:none; transform-origin:50% 60%; will-change:transform; text-shadow:0 8px 18px rgba(0,0,0,.55); }
 .bvc-fade { position:absolute; pointer-events:none; z-index:50; }
 .bvc-hint { position:absolute; left:0; right:0; bottom:10px; text-align:center; font:500 .62rem 'DM Sans',sans-serif; letter-spacing:.3em; text-transform:uppercase; color:rgba(240,237,232,.6); pointer-events:none; transition:opacity .4s; z-index:60; }
+
+/* v3: plates + packed wordmark */
+.bvc .plate { position:absolute; inset:0; will-change:transform; pointer-events:none; }
+.bvc .plate img.c { will-change:auto; }
+.bvc .jl { line-height:.72; letter-spacing:0; transform-origin:50% 50%; }
