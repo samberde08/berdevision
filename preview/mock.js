@@ -28,7 +28,7 @@
         var me = fr;
         // stay hidden behind the thumbnail until Vimeo reports the film is really playing (no spinner on black)
         me._show = function(){ if (fr === me) { me.style.opacity = 1; t.classList.add('m-playing'); } };
-        fr.addEventListener('load', function(){ try { me.contentWindow.postMessage(JSON.stringify({method:'addEventListener', value:'timeupdate'}), 'https://player.vimeo.com'); } catch(e){} });
+        fr.addEventListener('load', function(){ try { me.contentWindow.postMessage(JSON.stringify({method:'addEventListener', value:'playProgress'}), 'https://player.vimeo.com'); } catch(e){} });
         t.insertBefore(fr, t.querySelector('.work-overlay'));
       }, 220);                                    // only start if the pointer actually rests on the tile
     });
@@ -40,8 +40,8 @@
     if (!d) return;
     var frames = document.querySelectorAll('iframe.m-emb');
     for (var i=0;i<frames.length;i++) { var f = frames[i]; if (f.contentWindow !== e.source) continue;
-      if (d.event === 'ready') { try { f.contentWindow.postMessage(JSON.stringify({method:'addEventListener', value:'timeupdate'}), 'https://player.vimeo.com'); } catch(x){} }
-      if (d.event === 'timeupdate' && d.data && d.data.seconds > 3.15 && f._show) { f._show(); f._show = null; } }
+      if (d.event === 'ready') { try { f.contentWindow.postMessage(JSON.stringify({method:'addEventListener', value:'playProgress'}), 'https://player.vimeo.com'); } catch(x){} }
+      if ((d.event === 'timeupdate' || d.event === 'playProgress') && d.data && d.data.seconds > 3.15 && f._show) { f._show(); f._show = null; } }
   });
   // ---- hero ----
   var c = document.querySelector('.reel-center');
