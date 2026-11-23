@@ -107,3 +107,22 @@ footer.m-footer { display:block !important; padding:3.5rem 1.5rem 1.6rem !import
 .reel-slogan.m-jumble { gap:.9vw; }
 
 .m-jrow span { color:#e2ded5; }
+
+/* ===== dial-in pass ===== */
+/* footer wordmark: a sign-off, not a second hero; lines up with the columns under it */
+.m-f-mark { max-width:1500px; margin:0 auto; align-items:flex-start !important; }
+/* the footer already carries email + Instagram, so drop the duplicate row (and its dead LinkedIn link) under the form */
+.contact-grid .contact-links { display:none !important; }
+/* services: readable at desktop size */
+.service-title { font-size:1.05rem !important; line-height:1.15 !important; }
+.service-desc { font-size:.92rem !important; line-height:1.5 !important; }
+/* About: client logos match the quiet strip on the home page */
+.about-body .logo-track img { height:44px !important; opacity:.7 !important; }
+.about-body .logo-track { gap:3.4rem !important; }
+@media (max-width:768px){ .about-body .logo-track img { height:30px !important; } .about-body .logo-track { gap:2.2rem !important; } }
+
+/* hover preview via the Vimeo player (older tiles) */
+.work-strip .work-item iframe.m-emb { position:absolute; left:50%; top:50%; width:100%; height:auto; transform:translate(-50%,-50%); border:0; pointer-events:none; z-index:1; opacity:0; transition:opacity .4s ease; background:#000; }
+
+/* the About "Clients" heading was rendering near-black on the dark page */
+.about-page .about-body p.work-label { color:#f1eee8 !important; }

@@ -13,6 +13,36 @@
     t.addEventListener('mouseenter', on); t.addEventListener('mouseleave', off);
     t._mOn = on;
   });
+  // ---- hover previews for the older tiles: the Vimeo film itself plays, muted, inside the tile ----
+  var shape = {'1204589600':426/234,'1204409147':240/300,'1204579585':300/240,'1203344844':300/240,'1204398806':292/240,'1204416675':240/426,'1203256076':322/240};
+  if (window.matchMedia && matchMedia('(hover: hover)').matches) tiles.forEach(function(t){
+    var id = t.dataset.vimeo; if (!id || loops.indexOf(id) !== -1) return;
+    var fr = null, timer = 0;
+    t.addEventListener('mouseenter', function(){
+      clearTimeout(timer);
+      timer = setTimeout(function(){
+        if (fr) return;
+        fr = document.createElement('iframe'); fr.className = 'm-emb'; fr.setAttribute('allow','autoplay'); fr.setAttribute('tabindex','-1'); fr.setAttribute('aria-hidden','true');
+        fr.style.aspectRatio = String(shape[id] || 16/9);
+        fr.src = 'https://player.vimeo.com/video/' + id + '?background=1&autoplay=1&loop=1&muted=1&dnt=1#t=3s';
+        var me = fr;
+        // stay hidden behind the thumbnail until Vimeo reports the film is really playing (no spinner on black)
+        me._show = function(){ if (fr === me) { me.style.opacity = 1; t.classList.add('m-playing'); } };
+        fr.addEventListener('load', function(){ try { me.contentWindow.postMessage(JSON.stringify({method:'addEventListener', value:'timeupdate'}), 'https://player.vimeo.com'); } catch(e){} });
+        t.insertBefore(fr, t.querySelector('.work-overlay'));
+      }, 220);                                    // only start if the pointer actually rests on the tile
+    });
+    t.addEventListener('mouseleave', function(){ clearTimeout(timer); t.classList.remove('m-playing'); if (fr) { var old = fr; fr = null; old.style.opacity = 0; setTimeout(function(){ old.remove(); }, 350); } });
+  });
+  window.addEventListener('message', function(e){
+    if (!/player\.vimeo\.com$/.test(e.origin || '')) return;
+    var d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch(x){ return; }
+    if (!d) return;
+    var frames = document.querySelectorAll('iframe.m-emb');
+    for (var i=0;i<frames.length;i++) { var f = frames[i]; if (f.contentWindow !== e.source) continue;
+      if (d.event === 'ready') { try { f.contentWindow.postMessage(JSON.stringify({method:'addEventListener', value:'timeupdate'}), 'https://player.vimeo.com'); } catch(x){} }
+      if (d.event === 'timeupdate' && d.data && d.data.seconds > 3.15 && f._show) { f._show(); f._show = null; } }
+  });
   // ---- hero ----
   var c = document.querySelector('.reel-center');
   if (c) {
@@ -93,7 +123,7 @@
         '<div><div class="m-f-h">Studio</div><span>Video · VFX · Post-production</span><span>Based in Dallas — Available worldwide</span></div>' +
         '<div><div class="m-f-h">Site</div><a href="#" data-page="home">Work</a><a href="#" data-page="about">About</a></div>' +
       '</div><div class="m-f-base">© 2026 Berdevision. All rights reserved.</div>';
-    lockup(ft.querySelector('.m-f-mark'), ['BERDE','VISION'], function(){ return Math.min(ft.clientWidth - 48, 1500); });
+    lockup(ft.querySelector('.m-f-mark'), ['BERDE','VISION'], function(){ return Math.min(ft.clientWidth - 48, 620); });
     ft.querySelectorAll('a[data-page]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault();
       var n = document.querySelector('nav a[data-page="' + a.dataset.page + '"]'); if (n) n.click(); window.scrollTo(0,0); }); });
   }

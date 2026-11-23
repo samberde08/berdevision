@@ -22,7 +22,7 @@
     var o = getComputedStyle(a); if (/(hidden|auto|scroll)/.test(o.overflowX + o.overflowY)) { a.style.overflow = 'clip'; }
   }
   function pageBg(){ for (var e = wrap; e; e = e.parentElement) { var c = getComputedStyle(e).backgroundColor; if (c && !/rgba\(0, 0, 0, 0\)|transparent/.test(c)) return c; } return 'rgb(12,12,13)'; }
-  var C=DESK, mobile=false, plates=[], letters=[], earthEl, s=1, pin=0, anchor=8, builtW=-1, mx=0, my=0;
+  var C=DESK, mobile=false, plates=[], letters=[], cuts=[], dropAll=0, earthEl, s=1, pin=0, anchor=8, builtW=-1, mx=0, my=0;
   var meas = document.createElement('canvas').getContext('2d');
   function buildType(){
     // every line is fitted to the full width, so short lines get huge letters and long lines smaller ones;
@@ -54,7 +54,7 @@
     builtW = wrap.clientWidth; if (!builtW) return;
     mobile = builtW < 720; C = mobile ? MOB : DESK;
     var H=C.H, CX=C.CX, E=C.earth;
-    col.innerHTML=''; plates=[]; letters=[];
+    col.innerHTML=''; plates=[]; letters=[]; cuts=[];
     col.style.width=C.W+'px'; col.style.height=H+'px'; col.style.marginLeft=(-C.W/2)+'px';
     var stars=document.createElement('div'); stars.className='stars'; stars.style.zIndex=1; col.appendChild(stars);
     buildType();
@@ -69,11 +69,15 @@
         var im=document.createElement('img'); im.className='c'; im.alt=''; im.decoding='async'; im.src='collage2/'+c[0]+'.webp';
         im.style.cssText='left:'+(c[1]-PAD)+'px;bottom:'+(c[3]-PAD)+'px;height:'+(c[2]+PAD*2)+'px;z-index:'+z+';transform:rotate('+c[4]+'deg)';
         p.appendChild(im); maxTop=Math.max(maxTop, c[3]+c[2]);
+        // each character rises on its own beat: centre first, edges later, with a little swing and its own speed
+        var n=cuts.length, cxm=c[1]+c[2]*c[6]/2, jit=((n*37)%11)/11;
+        cuts.push({el:im, rot:c[4], d: inBack ? 0.07 : 0.05 + 0.17*Math.min(1,Math.abs(cxm-CX)/(C.W/2)) + 0.07*jit + gi*0.02,
+          dur: 0.5 + 0.16*(((n*53)%7)/7), sw: (n%2 ? 1 : -1)*(4 + 5*jit)});
       });
       plates.push({el:p, drop: maxTop - Math.min(topStart, 60) + 80, t:0.04, dur:0.82, depth:[-0.6,0.1,0.8][gi]});
     });
     // the whole pyramid rises as ONE piece, so the arrangement (and its overlaps) is identical at every scroll position
-    var dmax = Math.max.apply(null, plates.map(function(o){ return o.drop; })); plates.forEach(function(o){ o.drop = dmax; });
+    var dmax = Math.max.apply(null, plates.map(function(o){ return o.drop; })); plates.forEach(function(o){ o.drop = dmax; }); dropAll = dmax;
     earthEl=document.createElement('img'); earthEl.className='earth'; earthEl.alt=''; earthEl.src='collage2/ye_earth1.webp';
     earthEl.style.cssText='left:'+E.x+'px;bottom:'+E.b+'px;height:'+E.h+'px;z-index:30;transform-origin:50% 100%';
     col.appendChild(earthEl);
@@ -99,7 +103,9 @@
     var pe = ease(prog/0.7), es = E.s0 + (1-E.s0)*pe;
     earthEl.style.transform='translate3d('+(mx*8)+'px,'+((1-pe)*E.y0 + my*3)+'px,0) scale('+es.toFixed(4)+')';
     for (var i=0;i<plates.length;i++){ var o=plates[i], u=Math.max(0,Math.min(1,(prog - o.t)/o.dur)), l=1-Math.pow(1-u,2.2);
-      o.el.style.transform='translate3d('+(mx*o.depth*16)+'px,'+((1-l)*o.drop + my*o.depth*6)+'px,0)'; }
+      o.el.style.transform='translate3d('+(mx*o.depth*16)+'px,'+(my*o.depth*6)+'px,0)'; }
+    for (var k=0;k<cuts.length;k++){ var q2=cuts[k], u2=Math.max(0,Math.min(1,(prog - q2.d)/q2.dur)), l2=1-Math.pow(1-u2,2.4);
+      q2.el.style.transform='translate3d(0,'+((1-l2)*dropAll).toFixed(1)+'px,0) rotate('+(q2.rot + q2.sw*(1-l2)).toFixed(2)+'deg) scale('+(0.92+0.08*l2).toFixed(3)+')'; }
     var jp = ease(prog/0.45);                                   // the wordmark starts straight and jumbles as you scroll
     for (var j=0;j<letters.length;j++){ var q=letters[j];
       q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+(my*q.depth*7)+'px,0) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }
