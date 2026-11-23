@@ -2476,6 +2476,10 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
     if (next) next.disabled = strip.scrollLeft >= max - 2;
   }
   strip.addEventListener('scroll', updateUI, { passive: true });
+  // flag swipes so the glow animation can stand down while the strip moves
+  var busyT = 0; function busy(){ window.__stripBusy = true; clearTimeout(busyT); busyT = setTimeout(function(){ window.__stripBusy = false; }, 300); }
+  strip.addEventListener('scroll', busy, { passive: true });
+  strip.addEventListener('touchstart', busy, { passive: true });
   window.addEventListener('resize', updateUI);
 
   function nudge(dir) {
@@ -2572,6 +2576,8 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
 
     var t = performance.now() / 1000;
     var isMobile = mobileQ.matches;
+    // phones: never repaint glows while the strip is being swiped, and only update ~2x a second otherwise
+    if (isMobile && (window.__stripBusy || ((window.__tideN = (window.__tideN || 0) + 1) % 6))) return;
     tiles.forEach(function(tile, i) {
       var rgb = tile.dataset.glowRGB;
       if (!rgb) return;
@@ -2591,6 +2597,13 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
 })();
 </script>
 
+<style id="stripTouchFix">
+/* phones: smooth sideways swiping on the work strip */
+@media (max-width: 768px) {
+  .work-strip { touch-action: pan-x pan-y; overscroll-behavior-x: contain; scroll-snap-type: x proximity; }
+  .work-strip .work-item { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; transform-style: flat !important; will-change: auto !important; transition: opacity 0.4s, box-shadow 0.5s linear !important; }
+}
+</style>
 <style id="ambientTheme">
 /* ===== AMBIENT GLASS THEME: deep base, tile-colored light fields, translucent surfaces ===== */
 html { background: #0f0f11 !important; overflow-x: clip; }
