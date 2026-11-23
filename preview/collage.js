@@ -2,13 +2,14 @@
   var ab = document.querySelector('.about-page .about-body'); if (!ab) return;
   var PAD=24;
   // name, x, height, bottom, rotate(deg), z, aspect (w/h of the un-padded cut-out)
-  var DESK = {W:1640, H:1100, CX:820, items:[["ai_bear",470,335,540,-6,8,0.508],["ai_kaiju",975,330,540,6,8,0.678],["ai_ye_face",580,490,560,0,14,1.028],["ai_sf_face",292,225,550,-8,12,1.14],["ai_im03",398,215,470,-4,11,0.944],["yachty_portrait",212,265,395,-5,13,0.795],["ai_pegasus",105,250,490,-10,15,1.028],["ai_paige",420,290,400,-4,16,0.637],["ai_danna",615,290,445,-3,18,0.774],["ai_noah",805,300,445,3,18,0.954],["ai_trophy",1112,285,545,8,10,0.652],["storm",1040,250,420,4,16,1.144],["ai_im13",1205,225,420,5,15,0.697],["ai_ye_stance",1250,215,560,7,9,0.84],["ar_guy",1260,190,395,5,17,1.032],["im-12",1285,235,285,6,15,0.709],["ai_im10",1200,260,300,3,13,0.59],["ai_sf_jacket",1335,225,430,9,11,0.614],["esdee",200,370,155,0,23,0.885],["cal",365,320,273,0,26,1.315],["ai_ice",892,440,180,0,27,0.989],["st_ball",725,240,450,0,17,1.143],["es_eye",440,150,255,-6,25,1.416],["arran",1078,250,213,0,28,1.348],["es_dog",585,228,283,0,29,1.941],["ai_cal_shoot",160,320,330,-5,9,0.352],["im-16",95,320,60,-4,20,1.182],["ai_st_serve",70,300,240,-7,8,0.608],["ai_ye_run",-25,235,0,-6,21,0.891],["im-09",1395,255,235,6,9,0.769],["cal_16",1285,310,80,4,20,1.057],["ai_hoka",1425,280,150,7,8,0.653],["ai_hubbard_small",1540,250,10,8,21,0.396]],
+  var DESK = {W:1640, H:1100, CX:820, items:[["ai_bear",495,335,540,-6,15,0.508],["ai_kaiju",975,330,540,6,8,0.678],["ai_ye_face",580,490,560,0,14,1.028],["ai_sf_face",292,225,550,-8,12,1.14],["ai_im03",398,215,470,-4,11,0.944],["yachty_portrait",212,275,395,-5,13,0.795],["ai_pegasus",105,250,490,-10,15,1.028],["ai_paige",415,300,395,-4,16,0.637],["ai_danna",615,290,445,-3,18,0.774],["ai_noah",815,310,445,3,18,0.954],["ai_trophy",1112,285,545,8,10,0.652],["storm",1040,250,420,4,16,1.144],["ai_im13",1205,225,420,5,15,0.697],["ai_ye_stance",1250,215,560,7,9,0.84],["ar_guy",1260,190,395,5,17,1.032],["im-12",1285,235,250,6,18,0.709],["ai_im10",1200,260,300,3,18,0.59],["ai_sf_jacket",1335,225,430,9,11,0.614],["esdee",200,370,155,0,23,0.885],["cal",365,320,273,0,26,1.315],["ai_ice",892,440,180,0,27,0.989],["st_ball",725,240,440,0,17,1.143],["es_eye",440,150,262,-6,25,1.416],["arran",1040,250,120,0,28,1.348],["es_dog",585,228,283,0,29,1.941],["ai_cal_shoot",160,320,330,-5,9,0.352],["im-16",95,320,60,-4,20,1.182],["ai_st_serve",70,300,240,-7,8,0.608],["ai_ye_run",-25,235,-8,-6,21,0.891],["im-09",1370,255,235,6,19,0.769],["cal_16",1250,330,20,4,20,1.057],["ai_hoka",1425,280,150,7,8,0.653],["ai_hubbard_small",1540,250,-5,8,21,0.396]],
     earth:{x:-33, h:658, b:-338, R:889, cy:-569, s0:1.35, y0:164},
     type:{lines:['BERDE','VISION'], x0:130, x1:1510, top:1080, bottom:440}};
-  var MOB = {W:760, H:1340, CX:380, items:[["ai_pegasus",0,190,930,-10,9,1.028],["ai_bear",40,290,800,-6,8,0.508],["ai_kaiju",560,290,790,6,8,0.678],["ai_ye_face",135,480,600,0,14,1.028],["ai_paige",10,270,590,-4,16,0.637],["yachty_portrait",545,250,540,5,16,0.795],["ai_sf_face",-30,260,400,-8,15,1.14],["ai_danna",135,290,450,-3,18,0.774],["ai_noah",335,300,450,3,18,0.954],["arran",490,230,370,3,17,1.348],["st_ball",280,230,495,0,13,1.143],["esdee",-10,340,165,0,23,0.885],["cal",110,300,235,0,26,1.315],["es_eye",180,100,220,-6,25,1.416],["ai_ice",410,360,165,0,27,0.989],["es_dog",270,150,258,0,29,1.941]],
+  var MOB = {W:760, H:1340, CX:380, items:[["ai_pegasus",0,190,930,-10,9,1.028],["ai_bear",40,290,800,-6,8,0.508],["ai_kaiju",560,290,790,6,8,0.678],["ai_ye_face",135,480,600,0,14,1.028],["ai_paige",25,270,590,-4,16,0.637],["yachty_portrait",520,300,500,5,16,0.795],["ai_sf_face",-45,260,400,-8,17,1.14],["ai_danna",135,330,380,-3,18,0.774],["ai_noah",320,340,400,3,18,0.954],["arran",430,260,150,3,28,1.348],["st_ball",250,260,430,0,13,1.143],["esdee",-50,380,165,0,23,0.885],["cal",110,300,235,0,26,1.315],["es_eye",180,100,220,-6,25,1.416],["ai_ice",440,330,265,0,27,0.989],["es_dog",270,150,248,0,29,1.941]],
     earth:{x:-313, h:534, b:-274, R:722, cy:-462, s0:1.5, y0:-30},
     type:{lines:['BERDE','VIS','ION'], x0:40, x1:720, top:1320, bottom:585}};
   // per-letter size jitter (cycled) and tilt: packed, uneven, still readable
+  var TJ=[-5,4,-3,6,-4,3,-5,4,-2,5,-4], SJ=[1,.84,1.08,.9,1.12,.86,1.04,.92,1.1,.88,1];   // where each letter ends up once you scroll: tilted, mixed sizes
   var JIT=[1], TILT=[0];   // a clean stacked lockup: every line justified to the same width, tight leading
   var qs = location.search, forceP = (qs.match(/[?&]p=([0-9.]+)/)||[])[1], reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (/[?&]sil=1/.test(qs)) { var ds=document.createElement('style'); ds.textContent='.bvc img.c{filter:brightness(0) invert(1)!important}.bvc .jl,.bvc .stars{display:none!important}.bvc img.earth{filter:brightness(0) invert(.45)!important}'; document.head.appendChild(ds); }
@@ -43,7 +44,7 @@
         var fs=F*r.sc[i], cap=fs*0.72, d=document.createElement('div'); d.className='jl'; d.textContent=c;
         var lift = (i%2 ? (lineH-cap) : 0);                      // alternate bottom / top alignment so the sizes interlock
         d.style.cssText='left:'+x+'px;bottom:'+(y+lift)+'px;font-size:'+fs+'px;height:'+cap+'px;z-index:3';
-        col.appendChild(d); letters.push({el:d, rot:TILT[(idx++)%TILT.length], depth:-0.8+0.2*(i%3)});
+        col.appendChild(d); letters.push({el:d, rot:TJ[idx%TJ.length], sc:SJ[idx%SJ.length], depth:-0.8+0.2*(i%3)}); idx++;
         x += r.w100[i]/100*F + gap*F;
       });
       y -= gapY*fit;
@@ -99,8 +100,9 @@
     earthEl.style.transform='translate3d('+(mx*8)+'px,'+((1-pe)*E.y0 + my*3)+'px,0) scale('+es.toFixed(4)+')';
     for (var i=0;i<plates.length;i++){ var o=plates[i], u=Math.max(0,Math.min(1,(prog - o.t)/o.dur)), l=1-Math.pow(1-u,2.2);
       o.el.style.transform='translate3d('+(mx*o.depth*16)+'px,'+((1-l)*o.drop + my*o.depth*6)+'px,0)'; }
+    var jp = ease(prog/0.45);                                   // the wordmark starts straight and jumbles as you scroll
     for (var j=0;j<letters.length;j++){ var q=letters[j];
-      q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+(my*q.depth*7)+'px,0) rotate('+q.rot+'deg)'; }
+      q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+(my*q.depth*7)+'px,0) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }
     hint.style.opacity = prog > 0.06 ? 0 : 1;
   }
   var raf=0; function tick(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; update(); }); }

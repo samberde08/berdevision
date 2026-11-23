@@ -19,23 +19,27 @@
     // stacked wordmark: both lines justified to one width, tight leading (same lockup as the About collage)
     var sl = c.querySelector('.reel-slogan');
     if (sl) {
-      // mixed-size, tilted letters packed into two justified lines (the jumbled lockup)
-      var HL = ['BERDE','VISION'], JIT = [1,.78,1.08,.86,1.14,.8,1.04,.9,1.1,.84,1], TILT = [-3,2,-1.5,3,-2.5,1.5,-2,2.5,-1,3,-2];
+      // wordmark starts as a straight stacked lockup and jumbles (tilt + mixed sizes) as you scroll
+      var HL = ['BERDE','VISION'], SJ = [1,.8,1.1,.86,1.16,.82,1.06,.9,1.12,.84,1], TJ = [-5,4,-3,6,-4,3,-5,4,-2,5,-4], YJ = [0,-.08,.05,-.06,.07,.06,-.05,.08,-.04,.06,-.07];
       sl.textContent = ''; sl.classList.add('m-jumble'); sl.setAttribute('aria-label','BerdeVision');
-      var rows = [], kk = 0;
+      var rows = [], all = [], kk = 0;
       HL.forEach(function(t){ var r = document.createElement('div'); r.className = 'm-jrow'; sl.appendChild(r);
-        var ls = t.split('').map(function(ch, i){ var d = document.createElement('span'); d.textContent = ch; var q = kk++;
-          d.style.transform = 'rotate(' + TILT[q % TILT.length] + 'deg)'; d.style.alignSelf = i % 2 ? 'flex-start' : 'flex-end'; r.appendChild(d);
-          return {el:d, ch:ch, sc:JIT[q % JIT.length]}; });
+        var ls = t.split('').map(function(ch){ var d = document.createElement('span'); d.textContent = ch; r.appendChild(d); var q = kk++;
+          var o = {el:d, ch:ch, sc:SJ[q % SJ.length], rot:TJ[q % TJ.length], dy:YJ[q % YJ.length]}; all.push(o); return o; });
         rows.push(ls); });
       var mc = document.createElement('canvas').getContext('2d');
       var fit = function(){
         var W = Math.min(window.innerWidth*(window.innerWidth<=768?0.8:0.62), window.innerHeight*1.0, 980);
         mc.font = "800 100px Manrope, 'DM Sans', sans-serif";
-        rows.forEach(function(ls){ var w = 0; ls.forEach(function(l){ w += mc.measureText(l.ch).width * l.sc; });
-          var F = W / w * 100; ls.forEach(function(l){ l.el.style.fontSize = (F * l.sc).toFixed(1) + 'px'; }); });
+        rows.forEach(function(ls){ var w = 0; ls.forEach(function(l){ w += mc.measureText(l.ch).width; });
+          var F = W / w * 100; ls.forEach(function(l){ l.el.style.fontSize = F.toFixed(1) + 'px'; }); });
       };
-      fit(); window.addEventListener('resize', fit);
+      var jraf = 0, still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var jum = function(){ jraf = 0;
+        var p = still ? 0 : Math.max(0, Math.min(1, window.scrollY / (window.innerHeight * 0.2))); p = p*p*(3-2*p);
+        all.forEach(function(l){ l.el.style.transform = 'translateY(' + (l.dy*p).toFixed(3) + 'em) rotate(' + (l.rot*p).toFixed(2) + 'deg) scale(' + (1+(l.sc-1)*p).toFixed(3) + ')'; }); };
+      fit(); jum(); window.addEventListener('resize', fit);
+      window.addEventListener('scroll', function(){ if (!jraf) jraf = requestAnimationFrame(jum); }, {passive:true});
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
     }
     var s = document.createElement('div'); s.className = 'm-hero-sub'; s.textContent = 'Vision, elevated · Video + VFX · Dallas'; c.appendChild(s);
