@@ -17,15 +17,23 @@
   var c = document.querySelector('.reel-center');
   if (c) {
     // stacked wordmark: both lines justified to one width, tight leading (same lockup as the About collage)
-    var sl = c.querySelector('.reel-slogan'), lines = ['BERDE','VIS','ION'], els = [];
+    var sl = c.querySelector('.reel-slogan');
     if (sl) {
-      sl.textContent = ''; sl.classList.add('m-lock'); sl.setAttribute('aria-label','BerdeVision');
-      lines.forEach(function(t){ var d = document.createElement('span'); d.textContent = t; sl.appendChild(d); els.push(d); });
+      // mixed-size, tilted letters packed into two justified lines (the jumbled lockup)
+      var HL = ['BERDE','VISION'], JIT = [1,.78,1.08,.86,1.14,.8,1.04,.9,1.1,.84,1], TILT = [-3,2,-1.5,3,-2.5,1.5,-2,2.5,-1,3,-2];
+      sl.textContent = ''; sl.classList.add('m-jumble'); sl.setAttribute('aria-label','BerdeVision');
+      var rows = [], kk = 0;
+      HL.forEach(function(t){ var r = document.createElement('div'); r.className = 'm-jrow'; sl.appendChild(r);
+        var ls = t.split('').map(function(ch, i){ var d = document.createElement('span'); d.textContent = ch; var q = kk++;
+          d.style.transform = 'rotate(' + TILT[q % TILT.length] + 'deg)'; d.style.alignSelf = i % 2 ? 'flex-start' : 'flex-end'; r.appendChild(d);
+          return {el:d, ch:ch, sc:JIT[q % JIT.length]}; });
+        rows.push(ls); });
       var mc = document.createElement('canvas').getContext('2d');
       var fit = function(){
-        var W = Math.min(window.innerWidth*(window.innerWidth<=768?0.58:0.74), window.innerHeight*0.5, 600);
+        var W = Math.min(window.innerWidth*(window.innerWidth<=768?0.8:0.62), window.innerHeight*1.0, 980);
         mc.font = "800 100px Manrope, 'DM Sans', sans-serif";
-        els.forEach(function(d, i){ d.style.fontSize = (W / mc.measureText(lines[i]).width * 100).toFixed(1) + 'px'; });
+        rows.forEach(function(ls){ var w = 0; ls.forEach(function(l){ w += mc.measureText(l.ch).width * l.sc; });
+          var F = W / w * 100; ls.forEach(function(l){ l.el.style.fontSize = (F * l.sc).toFixed(1) + 'px'; }); });
       };
       fit(); window.addEventListener('resize', fit);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
