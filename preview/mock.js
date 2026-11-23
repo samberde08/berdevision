@@ -15,7 +15,23 @@
   });
   // ---- hero ----
   var c = document.querySelector('.reel-center');
-  if (c) { var s = document.createElement('div'); s.className = 'm-hero-sub'; s.textContent = 'Video + VFX Studio · Dallas'; c.appendChild(s); }
+  if (c) {
+    // stacked wordmark: both lines justified to one width, tight leading (same lockup as the About collage)
+    var sl = c.querySelector('.reel-slogan'), lines = ['BERDE','VISION'], els = [];
+    if (sl) {
+      sl.textContent = ''; sl.classList.add('m-lock'); sl.setAttribute('aria-label','BerdeVision');
+      lines.forEach(function(t){ var d = document.createElement('span'); d.textContent = t; sl.appendChild(d); els.push(d); });
+      var mc = document.createElement('canvas').getContext('2d');
+      var fit = function(){
+        var W = Math.min(window.innerWidth*0.74, window.innerHeight*1.15, 1180);
+        mc.font = "800 100px Manrope, 'DM Sans', sans-serif";
+        els.forEach(function(d, i){ d.style.fontSize = (W / mc.measureText(lines[i]).width * 100).toFixed(1) + 'px'; });
+      };
+      fit(); window.addEventListener('resize', fit);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    }
+    var s = document.createElement('div'); s.className = 'm-hero-sub'; s.textContent = 'Vision, elevated · Video + VFX · Dallas'; c.appendChild(s);
+  }
   // ---- player credits ----
   var credits = {
     '1249151789': [['Role','Shot + Edited'],['Artist','Ye'],['Venue','AT&T Stadium, Dallas']],
