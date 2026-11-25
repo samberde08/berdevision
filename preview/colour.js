@@ -3,10 +3,21 @@
 (function(){
   var root = document.documentElement, v = document.getElementById('reelVideo');
   var amb = document.createElement('div'); amb.className = 'm-amb'; amb.setAttribute('aria-hidden', 'true');
+  // the glow is four soft pools of colour that drift slowly, so the page is never still
+  amb.innerHTML = '<div class="m-blob m-blob-a"></div><div class="m-blob m-blob-b"></div><div class="m-blob m-blob-c"></div><div class="m-blob m-blob-d"></div>';
   document.body.insertBefore(amb, document.body.firstChild);
   var cv = document.createElement('canvas'); cv.width = 16; cv.height = 12;
   var cx = cv.getContext('2d', { willReadFrequently: true });
   var NEUTRAL = [118, 116, 124], STICK_K = 2.3;
+  var HOLD = 8, DRIFT = 1.5, stickAt = 0;          // an opened project's colour holds for 8 s, then its hue wanders 1.5 degrees a second
+  // turn a colour's hue by some degrees, keeping how light and how strong it is
+  function rot(c, deg){
+    var r = c[0] / 255, g = c[1] / 255, b = c[2] / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn, h = 0, sat = 0;
+    if (d > 1e-4) { sat = d / (1 - Math.abs(2 * l - 1)); h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
+    h = ((h + deg) % 360 + 360) % 360;
+    var C = (1 - Math.abs(2 * l - 1)) * sat, X = C * (1 - Math.abs((h / 60) % 2 - 1)), m = l - C / 2, q = h < 60 ? [C, X, 0] : h < 120 ? [X, C, 0] : h < 180 ? [0, C, X] : h < 240 ? [0, X, C] : h < 300 ? [X, 0, C] : [C, 0, X];
+    return [(q[0] + m) * 255, (q[1] + m) * 255, (q[2] + m) * 255];
+  }
   var reel = NEUTRAL.slice(), reelK = 0.55, hover = null, stick = null, cur = NEUTRAL.slice(), curK = 0.55, last = '', ok = true;
 
   // push the saturation, then bring every colour to the same brightness so the glow never goes muddy
@@ -38,11 +49,14 @@
   function tick(now){
     var dt = Math.min(500, prev ? now - prev : 16); prev = now;
     // a hovered project previews its colour; otherwise the last opened project holds the page; before that, the reel
-    var t = hover || stick || reel, k = hover ? (stick ? STICK_K : 1.55) : stick ? STICK_K : reelK;
+    var base = stick;
+    if (stick && !hover) { var age = (now - stickAt) / 1000; if (age > HOLD) base = rot(stick, (age - HOLD) * DRIFT); }
+    var t = hover || base || reel, k = hover ? (stick ? STICK_K : 1.55) : stick ? STICK_K : reelK;
     var e = 1 - Math.exp(-dt / (hover ? 220 : 320));           // timed, so it eases the same at any frame rate
     cur[0] += (t[0] - cur[0]) * e; cur[1] += (t[1] - cur[1]) * e; cur[2] += (t[2] - cur[2]) * e; curK += (k - curK) * e;
     var s = rgbOf(cur) + '|' + curK.toFixed(2);
-    if (s !== last) { last = s; root.style.setProperty('--amb', s.split('|')[0]); root.style.setProperty('--amb-k', curK.toFixed(2)); }
+    if (s !== last) { last = s; root.style.setProperty('--amb', s.split('|')[0]); root.style.setProperty('--amb-k', curK.toFixed(2));
+      root.style.setProperty('--amb2', rgbOf(rot(cur, 34))); root.style.setProperty('--amb3', rgbOf(rot(cur, -30))); }   // neighbouring hues for the other pools
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
@@ -83,7 +97,7 @@
   var SLOW = +((/[?&]slow=([\d.]+)/.exec(location.search) || [])[1]) || 1;   // ?slow=8 plays the opening in slow motion, for checking
   var lb = document.getElementById('lightbox'), lbFrame = document.getElementById('lightboxIframe'), fxRun = 0, mover = null, release = null;
   function px(n){ return n.toFixed(1) + 'px'; }
-  function hold(c){ stick = c; root.classList.add('m-amb-stick'); }
+  function hold(c){ stick = c; stickAt = performance.now(); root.classList.add('m-amb-stick'); }
   function clearFx(){ fxRun++; release = null; mover = null;
     document.querySelectorAll('.m-grow').forEach(function(e){ e.remove(); });
     if (lb && lb.classList.contains('m-mat')) lb.classList.remove('m-mat'); }
