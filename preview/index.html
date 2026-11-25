@@ -1596,7 +1596,7 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
     Set VIMEO_REEL_ID to your ID and uncomment the iframe block
   -->
   <video class="reel-video" id="reelVideo" muted autoplay loop playsinline webkit-playsinline preload="auto" disableremoteplayback></video>
-  <script>(function(){var v=document.getElementById("reelVideo");v.muted=true;v.defaultMuted=true;v.src=(window.innerWidth<=768?"hero/reel_roto_720.mp4":"hero/reel_roto_1080.mp4")+"?v=5";var p=v.play();if(p&&p.catch)p.catch(function(){});})();</script>
+  <script>(function(){var v=document.getElementById("reelVideo");v.muted=true;v.defaultMuted=true;v.src="hero/reel_roto_lit_"+(window.innerWidth<=768?"720":"1080")+".mp4?v=6";var p=v.play();if(p&&p.catch)p.catch(function(){});})();</script>
   <div class="reel-center">
     <div class="reel-slogan">Vision, elevated.</div>
   </div>
