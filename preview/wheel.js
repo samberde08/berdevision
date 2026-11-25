@@ -31,29 +31,35 @@
   function togState(){ Array.prototype.forEach.call(tog.querySelectorAll('button'), function(b){ b.classList.toggle('m-on', b.dataset.v === mode); b.setAttribute('aria-pressed', b.dataset.v === mode ? 'true' : 'false'); }); }
   var counter = document.getElementById('workNavCounter'), prevB = document.getElementById('workPrev'), nextB = document.getElementById('workNext');
 
-  var STEP = 24 * Math.PI / 180, W = 0, H = 0, R = 0, CY = 0, pos = 0, target = 0, front = -1, raf = 0, lastT = 0, mode = 'wheel', busy = 0;
+  var STEP = 2 * Math.PI / n, TILT = -7, BUMP = .22, W = 0, H = 0, R = 0, CY = 0, pos = 0, target = 0, front = -1, raf = 0, lastT = 0, mode = 'wheel', busy = 0;
   function count(){ if (counter && front >= 0) counter.textContent = (front < 9 ? '0' : '') + (front + 1) + ' / ' + n; }
   function size(){
     var vw = window.innerWidth, small = vw <= 768;
-    W = small ? vw * 0.58 : Math.min(vw * 0.27, 540);                 // small enough to see two films either side of the front one
-    H = W * 9 / 16; R = W * 2.55;                                      // ring wide enough that neighbouring films never cut into each other
-    CY = H / 2 + (small ? 18 : 30);
+    W = small ? vw * 0.40 : Math.min(vw * 0.22, 430);                 // each film's width on the ring; the one at the front is pulled forward and reads larger
+    H = W * 9 / 16; BUMP = small ? .30 : .22;
+    R = W / (2 * Math.tan(STEP / 2)) * 1.03;                           // the radius at which every film has its own place and none cuts into its neighbour
+    CY = W * 0.30 + (small ? 10 : 14);                                 // the ring's centre line: the far side rises above it, the front hangs below
     strip.style.setProperty('--ww', W.toFixed(1) + 'px'); strip.style.setProperty('--wh', H.toFixed(1) + 'px'); strip.style.setProperty('--cy', CY.toFixed(1) + 'px');
-    strip.style.perspective = (W * 4.4).toFixed(0) + 'px'; strip.style.perspectiveOrigin = '50% ' + CY.toFixed(0) + 'px';
-    if (mode === 'wheel') { strip.style.height = (2 * CY).toFixed(0) + 'px'; render(); } else layGrid();
+    strip.style.perspective = R.toFixed(0) + 'px'; strip.style.perspectiveOrigin = '50% ' + CY.toFixed(0) + 'px';
+    if (mode === 'wheel') { strip.style.height = (CY + W * (0.50 + 0.28 * (1 + BUMP)) + (small ? 10 : 16)).toFixed(0) + 'px'; render(); } else layGrid();
   }
   function wrapD(d){ return ((d + n / 2) % n + n) % n - n / 2; }
-  function wheelT(d){ return 'translate(-50%,-50%) translateZ(' + (-R).toFixed(1) + 'px) rotateY(' + (d * STEP * 180 / Math.PI).toFixed(2) + 'deg) translateZ(' + R.toFixed(1) + 'px)'; }
-  function render(showAll){
+  // The whole wheel is drawn: a ring tipped slightly towards you, so the films on the far side are seen small, above and behind, travelling round.
+  function wheelT(d){
+    var a = d * STEP * 180 / Math.PI, far = Math.abs(a) > 90, k = Math.max(0, 1 - Math.abs(d)), sc = 1 + BUMP * k * k;
+    return 'translate(-50%,-50%) translateZ(' + (-R).toFixed(1) + 'px) rotateX(' + TILT + 'deg) rotateY(' + a.toFixed(2) + 'deg) translateZ(' + R.toFixed(1) + 'px)' +
+      (far ? ' rotateY(180deg)' : '') + (sc > 1.001 ? ' scale(' + sc.toFixed(4) + ')' : '');          // films on the far side turn to face you
+  }
+  function render(){
     var f = ((Math.round(pos) % n) + n) % n;
     for (var i = 0; i < n; i++) {
-      var s = slots[i], d = wrapD(i - pos), ad = Math.abs(d);
-      if (ad > 3.6 && !showAll) { if (s.shown) { s.el.style.display = 'none'; s.shown = false; } continue; }
+      var s = slots[i], d = wrapD(i - pos), ad = Math.abs(d), depth = (1 - Math.cos(d * STEP)) / 2;                // 0 at the front, 1 at the very back
       if (!s.shown) { s.el.style.display = ''; s.shown = true; }
-      s.el.style.transform = wheelT(Math.max(-3.7, Math.min(3.7, d)));
-      s.el.style.zIndex = String(100 - Math.round(ad * 20));
-      s.veil.style.opacity = Math.min(.78, Math.max(0, ad - .1) * .34).toFixed(3);            // films further round the wheel sit in shadow
-      s.el.style.opacity = ad > 2.7 ? Math.max(0, (3.6 - ad) / .9).toFixed(3) : '1';
+      s.el.style.transform = wheelT(d);
+      s.el.style.zIndex = String(100 - Math.round(depth * 90));
+      s.veil.style.opacity = (ad < .5 ? ad * .3 : Math.min(.74, .15 + .62 * depth)).toFixed(3);                    // further round = deeper in shadow
+      s.el.style.opacity = '1';
+      s.el.style.pointerEvents = depth > .42 ? 'none' : '';                                                        // only the near side can be clicked or hovered
     }
     if (f !== front) setFront(f);
   }
@@ -115,14 +121,14 @@
       var x = c.x + c.w / 2 - G.SW / 2, y = c.y + c.h / 2 - CY;
       s.el.style.transform = 'translate(-50%,-50%) translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + sc.toFixed(4) + ')';
       s.el.style.setProperty('--inv', (1 / sc).toFixed(4)); s.el.classList.remove('m-big');
-      s.el.style.opacity = '1'; s.veil.style.opacity = '0'; s.el.style.zIndex = '1'; }
+      s.el.style.opacity = '1'; s.veil.style.opacity = '0'; s.el.style.zIndex = '1'; s.el.style.pointerEvents = ''; }
     strip.style.height = G.H.toFixed(0) + 'px';
   }
   function stagger(){ var f = front < 0 ? 0 : front;
     slots.forEach(function(s, i){ s.el.style.transitionDelay = still ? '0ms' : (Math.min(12, Math.abs(wrapD(i - f))) * 28).toFixed(0) + 'ms'; }); }
   function unfurl(){
     if (mode !== 'wheel' || busy) return; busy = 1;
-    pos = target = Math.round(pos); render(true);                       // every film takes its place on the ring first, even those round the back
+    pos = target = Math.round(pos); render();
     if (front >= 0) play(slots[front], false);
     void strip.offsetWidth;
     mode = 'grid'; strip.classList.add('m-anim', 'm-grid'); stagger(); layGrid();
@@ -133,7 +139,7 @@
   function furl(){
     if (mode !== 'grid' || busy) return; busy = 1;
     strip.classList.add('m-anim'); stagger(); mode = 'wheel'; strip.classList.remove('m-grid');
-    strip.style.height = (2 * CY).toFixed(0) + 'px'; render(true);
+    size();
     cap.classList.remove('m-gone'); togState(); document.documentElement.classList.remove('m-allwork-on');
     setTimeout(function(){ strip.classList.remove('m-anim'); slots.forEach(function(s){ s.el.style.transitionDelay = ''; }); busy = 0; render(); if (front >= 0) play(slots[front], true); }, still ? 60 : 1500);
     var top = (hdr || strip).getBoundingClientRect().top + window.scrollY - 90; window.scrollTo({ top: top, behavior: still ? 'auto' : 'smooth' });

@@ -323,3 +323,9 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 /* only one preview film per tile */
 .work-strip .work-item iframe.m-emb ~ iframe.m-emb { display:none; }
 .work-strip.m-grid .work-item iframe.m-emb-w { display:none; }
+
+/* ===== full ring wheel; no white outlines on the films ===== */
+.work-strip.m-wheel .work-item, .m-slot.m-front .work-item, .work-strip.m-grid .work-item { border:0 !important; outline:0 !important; }
+.work-strip.m-wheel .work-item { box-shadow: 0 18px 40px rgba(0,0,0,.5) !important; }
+.m-slot.m-front .work-item { box-shadow: 0 0 90px 4px rgba(var(--tile, var(--amb)), .5), 0 26px 60px rgba(0,0,0,.6) !important; }
+.work-strip.m-grid .work-item, .work-strip.m-grid .m-slot.m-front .work-item { box-shadow:none !important; }
