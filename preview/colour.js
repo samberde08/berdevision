@@ -77,7 +77,8 @@
     // phones, before any project has been opened: the project in the middle of the strip sets the colour while the strip is on screen
     var strip = document.querySelector('.work-strip'), seen = false, raf = 0;
     var pick = function(){ raf = 0;
-      if (stick || !seen || !strip) { hover = null; root.classList.remove('m-amb-proj'); return; }
+      var hero = document.querySelector('.reel-wrap');                       // while the reel is still on screen, the reel sets the colour
+      if (stick || !seen || !strip || (hero && hero.getBoundingClientRect().bottom > window.innerHeight * 0.3)) { hover = null; root.classList.remove('m-amb-proj'); return; }
       var sr = strip.getBoundingClientRect(), mid = sr.left + sr.width / 2, best = null, bd = 1e9;
       strip.querySelectorAll('.work-item').forEach(function(t){ var r = t.getBoundingClientRect(); if (!r.width) return;
         var dd = Math.abs(r.left + r.width / 2 - mid); if (dd < bd) { bd = dd; best = t; } });
@@ -88,6 +89,7 @@
       new IntersectionObserver(function(en){ seen = en[0].isIntersecting && en[0].intersectionRatio > 0.6; ask(); }, { threshold: [0, 0.6, 1] }).observe(strip);
       strip.addEventListener('scroll', ask, { passive: true });
       strip.addEventListener('m-spin', ask);
+      window.addEventListener('scroll', ask, { passive: true });
     }
   }
 
