@@ -1,5 +1,5 @@
 // The page takes its colour from the hero reel, live. Hovering a project previews that project's colour.
-// Opening a project floods the page with its colour from the panel outwards, and the page keeps it until another project is opened.
+// Opening a project grows its panel into the player; the page eases into that project's colour and keeps it until another is opened.
 (function(){
   var root = document.documentElement, v = document.getElementById('reelVideo');
   var amb = document.createElement('div'); amb.className = 'm-amb'; amb.setAttribute('aria-hidden', 'true');
@@ -77,159 +77,71 @@
   }
 
   // ---- opening a project ----
-  // The thumbnail breaks into its own pixels, they swirl up out of the panel and settle into the player.
-  // A wobbling front of light in the project's colour bursts from the panel's edges, throwing sparks, and the page keeps that colour.
+  // No added effects: the panel itself, still playing its loop, grows from where it sits into the player.
+  // It stays on top until the real film is actually playing, then lets go. The page eases into the project's colour and keeps it.
   var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var SLOW = +((/[?&]slow=([\d.]+)/.exec(location.search) || [])[1]) || 1;   // ?slow=8 plays the opening in slow motion, for checking
-  var lb = document.getElementById('lightbox'), fxRun = 0;
+  var lb = document.getElementById('lightbox'), lbFrame = document.getElementById('lightboxIframe'), fxRun = 0, mover = null, release = null;
+  function px(n){ return n.toFixed(1) + 'px'; }
   function hold(c){ stick = c; root.classList.add('m-amb-stick'); }
-  function clearFx(){ fxRun++; document.querySelectorAll('.m-fx, .m-ghost, .m-amb-new').forEach(function(e){ e.remove(); }); if (lb && lb.classList.contains('m-mat')) lb.classList.remove('m-mat'); }
+  function clearFx(){ fxRun++; release = null; mover = null;
+    document.querySelectorAll('.m-grow').forEach(function(e){ e.remove(); });
+    if (lb && lb.classList.contains('m-mat')) lb.classList.remove('m-mat'); }
 
-  function openFx(t, r, c, cxk, cyk){
+  function openFx(t, r, c){
     var fr = lb && lb.querySelector('.lightbox-frame'), img = t.querySelector('img');
     hold(c);
-    if (still || !fr || !img || !document.body.animate) { cur = c.slice(); curK = STICK_K; return; }
+    if (still || !fr || !img || !document.body.animate) return;
     clearFx(); var run = fxRun;
-    lb.classList.add('m-mat');
-    var W = window.innerWidth, H = window.innerHeight, small = W <= 768, f = fr.getBoundingClientRect();
-    var dpr = Math.min(window.devicePixelRatio || 1, small ? 2 : 1.5);
-    var cvs = document.createElement('canvas'); cvs.className = 'm-fx'; cvs.width = Math.round(W * dpr); cvs.height = Math.round(H * dpr);
-    cvs.setAttribute('aria-hidden', 'true'); document.body.appendChild(cvs);
-    var g = cvs.getContext('2d'); g.scale(dpr, dpr);
-    var C0 = Math.round(c[0]), C1 = Math.round(c[1]), C2 = Math.round(c[2]);
-
-    // the new colour comes up behind the page while the front travels across it
-    var under = document.createElement('div'); under.className = 'm-amb m-amb-new'; under.setAttribute('aria-hidden', 'true');
-    under.style.setProperty('--amb', C0 + ',' + C1 + ',' + C2); under.style.setProperty('--amb-k', String(STICK_K));
-    amb.insertAdjacentElement('afterend', under);
-    under.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 1300 * SLOW, delay: 250 * SLOW, easing: 'ease-out', fill: 'both' })
-      .onfinish = function(){ cur = c.slice(); curK = STICK_K; under.remove(); };
-
-    // ---- the thumbnail as particles ----
-    var GW = small ? 54 : 92, GH = small ? 30 : 52, n = GW * GH, pix = null;
-    try {
-      var sc = document.createElement('canvas'); sc.width = GW; sc.height = GH; var sg = sc.getContext('2d');
-      var iw = img.naturalWidth, ih = img.naturalHeight, tw = Math.min(iw, ih * 16 / 9), th = tw * 9 / 16;
-      var op = getComputedStyle(img).objectPosition.split(' '), oy = parseFloat(op[1]); if (isNaN(oy)) oy = 50;
-      sg.drawImage(img, (iw - tw) / 2, (ih - th) * oy / 100, tw, th, 0, 0, GW, GH);
-      pix = sg.getImageData(0, 0, GW, GH).data;
-    } catch (e) { pix = null; }
-    var P = new Float32Array(n * 9), mxc = r.left + r.width / 2, myc = r.top + r.height / 2;
-    var far = Math.hypot(r.width, r.height);
-    for (var i = 0; i < n; i++) {
-      var gx = i % GW, gy = (i / GW) | 0, o = i * 9;
-      var sx = r.left + (gx + .5) / GW * r.width, sy = r.top + (gy + .5) / GH * r.height;
-      P[o] = sx; P[o+1] = sy;
-      P[o+2] = f.left + (gx + .5) / GW * f.width; P[o+3] = f.top + (gy + .5) / GH * f.height;
-      P[o+4] = Math.hypot(sx - cxk, sy - cyk) / far * 380 + Math.random() * 260;        // leaves later the further it is from the click
-      P[o+5] = Math.atan2(sy - myc, sx - mxc) + (Math.random() - .5) * 1.2;             // where on the swirl it starts
-      P[o+6] = (70 + Math.random() * Math.random() * 300) * (small ? .55 : 1);        // how wide it swings
-      P[o+7] = .55 + Math.random() * 1.1;                                               // how many turns
-      P[o+8] = 820 + Math.random() * 420;                                               // flight time
+    lb.classList.add('m-mat');                                       // the player's own frame stays hidden until the panel has arrived
+    var f = fr.getBoundingClientRect();
+    var m = document.createElement('div'); m.className = 'm-grow'; m.setAttribute('aria-hidden', 'true');
+    var pos = getComputedStyle(img).objectPosition;
+    var still2 = document.createElement('img'); still2.alt = ''; still2.src = img.currentSrc || img.src; still2.style.objectPosition = pos; m.appendChild(still2);
+    var loop = t.querySelector('video.m-loop');
+    if (loop && loop.currentSrc) {                                   // carry the loop on, from the frame it was showing
+      var v2 = document.createElement('video'); v2.muted = true; v2.loop = true; v2.playsInline = true; v2.setAttribute('playsinline', ''); v2.preload = 'auto';
+      v2.src = loop.currentSrc; v2.style.objectPosition = pos; v2.style.opacity = 0;
+      var at = loop.currentTime || 0;
+      v2.addEventListener('loadeddata', function(){ try { v2.currentTime = at; } catch (e) {} var p = v2.play(); if (p && p.catch) p.catch(function(){}); v2.style.opacity = 1; });
+      m.appendChild(v2);
     }
-    var cs = r.width / GW, ce = f.width / GW;
-
-    // ---- sparks thrown off the panel's edge ----
-    var NS = small ? 200 : 520, S = new Float32Array(NS * 7);
-    for (var j = 0; j < NS; j++) {
-      var u = Math.random() * 2 * (r.width + r.height), ex, ey, q = j * 7;
-      if (u < r.width) { ex = r.left + u; ey = r.top; } else if (u < r.width + r.height) { ex = r.right; ey = r.top + (u - r.width); }
-      else if (u < 2 * r.width + r.height) { ex = r.right - (u - r.width - r.height); ey = r.bottom; } else { ex = r.left; ey = r.bottom - (u - 2 * r.width - r.height); }
-      var an = Math.atan2(ey - myc, ex - mxc) + (Math.random() - .5) * .9, sp = 180 + Math.random() * Math.random() * 1500;
-      S[q] = ex; S[q+1] = ey; S[q+2] = Math.cos(an) * sp; S[q+3] = Math.sin(an) * sp;
-      S[q+4] = .7 + Math.random() * 1.9; S[q+5] = Math.random() * 6.28; S[q+6] = Math.random() < .35 ? 1 : 0;      // life, twinkle phase, white-hot
-    }
-    // the front grows from the panel's own rectangle until it clears every corner of the screen
-    var SC = Math.max(Math.max(mxc, W - mxc) / (r.width / 2), Math.max(myc, H - myc) / (r.height / 2)) * 1.25;
-    var CHARGE = 170, LAND = 1500, END = 2500, ghost = null, t0 = performance.now(), lastEl = 0;
-    function front(el, lag, wide, alpha){
-      var tt = (el - CHARGE - lag) / 1500; if (tt <= 0 || tt >= 1) return;
-      var e = 1 - Math.pow(1 - tt, 2.6), s = 1 + (SC - 1) * e, nn = 9 - 6 * Math.min(1, e * 1.6), fade = Math.pow(1 - tt, 1.4) * alpha, T = el / 1000;
-      g.beginPath();
-      for (var k = 0; k <= 180; k++) { var a = k / 180 * 6.2832, ca = Math.cos(a), sa = Math.sin(a);
-        var wob = 1 + (.05 * Math.sin(a * 3 + T * 3 + lag) + .035 * Math.sin(a * 5 - T * 4) + .02 * Math.sin(a * 8 + T * 6)) * Math.min(1, e * 2.5);
-        var rr = s * wob / Math.pow(Math.pow(Math.abs(ca), nn) + Math.pow(Math.abs(sa), nn), 1 / nn);
-        var x = mxc + r.width / 2 * rr * ca, y = myc + r.height / 2 * rr * sa;
-        if (k) g.lineTo(x, y); else g.moveTo(x, y); }
-      g.closePath();
-      g.fillStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.14 * fade).toFixed(3) + ')'; g.fill();     // the body of colour behind the front
-      g.lineJoin = 'round';
-      var grow = 1 + e * 2.2;                                                                                // the front thickens as it runs
-      g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.10 * fade).toFixed(3) + ')'; g.lineWidth = wide * 14 * grow; g.stroke();
-      g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.20 * fade).toFixed(3) + ')'; g.lineWidth = wide * 6 * grow; g.stroke();
-      g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.55 * fade).toFixed(3) + ')'; g.lineWidth = wide * 2 * grow; g.stroke();
-      g.strokeStyle = 'rgba(255,255,255,' + (.95 * fade).toFixed(3) + ')'; g.lineWidth = Math.max(1.5, wide * .3 * grow); g.stroke();
-    }
-    function frame(now){
+    document.body.appendChild(m); mover = m;
+    var landed = false, playing = false;
+    var go = function(){ if (run !== fxRun || !landed || !playing || !m.isConnected) return;
+      m.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450 * SLOW, easing: 'ease', fill: 'forwards' }).onfinish = function(){ m.remove(); }; };
+    release = function(){ playing = true; go(); };
+    m.animate([
+      { top: px(r.top), left: px(r.left), width: px(r.width), height: px(r.height), borderRadius: '2px' },
+      { top: px(f.top), left: px(f.left), width: px(f.width), height: px(f.height), borderRadius: '4px' }
+    ], { duration: 720 * SLOW, easing: 'cubic-bezier(.22,.8,.2,1)', fill: 'forwards' }).onfinish = function(){
       if (run !== fxRun) return;
-      var el = (now - t0) / SLOW, dt = Math.min(.05, (el - lastEl) / 1000); lastEl = el;
-      g.clearRect(0, 0, W, H);
-      g.globalCompositeOperation = 'lighter';
-      // charge: the panel's edge tightens and brightens, then lets go
-      if (el < CHARGE + 260) { var ch = Math.min(1, el / CHARGE), rel = Math.max(0, (el - CHARGE) / 260), k2 = 1 - .05 * ch * (1 - rel), a2 = ch * (1 - rel);
-        var w2 = r.width * k2, h2 = r.height * k2;
-        g.strokeStyle = 'rgba(255,255,255,' + (.95 * a2).toFixed(3) + ')'; g.lineWidth = 2; g.strokeRect(mxc - w2 / 2, myc - h2 / 2, w2, h2);
-        g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.5 * a2).toFixed(3) + ')'; g.lineWidth = 12; g.strokeRect(mxc - w2 / 2, myc - h2 / 2, w2, h2);
-        var rg = g.createRadialGradient(mxc, myc, 0, mxc, myc, r.width * (.7 + rel * 1.6));
-        rg.addColorStop(0, 'rgba(255,255,255,' + (.55 * a2 + .5 * rel * (1 - rel)).toFixed(3) + ')'); rg.addColorStop(.4, 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.35 * (a2 + rel * (1 - rel))).toFixed(3) + ')'); rg.addColorStop(1, 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',0)');
-        g.fillStyle = rg; g.fillRect(0, 0, W, H); }
-      front(el, 0, 9, 1); front(el, 190, 6, .6); front(el, 430, 4, .35);
-      // sparks
-      if (el > CHARGE) { var se = (el - CHARGE) / 1000, drag = Math.exp(-1.9 * dt);
-        for (var j = 0; j < NS; j++) { var q = j * 7, life = S[q+4]; if (se > life) continue;
-          var px0 = S[q], py0 = S[q+1], sw = Math.sin(se * 5 + S[q+5]) * 60;
-          S[q+2] = (S[q+2] - S[q+3] * .9 * dt) * drag; S[q+3] = (S[q+3] + S[q+2] * .9 * dt) * drag - 14 * dt;      // slight curl, slight lift
-          S[q] += (S[q+2] + sw * dt * 8) * dt; S[q+1] += S[q+3] * dt;
-          var al = Math.pow(1 - se / life, 1.5) * (.55 + .45 * Math.sin(se * 22 + S[q+5]));
-          g.strokeStyle = S[q+6] ? 'rgba(255,255,255,' + al.toFixed(3) + ')' : 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + al.toFixed(3) + ')';
-          g.lineWidth = S[q+6] ? 2 : 3; g.beginPath(); g.moveTo(px0, py0); g.lineTo(S[q], S[q+1]); g.stroke();
-          g.fillStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (al * .25).toFixed(3) + ')'; g.fillRect(S[q] - 4, S[q+1] - 4, 8, 8);
-          if (S[q+6]) { g.fillStyle = 'rgba(255,255,255,' + al.toFixed(3) + ')'; g.fillRect(S[q] - 1.5, S[q+1] - 1.5, 3, 3); } } }
-      // the unlock: as the pixels land, the player's frame flares and lets go a second ring of light
-      var ul = (el - (LAND - 260)) / 700; if (ul > 0 && ul < 1) { var ub = Math.sin(Math.PI * Math.pow(ul, .6)), gx2 = 10 + ul * 46;
-        g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.30 * ub).toFixed(3) + ')'; g.lineWidth = 26 + ul * 40; g.strokeRect(f.left - gx2, f.top - gx2, f.width + 2 * gx2, f.height + 2 * gx2);
-        g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.6 * ub).toFixed(3) + ')'; g.lineWidth = 8; g.strokeRect(f.left - gx2, f.top - gx2, f.width + 2 * gx2, f.height + 2 * gx2);
-        g.strokeStyle = 'rgba(255,255,255,' + ub.toFixed(3) + ')'; g.lineWidth = 2; g.strokeRect(f.left - gx2, f.top - gx2, f.width + 2 * gx2, f.height + 2 * gx2);
-        var ug = g.createRadialGradient(f.left + f.width / 2, f.top + f.height / 2, 0, f.left + f.width / 2, f.top + f.height / 2, f.width * .75);
-        ug.addColorStop(0, 'rgba(255,255,255,' + (.30 * ub).toFixed(3) + ')'); ug.addColorStop(.5, 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.22 * ub).toFixed(3) + ')'); ug.addColorStop(1, 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',0)');
-        g.fillStyle = ug; g.fillRect(0, 0, W, H); }
-      // the thumbnail's pixels
-      g.globalCompositeOperation = 'source-over';
-      var out = el > LAND ? Math.max(0, 1 - (el - LAND) / 320) : 1;
-      if (out > 0) for (var i = 0; i < n; i++) { var o = i * 9, tt = (el - CHARGE - P[o+4]) / P[o+8];
-        if (tt <= 0) continue; if (tt > 1) tt = 1;
-        var e2 = tt < .5 ? 4 * tt * tt * tt : 1 - Math.pow(-2 * tt + 2, 3) / 2, arc = Math.sin(Math.PI * tt);
-        var th2 = P[o+5] + (1 - e2) * P[o+7] * 6.2832, rad = P[o+6] * arc;
-        var x = P[o] + (P[o+2] - P[o]) * e2 + Math.cos(th2) * rad, y = P[o+1] + (P[o+3] - P[o+1]) * e2 + Math.sin(th2) * rad * .8 - arc * 46;
-        var sz = (cs + (ce - cs) * e2) * (1 - .45 * arc) + .6, wv = arc * .7;
-        var pr = pix ? pix[i*4] : C0, pg = pix ? pix[i*4+1] : C1, pb = pix ? pix[i*4+2] : C2;
-        g.fillStyle = 'rgba(' + ((pr + (255 - pr) * wv) | 0) + ',' + ((pg + (255 - pg) * wv) | 0) + ',' + ((pb + (255 - pb) * wv) | 0) + ',' + (out * Math.min(1, tt * 6)).toFixed(3) + ')';
-        g.fillRect(x - sz / 2, y - sz / 2, sz, sz); }
-      // the settled pixels sharpen into the real frame, then the player comes up under it
-      if (!ghost && el > LAND - 420) { ghost = document.createElement('img'); ghost.className = 'm-ghost'; ghost.alt = ''; ghost.src = img.currentSrc || img.src;
-        ghost.style.cssText = 'top:' + f.top + 'px;left:' + f.left + 'px;width:' + f.width + 'px;height:' + f.height + 'px;object-position:' + getComputedStyle(img).objectPosition;
-        document.body.appendChild(ghost);
-        var gh = ghost; gh.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420 * SLOW, easing: 'ease-out', fill: 'forwards' }).onfinish = function(){
-          if (run === fxRun) lb.classList.remove('m-mat');
-          gh.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 600 * SLOW, delay: 350 * SLOW, easing: 'ease', fill: 'forwards' }).onfinish = function(){ gh.remove(); }; }; }
-      if (el < END + 900) requestAnimationFrame(frame); else cvs.remove();
-    }
-    requestAnimationFrame(frame);
+      lb.classList.remove('m-mat'); landed = true; go();             // title, credits and close button come up around it
+    };
+    setTimeout(function(){ if (run === fxRun) { playing = true; go(); } }, 5000 * SLOW);       // never wait on the player for ever
   }
+  // the player tells us when the film is really playing
+  function listen(){ try { lbFrame.contentWindow.postMessage(JSON.stringify({ method: 'addEventListener', value: 'playProgress' }), 'https://player.vimeo.com'); } catch (e) {} }
+  if (lbFrame) lbFrame.addEventListener('load', listen);
+  window.addEventListener('message', function(e){
+    if (!lbFrame || e.source !== lbFrame.contentWindow || !/player\.vimeo\.com$/.test(e.origin || '')) return;
+    var d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (x) { return; }
+    if (!d) return;
+    if (d.event === 'ready') listen();
+    if ((d.event === 'playProgress' || d.event === 'timeupdate') && d.data && d.data.seconds > 0.12 && release) { var rl = release; release = null; rl(); }
+  });
   tiles.forEach(function(t){
-    t.addEventListener('click', function(ev){
-      var kx = ev.clientX, ky = ev.clientY;
+    t.addEventListener('click', function(){
       // only when the player really opens (a drag on the strip cancels the click)
       setTimeout(function(){ if (!lb || !lb.classList.contains('open')) return;
-        var r = t.getBoundingClientRect(), c = tileColour(t) || reel.slice();
-        openFx(t, r, c, kx || r.left + r.width / 2, ky || r.top + r.height / 2); }, 0);
+        openFx(t, t.getBoundingClientRect(), tileColour(t) || reel.slice()); }, 0);
     });
   });
   // tidy up once, at the moment the player closes (never on our own class changes, which would loop)
   var wasOpen = false;
   if (lb) new MutationObserver(function(){
     var isOpen = lb.classList.contains('open');
-    if (wasOpen && !isOpen) { clearFx(); if (stick) { cur = stick.slice(); curK = STICK_K; } }
+    if (wasOpen && !isOpen) clearFx();
     wasOpen = isOpen;
   }).observe(lb, { attributes: true, attributeFilter: ['class'] });
   window.__amb = function(){ return { reel: reel, reelK: reelK, hover: hover, stick: stick, cur: cur, curK: curK, ok: ok }; };
