@@ -15,7 +15,7 @@
   // 2. big titles assemble: each letter drops into place, one after another, when its line arrives
   var titles = Array.prototype.slice.call(document.querySelectorAll('.contact-big, .m-statement span, .m-f-mark span'));
   titles.forEach(function(el){
-    if (el.children.length || el.dataset.mAsm) return; var txt = el.textContent; if (!txt || txt.length > 40) return;
+    if (el.children.length || el.dataset.mAsm) return; var txt = (el.textContent || '').replace(/\s+/g, ' ').trim(); if (!txt || txt.length > 40) return;
     el.dataset.mAsm = '1'; el.setAttribute('aria-label', txt); el.textContent = '';
     txt.split('').forEach(function(ch, i){ var sp = document.createElement('span'); sp.className = 'm-asm'; sp.setAttribute('aria-hidden', 'true');
       sp.textContent = ch === ' ' ? '\u00a0' : ch; sp.style.transitionDelay = (i * 38) + 'ms'; el.appendChild(sp); });
