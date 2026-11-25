@@ -128,7 +128,7 @@
     var cs = r.width / GW, ce = f.width / GW;
 
     // ---- sparks thrown off the panel's edge ----
-    var NS = small ? 170 : 420, S = new Float32Array(NS * 7);
+    var NS = small ? 200 : 520, S = new Float32Array(NS * 7);
     for (var j = 0; j < NS; j++) {
       var u = Math.random() * 2 * (r.width + r.height), ex, ey, q = j * 7;
       if (u < r.width) { ex = r.left + u; ey = r.top; } else if (u < r.width + r.height) { ex = r.right; ey = r.top + (u - r.width); }
@@ -142,18 +142,21 @@
     var CHARGE = 170, LAND = 1500, END = 2500, ghost = null, t0 = performance.now(), lastEl = 0;
     function front(el, lag, wide, alpha){
       var tt = (el - CHARGE - lag) / 1500; if (tt <= 0 || tt >= 1) return;
-      var e = 1 - Math.pow(1 - tt, 2.6), s = 1 + (SC - 1) * e, pw = .16 + .5 * e, fade = Math.pow(1 - tt, 1.4) * alpha, T = el / 1000;
+      var e = 1 - Math.pow(1 - tt, 2.6), s = 1 + (SC - 1) * e, nn = 9 - 6 * Math.min(1, e * 1.6), fade = Math.pow(1 - tt, 1.4) * alpha, T = el / 1000;
       g.beginPath();
-      for (var k = 0; k <= 120; k++) { var a = k / 120 * 6.2832, ca = Math.cos(a), sa = Math.sin(a);
-        var wob = 1 + (.035 * Math.sin(a * 5 + T * 4 + lag) + .028 * Math.sin(a * 9 - T * 3) + .02 * Math.sin(a * 14 + T * 6)) * Math.min(1, e * 3);
-        var x = mxc + r.width / 2 * s * wob * (ca < 0 ? -1 : 1) * Math.pow(Math.abs(ca), pw), y = myc + r.height / 2 * s * wob * (sa < 0 ? -1 : 1) * Math.pow(Math.abs(sa), pw);
+      for (var k = 0; k <= 180; k++) { var a = k / 180 * 6.2832, ca = Math.cos(a), sa = Math.sin(a);
+        var wob = 1 + (.05 * Math.sin(a * 3 + T * 3 + lag) + .035 * Math.sin(a * 5 - T * 4) + .02 * Math.sin(a * 8 + T * 6)) * Math.min(1, e * 2.5);
+        var rr = s * wob / Math.pow(Math.pow(Math.abs(ca), nn) + Math.pow(Math.abs(sa), nn), 1 / nn);
+        var x = mxc + r.width / 2 * rr * ca, y = myc + r.height / 2 * rr * sa;
         if (k) g.lineTo(x, y); else g.moveTo(x, y); }
       g.closePath();
-      g.fillStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.10 * fade).toFixed(3) + ')'; g.fill();     // the body of colour behind the front
+      g.fillStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.14 * fade).toFixed(3) + ')'; g.fill();     // the body of colour behind the front
       g.lineJoin = 'round';
-      g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.16 * fade).toFixed(3) + ')'; g.lineWidth = wide * 4.5; g.stroke();
-      g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.42 * fade).toFixed(3) + ')'; g.lineWidth = wide * 1.5; g.stroke();
-      g.strokeStyle = 'rgba(255,255,255,' + (.9 * fade).toFixed(3) + ')'; g.lineWidth = Math.max(1, wide * .14); g.stroke();
+      var grow = 1 + e * 2.2;                                                                                // the front thickens as it runs
+      g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.10 * fade).toFixed(3) + ')'; g.lineWidth = wide * 14 * grow; g.stroke();
+      g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.20 * fade).toFixed(3) + ')'; g.lineWidth = wide * 6 * grow; g.stroke();
+      g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.55 * fade).toFixed(3) + ')'; g.lineWidth = wide * 2 * grow; g.stroke();
+      g.strokeStyle = 'rgba(255,255,255,' + (.95 * fade).toFixed(3) + ')'; g.lineWidth = Math.max(1.5, wide * .3 * grow); g.stroke();
     }
     function frame(now){
       if (run !== fxRun) return;
@@ -177,8 +180,17 @@
           S[q] += (S[q+2] + sw * dt * 8) * dt; S[q+1] += S[q+3] * dt;
           var al = Math.pow(1 - se / life, 1.5) * (.55 + .45 * Math.sin(se * 22 + S[q+5]));
           g.strokeStyle = S[q+6] ? 'rgba(255,255,255,' + al.toFixed(3) + ')' : 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + al.toFixed(3) + ')';
-          g.lineWidth = S[q+6] ? 1.4 : 2.2; g.beginPath(); g.moveTo(px0, py0); g.lineTo(S[q], S[q+1]); g.stroke();
-          if (S[q+6]) { g.fillStyle = 'rgba(255,255,255,' + (al * .9).toFixed(3) + ')'; g.fillRect(S[q] - 1, S[q+1] - 1, 2, 2); } } }
+          g.lineWidth = S[q+6] ? 2 : 3; g.beginPath(); g.moveTo(px0, py0); g.lineTo(S[q], S[q+1]); g.stroke();
+          g.fillStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (al * .25).toFixed(3) + ')'; g.fillRect(S[q] - 4, S[q+1] - 4, 8, 8);
+          if (S[q+6]) { g.fillStyle = 'rgba(255,255,255,' + al.toFixed(3) + ')'; g.fillRect(S[q] - 1.5, S[q+1] - 1.5, 3, 3); } } }
+      // the unlock: as the pixels land, the player's frame flares and lets go a second ring of light
+      var ul = (el - (LAND - 260)) / 700; if (ul > 0 && ul < 1) { var ub = Math.sin(Math.PI * Math.pow(ul, .6)), gx2 = 10 + ul * 46;
+        g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.30 * ub).toFixed(3) + ')'; g.lineWidth = 26 + ul * 40; g.strokeRect(f.left - gx2, f.top - gx2, f.width + 2 * gx2, f.height + 2 * gx2);
+        g.strokeStyle = 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.6 * ub).toFixed(3) + ')'; g.lineWidth = 8; g.strokeRect(f.left - gx2, f.top - gx2, f.width + 2 * gx2, f.height + 2 * gx2);
+        g.strokeStyle = 'rgba(255,255,255,' + ub.toFixed(3) + ')'; g.lineWidth = 2; g.strokeRect(f.left - gx2, f.top - gx2, f.width + 2 * gx2, f.height + 2 * gx2);
+        var ug = g.createRadialGradient(f.left + f.width / 2, f.top + f.height / 2, 0, f.left + f.width / 2, f.top + f.height / 2, f.width * .75);
+        ug.addColorStop(0, 'rgba(255,255,255,' + (.30 * ub).toFixed(3) + ')'); ug.addColorStop(.5, 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',' + (.22 * ub).toFixed(3) + ')'); ug.addColorStop(1, 'rgba(' + C0 + ',' + C1 + ',' + C2 + ',0)');
+        g.fillStyle = ug; g.fillRect(0, 0, W, H); }
       // the thumbnail's pixels
       g.globalCompositeOperation = 'source-over';
       var out = el > LAND ? Math.max(0, 1 - (el - LAND) / 320) : 1;
@@ -187,7 +199,7 @@
         var e2 = tt < .5 ? 4 * tt * tt * tt : 1 - Math.pow(-2 * tt + 2, 3) / 2, arc = Math.sin(Math.PI * tt);
         var th2 = P[o+5] + (1 - e2) * P[o+7] * 6.2832, rad = P[o+6] * arc;
         var x = P[o] + (P[o+2] - P[o]) * e2 + Math.cos(th2) * rad, y = P[o+1] + (P[o+3] - P[o+1]) * e2 + Math.sin(th2) * rad * .8 - arc * 46;
-        var sz = (cs + (ce - cs) * e2) * (1 - .62 * arc) + .6, wv = arc * .55;
+        var sz = (cs + (ce - cs) * e2) * (1 - .45 * arc) + .6, wv = arc * .7;
         var pr = pix ? pix[i*4] : C0, pg = pix ? pix[i*4+1] : C1, pb = pix ? pix[i*4+2] : C2;
         g.fillStyle = 'rgba(' + ((pr + (255 - pr) * wv) | 0) + ',' + ((pg + (255 - pg) * wv) | 0) + ',' + ((pb + (255 - pb) * wv) | 0) + ',' + (out * Math.min(1, tt * 6)).toFixed(3) + ')';
         g.fillRect(x - sz / 2, y - sz / 2, sz, sz); }

@@ -96,6 +96,7 @@
   }
   function ease(t){ t=Math.max(0,Math.min(1,t)); return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
   function update(){
+    if (typeof earthEl === 'undefined' || !earthEl) return;        // collage not built yet (home page)
     var prog, E=C.earth;
     if (forceP!==undefined) prog=parseFloat(forceP); else if (reduce || !pin) prog=1; else {
       prog = Math.max(0, Math.min(pin, anchor - wrap.getBoundingClientRect().top))/pin;
