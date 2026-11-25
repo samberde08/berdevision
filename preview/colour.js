@@ -42,7 +42,7 @@
       reelK = Math.max(0.45, Math.min(1, lumAll / 70));      // dark shots glow less, never off
     } catch (e) { ok = false; }                                // canvas blocked: stay neutral
   }
-  setInterval(sample, 150);
+  setInterval(sample, 70);
 
   function rgbOf(c){ return Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]); }
   var prev = 0;
@@ -52,7 +52,7 @@
     var base = stick;
     if (stick && !hover) { var age = (now - stickAt) / 1000; if (age > HOLD) base = rot(stick, (age - HOLD) * DRIFT); }
     var t = hover || base || reel, k = hover ? (stick ? STICK_K : 1.55) : stick ? STICK_K : reelK;
-    var e = 1 - Math.exp(-dt / (hover ? 220 : 320));           // timed, so it eases the same at any frame rate
+    var e = 1 - Math.exp(-dt / (hover ? 170 : stick ? 260 : 110));     // following the reel: quick enough to land with the cut, still eased           // timed, so it eases the same at any frame rate
     cur[0] += (t[0] - cur[0]) * e; cur[1] += (t[1] - cur[1]) * e; cur[2] += (t[2] - cur[2]) * e; curK += (k - curK) * e;
     var s = rgbOf(cur) + '|' + curK.toFixed(2);
     if (s !== last) { last = s; root.style.setProperty('--amb', s.split('|')[0]); root.style.setProperty('--amb-k', curK.toFixed(2));
