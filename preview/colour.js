@@ -32,8 +32,10 @@
   }
   setInterval(sample, 150);
 
-  function tick(){
-    var t = hover || reel, k = hover ? 1.55 : reelK, e = hover ? 0.10 : 0.07;
+  var prev = 0;
+  function tick(now){
+    var dt = Math.min(500, prev ? now - prev : 16); prev = now;
+    var t = hover || reel, k = hover ? 1.55 : reelK, e = 1 - Math.exp(-dt / (hover ? 220 : 320));   // timed, so it eases the same at any frame rate
     cur[0] += (t[0] - cur[0]) * e; cur[1] += (t[1] - cur[1]) * e; cur[2] += (t[2] - cur[2]) * e; curK += (k - curK) * e;
     var s = Math.round(cur[0]) + ',' + Math.round(cur[1]) + ',' + Math.round(cur[2]) + '|' + curK.toFixed(2);
     if (s !== last) { last = s; root.style.setProperty('--amb', s.split('|')[0]); root.style.setProperty('--amb-k', curK.toFixed(2)); }
