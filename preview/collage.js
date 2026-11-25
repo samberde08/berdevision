@@ -18,6 +18,8 @@
   var col = document.createElement('div'); col.className='bvc'; stage.appendChild(col);
   var hint = document.createElement('div'); hint.className='bvc-hint'; hint.textContent='Scroll'; stage.appendChild(hint);
   ab.insertBefore(wrap, ab.firstChild);
+  if ('IntersectionObserver' in window && !reduce) new IntersectionObserver(function(en, io){ if (en[0].isIntersecting) { stage.classList.add('m-in'); io.disconnect(); } }, { threshold: 0.12 }).observe(wrap);
+  else stage.classList.add('m-in');
   for (var a = wrap.parentElement; a && a !== document.body; a = a.parentElement) {
     var o = getComputedStyle(a); if (/(hidden|auto|scroll)/.test(o.overflowX + o.overflowY)) { a.style.overflow = 'clip'; }
   }
@@ -86,7 +88,7 @@
     var sh = H*s;
     anchor = Math.max(mobile ? 62 : 8, Math.round((vh - sh)/2));
     stage.style.top = anchor+'px';
-    pin = (reduce || forceP!==undefined) ? 0 : Math.round(Math.min(vh*1.25, 1100));
+    pin = 0;   // no scroll-driven reveal: Sam rejected the slide-up, the camera pull-back and the point cloud. The collage simply fades in, complete.
     stage.style.height=sh+'px'; wrap.style.height=(sh+pin)+'px';
     stage.querySelectorAll('.bvc-fade').forEach(function(f){ f.remove(); });
     var bg = pageBg(), clear = bg.replace('rgb(','rgba(').replace(')',',0)');
