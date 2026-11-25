@@ -9,6 +9,7 @@
   var cv = document.createElement('canvas'); cv.width = 16; cv.height = 12;
   var cx = cv.getContext('2d', { willReadFrequently: true });
   var NEUTRAL = [118, 116, 124], STICK_K = 2.3;
+  var below = false, frontTile = null, wheelAt = 0, wasReel = null;
   var HOLD = 8, DRIFT = 1.5, stickAt = 0;          // an opened project's colour holds for 8 s, then its hue wanders 1.5 degrees a second
   // turn a colour's hue by some degrees, keeping how light and how strong it is
   function rot(c, deg){
@@ -48,11 +49,16 @@
   var prev = 0;
   function tick(now){
     var dt = Math.min(500, prev ? now - prev : 16); prev = now;
-    // a hovered project previews its colour; otherwise the last opened project holds the page; before that, the reel
-    var base = stick;
-    if (stick && !hover) { var age = (now - stickAt) / 1000; if (age > HOLD) base = rot(stick, (age - HOLD) * DRIFT); }
-    var t = hover || base || reel, k = hover ? (stick ? STICK_K : 1.55) : stick ? STICK_K : reelK;
-    var e = 1 - Math.exp(-dt / (hover ? 170 : stick ? 260 : 110));     // following the reel: quick enough to land with the cut, still eased           // timed, so it eases the same at any frame rate
+    // ONE source at a time, decided by what is on screen:
+    //   the hero reel while the hero is in view; below it, the film at the front of the wheel (or the last film opened, whichever is newer)
+    var foc = null, focAt = 0, wc = frontTile ? tileColour(frontTile) : null;
+    if (wc) { foc = wc; focAt = wheelAt; }
+    if (stick && (!foc || stickAt >= wheelAt)) { foc = stick; focAt = stickAt; }
+    if (foc && !hover) { var age = (now - focAt) / 1000; if (age > HOLD) foc = rot(foc, (age - HOLD) * DRIFT); }     // left alone, the hue wanders
+    var useReel = !below || !(hover || foc);
+    var t = useReel ? reel : (hover || foc), k = useReel ? reelK : STICK_K;
+    if (useReel !== wasReel) { wasReel = useReel; root.classList.toggle('m-amb-stick', !useReel); }
+    var e = 1 - Math.exp(-dt / (useReel ? 110 : hover ? 170 : 240));     // timed, so it eases the same at any frame rate
     cur[0] += (t[0] - cur[0]) * e; cur[1] += (t[1] - cur[1]) * e; cur[2] += (t[2] - cur[2]) * e; curK += (k - curK) * e;
     var s = rgbOf(cur) + '|' + curK.toFixed(2);
     if (s !== last) { last = s; root.style.setProperty('--amb', s.split('|')[0]); root.style.setProperty('--amb-k', curK.toFixed(2));
@@ -68,29 +74,18 @@
     return grade(c[0], c[1], c[2], 1.25);
   }
   var tiles = Array.prototype.slice.call(document.querySelectorAll('.work-item'));
+  // where we are on the page, and which film is at the front of the wheel
+  var heroEl = document.querySelector('.reel-wrap'), stripEl = document.querySelector('.work-strip');
+  function where(){ below = !!heroEl && heroEl.getBoundingClientRect().bottom < window.innerHeight * 0.42; }
+  function spun(){ var f = stripEl && stripEl.querySelector('.m-slot.m-front .work-item'); if (f && f !== frontTile) { frontTile = f; wheelAt = performance.now(); } }
+  window.addEventListener('scroll', where, { passive: true }); window.addEventListener('resize', where); where();
+  if (stripEl) { stripEl.addEventListener('m-spin', spun); spun(); }
+  // in the All work grid (no single front film), resting on a tile previews its colour
   if (window.matchMedia && matchMedia('(hover: hover)').matches) {
     tiles.forEach(function(t){
-      t.addEventListener('mouseenter', function(){ var c = tileColour(t); if (c) { hover = c; root.classList.add('m-amb-proj'); } });
-      t.addEventListener('mouseleave', function(){ hover = null; root.classList.remove('m-amb-proj'); });
+      t.addEventListener('mouseenter', function(){ if (!root.classList.contains('m-allwork-on')) return; var c = tileColour(t); if (c) hover = c; });
+      t.addEventListener('mouseleave', function(){ hover = null; });
     });
-  } else {
-    // phones, before any project has been opened: the project in the middle of the strip sets the colour while the strip is on screen
-    var strip = document.querySelector('.work-strip'), seen = false, raf = 0;
-    var pick = function(){ raf = 0;
-      var hero = document.querySelector('.reel-wrap');                       // while the reel is still on screen, the reel sets the colour
-      if (stick || !seen || !strip || (hero && hero.getBoundingClientRect().bottom > window.innerHeight * 0.3)) { hover = null; root.classList.remove('m-amb-proj'); return; }
-      var sr = strip.getBoundingClientRect(), mid = sr.left + sr.width / 2, best = null, bd = 1e9;
-      strip.querySelectorAll('.work-item').forEach(function(t){ var r = t.getBoundingClientRect(); if (!r.width) return;
-        var dd = Math.abs(r.left + r.width / 2 - mid); if (dd < bd) { bd = dd; best = t; } });
-      var c = best && tileColour(best); if (c) { hover = c; root.classList.add('m-amb-proj'); }
-    };
-    var ask = function(){ if (!raf) raf = requestAnimationFrame(pick); };
-    if (strip && 'IntersectionObserver' in window) {
-      new IntersectionObserver(function(en){ seen = en[0].isIntersecting && en[0].intersectionRatio > 0.6; ask(); }, { threshold: [0, 0.6, 1] }).observe(strip);
-      strip.addEventListener('scroll', ask, { passive: true });
-      strip.addEventListener('m-spin', ask);
-      window.addEventListener('scroll', ask, { passive: true });
-    }
   }
 
   // ---- opening a project ----
@@ -100,8 +95,7 @@
   var SLOW = +((/[?&]slow=([\d.]+)/.exec(location.search) || [])[1]) || 1;   // ?slow=8 plays the opening in slow motion, for checking
   var lb = document.getElementById('lightbox'), lbFrame = document.getElementById('lightboxIframe'), fxRun = 0, mover = null, release = null;
   function px(n){ return n.toFixed(1) + 'px'; }
-  function hold(c){ stick = c; stickAt = performance.now(); root.classList.add('m-amb-stick');
-    if (!(window.matchMedia && matchMedia('(hover: hover)').matches)) { hover = null; root.classList.remove('m-amb-proj'); } }   // phones: the strip's preview colour lets go
+  function hold(c){ stick = c; stickAt = performance.now(); hover = null; }
   function clearFx(){ fxRun++; release = null; mover = null;
     document.querySelectorAll('.m-grow').forEach(function(e){ e.remove(); });
     if (lb && lb.classList.contains('m-mat')) lb.classList.remove('m-mat'); }
