@@ -87,6 +87,7 @@
     if (strip && 'IntersectionObserver' in window) {
       new IntersectionObserver(function(en){ seen = en[0].isIntersecting && en[0].intersectionRatio > 0.6; ask(); }, { threshold: [0, 0.6, 1] }).observe(strip);
       strip.addEventListener('scroll', ask, { passive: true });
+      strip.addEventListener('m-spin', ask);
     }
   }
 
