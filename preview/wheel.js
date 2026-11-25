@@ -16,11 +16,11 @@
   strip.insertAdjacentElement('afterend', cap);
   var counter = document.getElementById('workNavCounter'), prevB = document.getElementById('workPrev'), nextB = document.getElementById('workNext');
 
-  var STEP = 33 * Math.PI / 180, W = 0, R = 0, pos = 0, target = 0, front = -1, raf = 0, lastT = 0;
+  var STEP = 35 * Math.PI / 180, W = 0, R = 0, pos = 0, target = 0, front = -1, raf = 0, lastT = 0;
   function size(){
     var vw = window.innerWidth, small = vw <= 768;
-    W = small ? vw * 0.80 : Math.min(vw * 0.56, 1040);
-    var H = W * 9 / 16; R = W * (small ? 1.25 : 1.12);
+    W = small ? vw * 0.76 : Math.min(vw * 0.5, 980);
+    var H = W * 9 / 16; R = W * 1.78;                       // wide enough that neighbouring films never cut into each other
     strip.style.setProperty('--ww', W.toFixed(1) + 'px'); strip.style.setProperty('--wh', H.toFixed(1) + 'px');
     strip.style.perspective = (W * 2.1).toFixed(0) + 'px';
     render();
@@ -30,13 +30,13 @@
     var f = ((Math.round(pos) % n) + n) % n;
     for (var i = 0; i < n; i++) {
       var s = slots[i], d = wrapD(i - pos), ad = Math.abs(d);
-      if (ad > 3.3) { if (s.shown) { s.el.style.display = 'none'; s.shown = false; } continue; }
+      if (ad > 2.55) { if (s.shown) { s.el.style.display = 'none'; s.shown = false; } continue; }
       if (!s.shown) { s.el.style.display = ''; s.shown = true; }
       var a = d * STEP;
       s.el.style.transform = 'translate(-50%,-50%) translateZ(' + (-R).toFixed(1) + 'px) rotateY(' + (a * 180 / Math.PI).toFixed(2) + 'deg) translateZ(' + R.toFixed(1) + 'px)';
       s.el.style.zIndex = String(100 - Math.round(ad * 20));
-      s.veil.style.opacity = Math.min(.82, Math.max(0, ad - .12) * .42).toFixed(3);          // films further round the wheel sit in shadow
-      s.el.style.opacity = ad > 2.5 ? Math.max(0, (3.3 - ad) / .8).toFixed(3) : '1';
+      s.veil.style.opacity = Math.min(.8, Math.max(0, ad - .1) * .5).toFixed(3);          // films further round the wheel sit in shadow
+      s.el.style.opacity = ad > 1.7 ? Math.max(0, (2.55 - ad) / .85).toFixed(3) : '1';
     }
     if (f !== front) setFront(f);
   }
