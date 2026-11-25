@@ -71,7 +71,7 @@
         p.appendChild(im); maxTop=Math.max(maxTop, c[3]+c[2]);
         // each character rises on its own beat: centre first, edges later, with a little swing and its own speed
         var n=cuts.length, cxm=c[1]+c[2]*c[6]/2, jit=((n*37)%11)/11;
-        cuts.push({el:im, rot:c[4], d: inBack ? 0.07 : 0.05 + 0.17*Math.min(1,Math.abs(cxm-CX)/(C.W/2)) + 0.07*jit + gi*0.02,
+        cuts.push({el:im, c:c, rot:c[4], d: inBack ? 0.07 : 0.05 + 0.17*Math.min(1,Math.abs(cxm-CX)/(C.W/2)) + 0.07*jit + gi*0.02,
           dur: 0.5 + 0.16*(((n*53)%7)/7), sw: (n%2 ? 1 : -1)*(4 + 5*jit)});
       });
       plates.push({el:p, drop: maxTop - Math.min(topStart, 60) + 80, t:0.04, dur:0.82, depth:[-0.6,0.1,0.8][gi]});
@@ -92,26 +92,72 @@
     var bg = pageBg(), clear = bg.replace('rgb(','rgba(').replace(')',',0)');
     [['left:0;right:0;bottom:0;height:9%','to top'],['left:0;top:0;bottom:0;width:4%','to right'],['right:0;top:0;bottom:0;width:4%','to left']].forEach(function(f){
       var d=document.createElement('div'); d.className='bvc-fade'; d.style.cssText=f[0]+';background:linear-gradient('+f[1]+','+bg+','+clear+')'; stage.appendChild(d); });
+    pcInit();
     update();
   }
   function ease(t){ t=Math.max(0,Math.min(1,t)); return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+  // ---- point cloud: every figure is sampled into coloured dots; as you scroll, a turning cloud of dots draws together into the collage ----
+  var pc=null, pcCtx=null, pcTok=0, PT=null, pcW=0, pcH=0, pcImg=null, pcBuf=null, pcClear=true;
+  function pcInit(){
+    var tok=++pcTok; PT=null; if (pc) { pc.remove(); pc=null; }
+    if (reduce || forceP!==undefined || !pin) return;
+    var sw=Math.max(2,Math.round(C.W*s)), sh=Math.max(2,Math.round(C.H*s));
+    pc=document.createElement('canvas'); pc.className='bvc-pc'; pc.width=sw; pc.height=sh;
+    pc.style.cssText='position:absolute;left:50%;top:0;margin-left:'+(-sw/2)+'px;width:'+sw+'px;height:'+sh+'px;z-index:45;pointer-events:none';
+    stage.appendChild(pc); pcCtx=pc.getContext('2d'); pcW=sw; pcH=sh; pcImg=pcCtx.createImageData(sw,sh); pcBuf=new Uint32Array(pcImg.data.buffer); pcClear=true;
+    var layers=cuts.map(function(q){ return {im:q.el, x:q.c[1]-PAD, b:q.c[3]-PAD, h:q.c[2]+PAD*2, rot:q.c[4], z:q.c[5], oy:0.92}; });
+    layers.push({im:earthEl, x:C.earth.x, b:C.earth.b, h:C.earth.h, rot:0, z:31, oy:1});
+    layers.sort(function(a,b){ return a.z-b.z; });
+    Promise.all(layers.map(function(L){ var im=L.im; return (im.complete && im.naturalWidth) ? 1 : new Promise(function(r){ im.addEventListener('load',r,{once:true}); im.addEventListener('error',r,{once:true}); }); })).then(function(){
+      if (tok!==pcTok) return;
+      var off=document.createElement('canvas'); off.width=sw; off.height=sh; var g=off.getContext('2d',{willReadFrequently:true});
+      var step = sw*sh > 700000 ? 4 : 3, X=[],Y=[],Z=[],Cc=[];
+      try {
+        layers.forEach(function(L){ var im=L.im; if (!im.naturalWidth) return;
+          var hh=L.h*s, ww=hh*im.naturalWidth/im.naturalHeight, left=L.x*s, top=(C.H-L.b-L.h)*s, ox=left+ww/2, oy=top+hh*L.oy, rad=Math.sqrt(ww*ww+hh*hh);
+          var x0=Math.max(0,Math.floor((ox-rad)/step)*step), y0=Math.max(0,Math.floor((oy-rad)/step)*step), x1=Math.min(sw,Math.ceil(ox+rad)), y1=Math.min(sh,Math.ceil(oy+rad));
+          if (x1-x0<2 || y1-y0<2) return;
+          g.clearRect(0,0,sw,sh); g.save(); g.translate(ox,oy); g.rotate(L.rot*Math.PI/180); g.drawImage(im,-ww/2,-hh*L.oy,ww,hh); g.restore();
+          var d=g.getImageData(x0,y0,x1-x0,y1-y0).data, w=x1-x0, zz=(L.z-18)*15*s;
+          for (var yy=0; yy<y1-y0; yy+=step) for (var xx=0; xx<w; xx+=step) { var o=(yy*w+xx)*4; if (d[o+3]<120) continue;
+            X.push(x0+xx); Y.push(y0+yy); Z.push(zz); Cc.push((255<<24)|(d[o+2]<<16)|(d[o+1]<<8)|d[o]); }
+        });
+      } catch(e) { return; }
+      var n=X.length, R=new Float32Array(n*4);
+      for (var i=0;i<n;i++){ var u=Math.random()*2-1, th=Math.random()*6.2832, q=Math.sqrt(1-u*u);        // a random direction, and how far out this dot starts
+        R[i*4]=q*Math.cos(th); R[i*4+1]=u*0.62; R[i*4+2]=q*Math.sin(th); R[i*4+3]=(0.35+Math.random()*0.75)*Math.max(sw,sh)*0.62; }
+      PT={n:n, X:new Float32Array(X), Y:new Float32Array(Y), Z:new Float32Array(Z), C:new Uint32Array(Cc), R:R, step:step};
+      update();
+    });
+  }
+  function pcDraw(e){
+    if (!PT || !pcBuf) return; pcBuf.fill(0); pcClear=false;
+    var n=PT.n, X=PT.X, Y=PT.Y, Z=PT.Z, Cc=PT.C, R=PT.R, k=1-e, kk=k*k*(3-2*k), yaw=kk*1.25, cs=Math.cos(yaw), sn=Math.sin(yaw);
+    var cx=pcW/2, cy=pcH*0.52, f=Math.max(pcW,pcH)*1.15, big=e>0.9 ? PT.step : (e>0.6 ? 2 : 1), W=pcW, H=pcH;
+    for (var i=0;i<n;i++){ var o=i*4, r=R[o+3]*kk;
+      var x=X[i]-cx+R[o]*r, y=Y[i]-cy+R[o+1]*r, z=Z[i]*(0.4+0.6*k)+R[o+2]*r;
+      var xr=x*cs - z*sn, zr=x*sn + z*cs, ps=f/(f+zr); if (ps<=0) continue;
+      var px=(cx+xr*ps)|0, py=(cy+y*ps)|0; if (px<0||py<0||px>=W-big||py>=H-big) continue;
+      var c=Cc[i], p=py*W+px;
+      for (var by=0;by<=big;by++) for (var bx=0;bx<=big;bx++) pcBuf[p+by*W+bx]=c; }
+    pcCtx.putImageData(pcImg,0,0);
+  }
   function update(){
     if (typeof earthEl === 'undefined' || !earthEl) return;        // collage not built yet (home page)
     var prog, E=C.earth;
     if (forceP!==undefined) prog=parseFloat(forceP); else if (reduce || !pin) prog=1; else {
       prog = Math.max(0, Math.min(pin, anchor - wrap.getBoundingClientRect().top))/pin;
     }
-    var pe = ease(prog/0.7), es = E.s0 + (1-E.s0)*pe;
-    earthEl.style.transform='translate3d('+(mx*8)+'px,'+((1-pe)*E.y0 + my*3)+'px,0) scale('+es.toFixed(4)+')';
-    for (var i=0;i<plates.length;i++){ var o=plates[i], u=Math.max(0,Math.min(1,(prog - o.t)/o.dur)), l=1-Math.pow(1-u,2.2);
+    // the figures stand still in their final places; dots gather into them, then the real pictures come up through the dots
+    var cloud = !!(pc && PT), dom = cloud ? Math.max(0, Math.min(1, (prog - 0.80)/0.13)) : 1;
+    earthEl.style.transform='translate3d('+(mx*8)+'px,'+(my*3)+'px,0)'; earthEl.style.opacity=dom.toFixed(3);
+    for (var i=0;i<plates.length;i++){ var o=plates[i];
       o.el.style.transform='translate3d('+(mx*o.depth*16)+'px,'+(my*o.depth*6)+'px,0)'; }
-    for (var k=0;k<cuts.length;k++){ var q2=cuts[k], u2=Math.max(0,Math.min(1,(prog - q2.d)/q2.dur)), l2=1-Math.pow(1-u2,2.4);
-      // each figure is already in its place and comes into the light as the camera reaches it: a small settle, no long slide
-      q2.el.style.transform='translate3d(0,'+((1-l2)*34).toFixed(1)+'px,0) rotate('+(q2.rot + q2.sw*(1-l2)*0.35).toFixed(2)+'deg) scale('+(0.84+0.16*l2).toFixed(3)+')';
-      q2.el.style.opacity=Math.min(1, l2*1.7).toFixed(3); }
-    // the camera starts close on the centre of the crowd and pulls back as you scroll
-    var zc = ease(prog/0.9), zoom = 1 + (mobile ? 0.85 : 1.05)*(1-zc), y0 = C.H*(mobile ? 0.52 : 0.56);
-    col.style.transform='translate3d(0,'+(y0*s*(1-zoom)).toFixed(1)+'px,0) scale('+(s*zoom).toFixed(4)+')';
+    for (var k=0;k<cuts.length;k++){ var q2=cuts[k]; q2.el.style.transform='rotate('+q2.rot+'deg)'; q2.el.style.opacity=dom.toFixed(3); }
+    col.style.transform='scale('+s.toFixed(4)+')';
+    if (cloud) { var fadeOut = Math.max(0, Math.min(1, (prog - 0.86)/0.11));
+      pc.style.opacity=(1-fadeOut).toFixed(3);
+      if (fadeOut < 1) pcDraw(ease(Math.min(1, prog/0.80))); else if (!pcClear) { pcCtx.clearRect(0,0,pcW,pcH); pcClear=true; } }
     var jp = ease(prog/0.45);                                   // the wordmark starts straight and jumbles as you scroll
     for (var j=0;j<letters.length;j++){ var q=letters[j];
       q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+(my*q.depth*7)+'px,0) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }
