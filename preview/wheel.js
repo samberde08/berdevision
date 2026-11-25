@@ -57,7 +57,7 @@
       if (!s.shown) { s.el.style.display = ''; s.shown = true; }
       s.el.style.transform = wheelT(d);
       s.el.style.zIndex = String(100 - Math.round(depth * 90));
-      s.veil.style.opacity = (ad < .5 ? ad * .3 : Math.min(.74, .15 + .62 * depth)).toFixed(3);                    // further round = deeper in shadow
+      s.veil.style.opacity = (ad < .5 ? ad * .12 : Math.min(.7, .06 + .68 * depth)).toFixed(3);                    // further round = deeper in shadow
       s.el.style.opacity = '1';
       s.el.style.pointerEvents = depth > .42 ? 'none' : '';                                                        // only the near side can be clicked or hovered
     }

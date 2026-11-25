@@ -336,3 +336,10 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-asm { display:inline-block; opacity:0; transform: translateY(.55em) rotate(7deg) scale(.9); transform-origin:50% 80%; transition: opacity .5s ease, transform .7s cubic-bezier(.2,.9,.25,1.15); }
 .m-asm-in .m-asm { opacity:1; transform:none; }
 @media (prefers-reduced-motion: reduce) { .work-strip.m-wheel { opacity:1; translate:0 0; } .m-asm { opacity:1; transform:none; } }
+
+/* any letter split inside a stacked lockup must never stack */
+.m-stack .m-asm { display:inline-block !important; font-size:inherit !important; line-height:inherit !important; }
+/* ===== film frames a touch brighter and richer than the page around them ===== */
+.work-strip.m-wheel .work-item img, .work-strip.m-wheel .work-item video.m-loop, .work-strip.m-wheel .work-item iframe.m-emb { filter: saturate(1.14) brightness(1.06) contrast(1.03); }
+.m-slot.m-front .work-item img, .m-slot.m-front .work-item video.m-loop, .m-slot.m-front .work-item iframe.m-emb { filter: saturate(1.24) brightness(1.13) contrast(1.05); }
+.work-strip.m-grid .work-item img, .work-strip.m-grid .work-item video.m-loop { filter: saturate(1.18) brightness(1.09) contrast(1.04); }

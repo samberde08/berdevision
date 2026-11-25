@@ -13,7 +13,7 @@
   window.addEventListener('scroll', function(){ if (!raf) raf = requestAnimationFrame(hero); }, { passive: true });
   if (v) { v.style.transformOrigin = '50% 46%'; v.style.willChange = 'transform, opacity'; }
   // 2. big titles assemble: each letter drops into place, one after another, when its line arrives
-  var titles = Array.prototype.slice.call(document.querySelectorAll('.contact-big, .m-statement span, .m-f-mark span'));
+  var titles = Array.prototype.slice.call(document.querySelectorAll('.contact-big'));
   titles.forEach(function(el){
     if (el.children.length || el.dataset.mAsm) return; var txt = (el.textContent || '').replace(/\s+/g, ' ').trim(); if (!txt || txt.length > 40) return;
     el.dataset.mAsm = '1'; el.setAttribute('aria-label', txt); el.textContent = '';
