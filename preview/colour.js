@@ -49,7 +49,9 @@
 
   function tileColour(t){
     var c = t.dataset.glowRGB; if (!c) return null;
-    c = c.split(',').map(Number); return grade(c[0], c[1], c[2], 1.25);
+    c = c.split(',').map(Number);
+    if (Math.max(c[0], c[1], c[2]) - Math.min(c[0], c[1], c[2]) < 20) return [190, 204, 228];     // black-and-white project: cool white light, not grey
+    return grade(c[0], c[1], c[2], 1.25);
   }
   var tiles = Array.prototype.slice.call(document.querySelectorAll('.work-item'));
   if (window.matchMedia && matchMedia('(hover: hover)').matches) {
