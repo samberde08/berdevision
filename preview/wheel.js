@@ -25,7 +25,8 @@
   var tog = document.createElement('div'); tog.className = 'm-viewtog'; tog.setAttribute('role', 'group'); tog.setAttribute('aria-label', 'How the projects are shown');
   tog.innerHTML = '<button type="button" data-v="wheel" class="m-on">Wheel</button><i>/</i><button type="button" data-v="grid">All</button>';
   var hdr = document.querySelector('#work .work-header');
-  if (hdr) { hdr.classList.add('m-has-tog'); hdr.appendChild(tog); } else strip.insertAdjacentElement('beforebegin', tog);
+  // (the section title is hidden on this page, so the switch gets its own slim line directly above the films)
+  var vbar = document.createElement('div'); vbar.className = 'm-viewbar'; vbar.appendChild(tog); strip.insertAdjacentElement('beforebegin', vbar); hdr = vbar;
   function togState(){ Array.prototype.forEach.call(tog.querySelectorAll('button'), function(b){ b.classList.toggle('m-on', b.dataset.v === mode); b.setAttribute('aria-pressed', b.dataset.v === mode ? 'true' : 'false'); }); }
   var counter = document.getElementById('workNavCounter'), prevB = document.getElementById('workPrev'), nextB = document.getElementById('workNext');
 

@@ -304,3 +304,9 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-slot.m-big .m-gcap { padding: calc(60px * var(--inv, 1)) calc(22px * var(--inv, 1)) calc(18px * var(--inv, 1)); }
 @media (max-width:768px){ .m-gc-name { font-size: calc(10.5px * var(--inv, 1)); } .m-gc-tag { display:none; } .m-slot.m-big .m-gc-name { font-size: calc(15px * var(--inv, 1)); } .m-slot.m-big .m-gc-tag { display:block; font-size: calc(10.5px * var(--inv, 1)); }
   .m-gcap { padding: calc(22px * var(--inv, 1)) calc(9px * var(--inv, 1)) calc(8px * var(--inv, 1)); } }
+
+/* the Wheel / All switch sits on its own slim line above the films, right-aligned to the grid's edge */
+.m-viewbar { position:relative; z-index:4; width:min(100% - 96px, 1360px); margin:1.4rem auto 0; display:flex; justify-content:flex-end; }
+.m-viewbar .m-viewtog { position:static; }
+.work-strip.m-wheel { margin-top:.6rem !important; }
+@media (max-width:768px){ .m-viewbar { width:calc(100% - 32px); justify-content:center; margin-top:1rem; } .m-viewbar .m-viewtog { margin-top:0; } .work-strip.m-wheel { margin-top:.4rem !important; } }
