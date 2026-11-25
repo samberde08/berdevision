@@ -257,3 +257,22 @@ footer.m-footer { display:block !important; padding:3.5rem 1.5rem 1.6rem !import
           mask-image: linear-gradient(to bottom, #000 0%, #000 46%, rgba(0,0,0,.92) 56%, rgba(0,0,0,.74) 66%, rgba(0,0,0,.5) 75%, rgba(0,0,0,.27) 83%, rgba(0,0,0,.1) 90%, rgba(0,0,0,.02) 95%, transparent 98%) !important; }
 .reel-wrap.roto, .m-clients { border:0 !important; box-shadow:none !important; background:transparent !important; }
 .reel-wrap.roto > .crop-mark { display:none !important; }
+
+/* ===== wheel v2: smaller films, and "All work" unfurls it into a grid ===== */
+.m-slot { top: var(--cy, 50%); }
+.work-strip.m-wheel { transition: height .9s cubic-bezier(.3,.7,.2,1); }
+.work-strip.m-anim .m-slot { transition: transform 1s cubic-bezier(.22,.8,.2,1), opacity .6s ease; }
+.work-strip.m-anim .m-veil { transition: opacity .6s ease; }
+.work-strip.m-grid { cursor: default; touch-action: auto; }
+.work-strip.m-grid .work-item { box-shadow: 0 10px 30px rgba(0,0,0,.45) !important; }
+.work-strip.m-grid .m-slot.m-front .work-item { box-shadow: 0 10px 30px rgba(0,0,0,.45) !important; }
+.work-strip.m-grid .work-item .work-overlay { display:flex !important; }
+.m-wheel-cap { transition: opacity .4s ease, min-height .6s ease, margin .6s ease; overflow:hidden; }
+.m-wheel-cap.m-gone { opacity:0; min-height:0 !important; height:0; margin-top:0 !important; pointer-events:none; }
+.m-allwork-on .work-side-arrow, .m-allwork-on .work-nav-counter { opacity:0 !important; pointer-events:none; }
+.m-allwork-bar { text-align:center; margin: 1.3rem 0 .6rem; position:relative; z-index:3; }
+.m-allwork { font-family:'DM Sans',sans-serif; font-weight:500; font-size:.72rem; letter-spacing:.24em; text-transform:uppercase; color:#fff; background:transparent;
+  border:1.5px solid rgba(255,255,255,.85); border-radius:999px; padding:.8rem 1.7rem; cursor:pointer; transition: background .25s ease, color .25s ease, transform .25s ease; }
+.m-allwork:hover, .m-allwork.m-on { background:#fff; color:#0c0c0d; }
+.m-allwork:active { transform: scale(.97); }
+html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
