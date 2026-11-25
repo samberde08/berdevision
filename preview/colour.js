@@ -97,7 +97,8 @@
   var SLOW = +((/[?&]slow=([\d.]+)/.exec(location.search) || [])[1]) || 1;   // ?slow=8 plays the opening in slow motion, for checking
   var lb = document.getElementById('lightbox'), lbFrame = document.getElementById('lightboxIframe'), fxRun = 0, mover = null, release = null;
   function px(n){ return n.toFixed(1) + 'px'; }
-  function hold(c){ stick = c; stickAt = performance.now(); root.classList.add('m-amb-stick'); }
+  function hold(c){ stick = c; stickAt = performance.now(); root.classList.add('m-amb-stick');
+    if (!(window.matchMedia && matchMedia('(hover: hover)').matches)) { hover = null; root.classList.remove('m-amb-proj'); } }   // phones: the strip's preview colour lets go
   function clearFx(){ fxRun++; release = null; mover = null;
     document.querySelectorAll('.m-grow').forEach(function(e){ e.remove(); });
     if (lb && lb.classList.contains('m-mat')) lb.classList.remove('m-mat'); }
