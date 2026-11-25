@@ -106,7 +106,12 @@
     for (var i=0;i<plates.length;i++){ var o=plates[i], u=Math.max(0,Math.min(1,(prog - o.t)/o.dur)), l=1-Math.pow(1-u,2.2);
       o.el.style.transform='translate3d('+(mx*o.depth*16)+'px,'+(my*o.depth*6)+'px,0)'; }
     for (var k=0;k<cuts.length;k++){ var q2=cuts[k], u2=Math.max(0,Math.min(1,(prog - q2.d)/q2.dur)), l2=1-Math.pow(1-u2,2.4);
-      q2.el.style.transform='translate3d(0,'+((1-l2)*dropAll).toFixed(1)+'px,0) rotate('+(q2.rot + q2.sw*(1-l2)).toFixed(2)+'deg) scale('+(0.92+0.08*l2).toFixed(3)+')'; }
+      // each figure is already in its place and comes into the light as the camera reaches it: a small settle, no long slide
+      q2.el.style.transform='translate3d(0,'+((1-l2)*34).toFixed(1)+'px,0) rotate('+(q2.rot + q2.sw*(1-l2)*0.35).toFixed(2)+'deg) scale('+(0.84+0.16*l2).toFixed(3)+')';
+      q2.el.style.opacity=Math.min(1, l2*1.7).toFixed(3); }
+    // the camera starts close on the centre of the crowd and pulls back as you scroll
+    var zc = ease(prog/0.9), zoom = 1 + (mobile ? 0.85 : 1.05)*(1-zc), y0 = C.H*(mobile ? 0.52 : 0.56);
+    col.style.transform='translate3d(0,'+(y0*s*(1-zoom)).toFixed(1)+'px,0) scale('+(s*zoom).toFixed(4)+')';
     var jp = ease(prog/0.45);                                   // the wordmark starts straight and jumbles as you scroll
     for (var j=0;j<letters.length;j++){ var q=letters[j];
       q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+(my*q.depth*7)+'px,0) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }

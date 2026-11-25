@@ -209,6 +209,17 @@
   strip.addEventListener('keydown', function(e){ if (e.key === 'ArrowRight') { goTo(Math.round(target) + 1); e.preventDefault(); } if (e.key === 'ArrowLeft') { goTo(Math.round(target) - 1); e.preventDefault(); } });
   strip.addEventListener('dragstart', function(e){ e.preventDefault(); });
 
+  // the first time the wheel comes into view it rises and spins in from a few films away
+  var spunIn = false;
+  function spinIn(){ if (spunIn) return; spunIn = true; strip.classList.add('m-in'); if (mode === 'wheel' && !still && !down) { pos = target - 5; render(); goTo(target); } }
+  if ('IntersectionObserver' in window && !still) new IntersectionObserver(function(en, io){ if (en[0].isIntersecting) { spinIn(); io.disconnect(); } }, { threshold: 0.35 }).observe(strip);
+  else spinIn();
+  // and as the page scrolls past, the ring tips: you look down into it when it is low on the screen, across it when it is high
+  var tr = 0;
+  function tip(){ tr = 0; if (mode !== 'wheel' || busy || still) return;
+    var r = strip.getBoundingClientRect(), c = (r.top + r.height / 2) / window.innerHeight;
+    var t = Math.max(-13, Math.min(-2.5, -7 - (c - 0.5) * 11)); if (Math.abs(t - TILT) > 0.05) { TILT = +t.toFixed(2); render(); } }
+  window.addEventListener('scroll', function(){ if (!tr) tr = requestAnimationFrame(tip); }, { passive: true });
   var rt = 0; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ size(); count(); }, 120); });
   size();
   setTimeout(function(){ if (front >= 0) { var rgb = slots[front].tile.dataset.glowRGB; if (rgb) slots[front].el.style.setProperty('--tile', rgb); count(); } }, 1200);
