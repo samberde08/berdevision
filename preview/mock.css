@@ -145,12 +145,33 @@ footer.m-footer { display:block !important; padding:3.5rem 1.5rem 1.6rem !import
 .work-side-arrow { border-color: rgba(var(--amb), .55) !important; }
 .work-nav-counter { color: color-mix(in srgb, rgba(236,234,228,.6) 50%, rgb(var(--amb))) !important; }
 
-/* ===== opening a project: colour shockwave over the whole page, and the player sits in that colour ===== */
+/* ===== opening a project: its colour spreads out of the panel, the player grows out of the panel, the colour stays ===== */
+.m-amb { background:
+    radial-gradient(120% 75% at 50% 0%, rgba(var(--amb), calc(.34 * var(--amb-k))) 0%, rgba(var(--amb), 0) 72%),
+    radial-gradient(70% 55% at 0% 100%, rgba(var(--amb), calc(.20 * var(--amb-k))) 0%, rgba(var(--amb), 0) 70%),
+    radial-gradient(70% 55% at 100% 100%, rgba(var(--amb), calc(.20 * var(--amb-k))) 0%, rgba(var(--amb), 0) 70%),
+    linear-gradient(rgba(var(--amb), calc(.07 * var(--amb-k))), rgba(var(--amb), calc(.045 * var(--amb-k)))); }
+.m-amb-new { will-change: clip-path; }
 .m-wave { position:fixed; inset:0; z-index:9500; pointer-events:none; overflow:hidden; mix-blend-mode:screen; }
-.m-wave-d { position:absolute; border-radius:50%; transform:scale(.03); will-change:transform, opacity; }
+.m-flood { position:absolute; border-radius:3px; will-change: transform, opacity; transform-origin:50% 50%;
+  background: radial-gradient(closest-side, rgba(var(--c), .18), rgba(var(--c), .44));
+  box-shadow: 0 0 0 1px rgba(255,255,255,.8), 0 0 0 3px rgba(var(--c), .9), 0 0 16px 6px rgba(var(--c), .7), 0 0 44px 16px rgba(var(--c), .35), inset 0 0 26px 4px rgba(var(--c), .55); }
+.m-flood-2 { background: none; box-shadow: 0 0 0 1px rgba(var(--c), .7), 0 0 22px 8px rgba(var(--c), .4), inset 0 0 30px 6px rgba(var(--c), .3); }
+.m-ghost { position:fixed; z-index:9400; object-fit:cover; pointer-events:none; 
+  box-shadow: 0 0 120px 20px rgba(var(--amb), .5), 0 32px 80px rgba(0,0,0,.5); }
+.lightbox { transition: opacity .75s ease !important; }
+.lightbox-inner { transition: opacity .5s ease; }
+.lightbox.m-mat .lightbox-inner { opacity:0; transition:none; }
 .lightbox-backdrop { background:
-  radial-gradient(90% 80% at 50% 50%, rgba(var(--amb), .30) 0%, rgba(var(--amb), .10) 55%, rgba(var(--amb), 0) 100%), rgba(8,8,8,.86) !important; }
-.lightbox-frame { box-shadow: 0 0 140px 10px rgba(var(--amb), .35); }
+  radial-gradient(90% 80% at 50% 50%, rgba(var(--amb), .34) 0%, rgba(var(--amb), .14) 55%, rgba(var(--amb), .05) 100%), rgba(8,8,8,.84) !important; }
+.lightbox-frame { box-shadow: 0 0 160px 14px rgba(var(--amb), .4); }
+/* while a project's colour holds the page, more of the page carries it */
+.m-amb-stick .work-title { color: color-mix(in srgb, #f1eee8 45%, rgb(var(--amb))) !important; }
+.m-amb-stick .work-strip .work-item { outline-color: rgba(var(--amb), .75); }
+.m-amb-stick .m-clients .logo-track img { filter: grayscale(1) brightness(0) invert(1) drop-shadow(0 0 10px rgba(var(--amb), .8)) !important; }
+.m-amb-stick .work-label, .m-amb-stick .contact-big, .m-amb-stick .m-statement span { color: color-mix(in srgb, #f1eee8 55%, rgb(var(--amb))) !important; }
+.m-amb-stick .contact-form-glass { border-color: rgba(var(--amb), .5) !important; box-shadow: 0 12px 48px rgba(0,0,0,.4), 0 0 80px rgba(var(--amb), .22), inset 0 1px 0 rgba(255,255,255,.18) !important; }
+.m-amb-stick footer.m-footer { border-top-color: rgba(var(--amb), .5) !important; background: color-mix(in srgb, #0b0b0c 86%, rgb(var(--amb))) !important; }
 
 /* ===== client logos: larger and brighter ===== */
 .m-clients .logo-track img { height:52px !important; opacity:.92 !important; }
