@@ -310,3 +310,16 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-viewbar .m-viewtog { position:static; }
 .work-strip.m-wheel { margin-top:.6rem !important; }
 @media (max-width:768px){ .m-viewbar { width:calc(100% - 32px); justify-content:center; margin-top:1rem; } .m-viewbar .m-viewtog { margin-top:0; } .work-strip.m-wheel { margin-top:.4rem !important; } }
+
+/* ===== Wheel / All switch, clearer: a small two-part control with icons and the film count ===== */
+.m-viewtog { gap:0 !important; font-size:.7rem; letter-spacing:.2em; border:1px solid rgba(255,255,255,.45); border-radius:999px; padding:3px; background:rgba(0,0,0,.18);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.m-viewtog i { display:none; }
+.m-viewtog button { display:flex; align-items:center; gap:.5rem; padding:.5rem .95rem !important; border:0 !important; border-radius:999px; color:rgba(255,255,255,.86); }
+.m-viewtog button:hover { color:#fff; background:rgba(255,255,255,.1); }
+.m-viewtog button.m-on { color:#0c0c0d; background:#fff; }
+.m-viewtog svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:1.4; flex:none; }
+@media (max-width:768px){ .m-viewtog { font-size:.66rem; } .m-viewtog button { padding:.5rem .85rem !important; } }
+/* only one preview film per tile */
+.work-strip .work-item iframe.m-emb ~ iframe.m-emb { display:none; }
+.work-strip.m-grid .work-item iframe.m-emb-w { display:none; }

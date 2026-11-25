@@ -23,7 +23,8 @@
   strip.insertAdjacentElement('afterend', cap);
   // a quiet two-word switch beside the section title: Wheel / All
   var tog = document.createElement('div'); tog.className = 'm-viewtog'; tog.setAttribute('role', 'group'); tog.setAttribute('aria-label', 'How the projects are shown');
-  tog.innerHTML = '<button type="button" data-v="wheel" class="m-on">Wheel</button><i>/</i><button type="button" data-v="grid">All</button>';
+  tog.innerHTML = '<button type="button" data-v="wheel" class="m-on"><svg viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6.2" ry="3.4"/><path d="M8 4.6v6.8"/></svg>Wheel</button>' +
+    '<button type="button" data-v="grid"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2.5" width="5" height="4.6"/><rect x="9" y="2.5" width="5" height="4.6"/><rect x="2" y="8.9" width="5" height="4.6"/><rect x="9" y="8.9" width="5" height="4.6"/></svg>All ' + n + '</button>';
   var hdr = document.querySelector('#work .work-header');
   // (the section title is hidden on this page, so the switch gets its own slim line directly above the films)
   var vbar = document.createElement('div'); vbar.className = 'm-viewbar'; vbar.appendChild(tog); strip.insertAdjacentElement('beforebegin', vbar); hdr = vbar;
@@ -56,7 +57,22 @@
     }
     if (f !== front) setFront(f);
   }
-  function play(s, on){ var t = s.tile, v = t.querySelector('video.m-loop'); if (!v) return;
+  var SHAPE = {'1204589600':426/234,'1204409147':240/300,'1204579585':300/240,'1203344844':300/240,'1204398806':292/240,'1204416675':240/426,'1203256076':322/240};
+  function embed(s, on){
+    var t = s.tile, id = t.dataset.vimeo; if (!id) return;
+    if (!on) { clearTimeout(s.embT); s.embT = 0; if (s.fr) { var o = s.fr; s.fr = null; o.style.opacity = 0; if (!t.matches(':hover')) t.classList.remove('m-playing'); setTimeout(function(){ o.remove(); }, 380); } return; }
+    if (s.fr || s.embT) return;
+    s.embT = setTimeout(function(){ s.embT = 0;                         // only once the wheel has come to rest on this film
+      if (mode !== 'wheel' || front < 0 || slots[front] !== s || s.fr) return;
+      var fr = document.createElement('iframe'); fr.className = 'm-emb m-emb-w'; fr.setAttribute('allow', 'autoplay'); fr.setAttribute('tabindex', '-1'); fr.setAttribute('aria-hidden', 'true');
+      fr.style.aspectRatio = String(SHAPE[id] || 16 / 9);
+      fr.src = 'https://player.vimeo.com/video/' + id + '?background=1&autoplay=1&loop=1&muted=1&dnt=1' + (t.dataset.vimeoHash ? '&h=' + t.dataset.vimeoHash : '') + '#t=3s';
+      fr._show = function(){ if (s.fr === fr) { fr.style.opacity = 1; t.classList.add('m-playing'); } };   // stays behind the still until the film is really playing
+      fr.addEventListener('load', function(){ try { fr.contentWindow.postMessage(JSON.stringify({ method: 'addEventListener', value: 'playProgress' }), 'https://player.vimeo.com'); } catch (e) {} });
+      t.insertBefore(fr, t.querySelector('.work-overlay')); s.fr = fr;
+    }, 700);
+  }
+  function play(s, on){ var t = s.tile, v = t.querySelector('video.m-loop'); if (!v) { embed(s, on); return; }
     if (on) { t.classList.add('m-playing'); var p = v.play(); if (p && p.catch) p.catch(function(){}); }
     else if (!t.matches(':hover')) { t.classList.remove('m-playing'); v.pause(); } }
   function setFront(f){
@@ -83,37 +99,22 @@
   function goTo(p){ if (mode !== 'wheel') return; target = p; kick(); }
 
   // ---- all work: the wheel unfurls into a grid, and rolls back up ----
-  // The All view is laid out like a contact sheet with a rhythm: a large film beside two smaller ones, a row of three,
-  // then the large one on the other side - so the eye has places to land instead of a wall of equal tiles.
+  // The All view: every film the same size, three across (two on a phone), with room between them.
   function cellsOf(){
-    var SW = strip.clientWidth, vw = window.innerWidth, phone = vw <= 768, cols = phone ? 2 : 3, gap = phone ? 10 : 22;
+    var SW = strip.clientWidth, vw = window.innerWidth, phone = vw <= 768, cols = phone ? 2 : 3, gap = phone ? 10 : 24;
     var maxW = Math.min(SW - (phone ? 32 : 96), 1360), side = (SW - maxW) / 2;
-    var cw = (maxW - gap * (cols - 1)) / cols, ch = cw * 9 / 16, bw = 2 * cw + gap, bh = bw * 9 / 16, rg = phone ? gap : gap * 9 / 16;   // row gap chosen so one large film is exactly two small ones tall
-    var out = [], y = 0, i = 0, ph = 0, X = function(c){ return side + c * (cw + gap); };
-    var small = function(c, yy){ out.push({ x: X(c), y: yy, w: cw, h: ch }); i++; };
-    while (i < n) {
-      var rem = n - i;
-      if (phone) {
-        if (ph % 3 === 0) { out.push({ x: side, y: y, w: bw, h: bh }); i++; y += bh + gap; }
-        else { for (var c = 0; c < 2 && i < n; c++) small(c, y); y += ch + gap; }
-      } else if (ph % 2 === 0 && rem >= 3) {
-        var left = (ph % 4 === 0);
-        out.push({ x: left ? X(0) : X(1), y: y, w: bw, h: bh }); i++;
-        small(left ? 2 : 0, y); small(left ? 2 : 0, y + ch + rg);
-        y += bh + gap;
-      } else if (rem >= 3) { for (var c2 = 0; c2 < 3; c2++) small(c2, y); y += ch + gap; }
-      else { var x0 = side + (maxW - (rem * cw + (rem - 1) * gap)) / 2;                    // the last one or two sit centred
-        for (var c3 = 0; c3 < rem; c3++) { out.push({ x: x0 + c3 * (cw + gap), y: y, w: cw, h: ch }); } i += rem; y += ch + gap; }
-      ph++;
-    }
-    return { cells: out, SW: SW, H: y - gap };
+    var cw = (maxW - gap * (cols - 1)) / cols, ch = cw * 9 / 16, out = [], rows = Math.ceil(n / cols);
+    for (var i = 0; i < n; i++) { var r = (i / cols) | 0, c = i % cols, inRow = (r === rows - 1) ? n - r * cols : cols;
+      var x0 = side + (maxW - (inRow * cw + (inRow - 1) * gap)) / 2;                         // a short last row sits centred
+      out.push({ x: x0 + c * (cw + gap), y: r * (ch + gap), w: cw, h: ch }); }
+    return { cells: out, SW: SW, H: rows * (ch + gap) - gap };
   }
   function layGrid(){
     var G = cellsOf();
     for (var i = 0; i < n; i++) { var s = slots[i], c = G.cells[i], sc = c.w / W;
       var x = c.x + c.w / 2 - G.SW / 2, y = c.y + c.h / 2 - CY;
       s.el.style.transform = 'translate(-50%,-50%) translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + sc.toFixed(4) + ')';
-      s.el.style.setProperty('--inv', (1 / sc).toFixed(4)); s.el.classList.toggle('m-big', c.w > W * 1.6 || (window.innerWidth <= 768 && c.w > W * 1.2));
+      s.el.style.setProperty('--inv', (1 / sc).toFixed(4)); s.el.classList.remove('m-big');
       s.el.style.opacity = '1'; s.veil.style.opacity = '0'; s.el.style.zIndex = '1'; }
     strip.style.height = G.H.toFixed(0) + 'px';
   }
