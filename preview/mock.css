@@ -126,3 +126,8 @@ footer.m-footer { display:block !important; padding:3.5rem 1.5rem 1.6rem !import
 
 /* the About "Clients" heading was rendering near-black on the dark page */
 .about-page .about-body p.work-label { color:#f1eee8 !important; }
+
+/* ===== hero: roto reel — the BERDE/VISION title is in the footage, behind the subjects ===== */
+.reel-wrap.roto .reel-center { display:none; }
+.reel-wrap.roto .reel-video { -webkit-mask-image:linear-gradient(to bottom, black 0%, black 90%, transparent 100%); mask-image:linear-gradient(to bottom, black 0%, black 90%, transparent 100%); }
+@media (max-width:768px){ .reel-wrap.roto { aspect-ratio:4 / 3 !important; min-height:0 !important; } }

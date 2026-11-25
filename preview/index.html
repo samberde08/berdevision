@@ -1576,7 +1576,7 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
 <div id="page-home" class="page active">
 
 <!-- REEL -->
-<div class="reel-wrap" style="position:relative;">
+<div class="reel-wrap roto" style="position:relative;">
   <div class="crop-mark tl"></div>
   <div class="crop-mark tr"></div>
   <div class="crop-mark bl"></div>
@@ -1595,8 +1595,8 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
     HIGHLIGHT REEL — paste your Vimeo video ID below (the number in the URL, e.g. vimeo.com/123456789)
     Set VIMEO_REEL_ID to your ID and uncomment the iframe block
   -->
-  <video class="reel-video" id="reelVideo" src="https://player.vimeo.com/progressive_redirect/playback/1213766454/rendition/1080p/file.mp4%20%281080p%29.mp4?loc=external&signature=69412310adb1d2968decaed490761c412655e4d9b60d40a0b2299fe3e6a7f297" muted autoplay loop playsinline webkit-playsinline preload="auto" disableremoteplayback></video>
-  <script>(function(){var v=document.getElementById("reelVideo");v.muted=true;v.defaultMuted=true;var p=v.play();if(p&&p.catch)p.catch(function(){});})();</script>
+  <video class="reel-video" id="reelVideo" muted autoplay loop playsinline webkit-playsinline preload="auto" disableremoteplayback></video>
+  <script>(function(){var v=document.getElementById("reelVideo");v.muted=true;v.defaultMuted=true;v.src=(window.innerWidth<=768?"hero/reel_roto_720.mp4":"hero/reel_roto_1080.mp4")+"?v=5";var p=v.play();if(p&&p.catch)p.catch(function(){});})();</script>
   <div class="reel-center">
     <div class="reel-slogan">Vision, elevated.</div>
   </div>
@@ -2691,5 +2691,5 @@ footer p { color: rgba(236,234,228,0.5); }
 })();
 </script>
 
-<link rel="stylesheet" href="mock.css"><script src="mock.js"></script><link rel="stylesheet" href="collage.css"><script src="collage.js"></script></body>
+<link rel="stylesheet" href="mock.css?v=roto1"><script src="mock.js"></script><link rel="stylesheet" href="collage.css"><script src="collage.js"></script></body>
 </html>
