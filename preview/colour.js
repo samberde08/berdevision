@@ -83,7 +83,7 @@
   var SLOW = +((/[?&]slow=([\d.]+)/.exec(location.search) || [])[1]) || 1;   // ?slow=8 plays the opening in slow motion, for checking
   var lb = document.getElementById('lightbox'), fxRun = 0;
   function hold(c){ stick = c; root.classList.add('m-amb-stick'); }
-  function clearFx(){ fxRun++; document.querySelectorAll('.m-fx, .m-ghost, .m-amb-new').forEach(function(e){ e.remove(); }); if (lb) lb.classList.remove('m-mat'); }
+  function clearFx(){ fxRun++; document.querySelectorAll('.m-fx, .m-ghost, .m-amb-new').forEach(function(e){ e.remove(); }); if (lb && lb.classList.contains('m-mat')) lb.classList.remove('m-mat'); }
 
   function openFx(t, r, c, cxk, cyk){
     var fr = lb && lb.querySelector('.lightbox-frame'), img = t.querySelector('img');
@@ -225,7 +225,12 @@
         openFx(t, r, c, kx || r.left + r.width / 2, ky || r.top + r.height / 2); }, 0);
     });
   });
-  if (lb) new MutationObserver(function(){ if (!lb.classList.contains('open')) { clearFx(); if (stick) { cur = stick.slice(); curK = STICK_K; } } })
-    .observe(lb, { attributes: true, attributeFilter: ['class'] });
+  // tidy up once, at the moment the player closes (never on our own class changes, which would loop)
+  var wasOpen = false;
+  if (lb) new MutationObserver(function(){
+    var isOpen = lb.classList.contains('open');
+    if (wasOpen && !isOpen) { clearFx(); if (stick) { cur = stick.slice(); curK = STICK_K; } }
+    wasOpen = isOpen;
+  }).observe(lb, { attributes: true, attributeFilter: ['class'] });
   window.__amb = function(){ return { reel: reel, reelK: reelK, hover: hover, stick: stick, cur: cur, curK: curK, ok: ok }; };
 })();
