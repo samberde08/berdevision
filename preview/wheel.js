@@ -64,20 +64,36 @@
     if (f !== front) setFront(f);
   }
   var SHAPE = {'1204589600':426/234,'1204409147':240/300,'1204579585':300/240,'1203344844':300/240,'1204398806':292/240,'1204416675':240/426,'1203256076':322/240};
+  // warm up the connection to the player so the first preview starts sooner
+  ['https://player.vimeo.com', 'https://i.vimeocdn.com', 'https://f.vimeocdn.com'].forEach(function(h){ var l = document.createElement('link'); l.rel = 'preconnect'; l.href = h; l.crossOrigin = ''; document.head.appendChild(l); });
+  function showEmb(s, fr){ if (s.fr !== fr || fr._on) return; fr._on = 1; fr._show = null; fr.style.opacity = 1; s.tile.classList.add('m-playing'); }
   function embed(s, on){
     var t = s.tile, id = t.dataset.vimeo; if (!id) return;
     if (!on) { clearTimeout(s.embT); s.embT = 0; if (s.fr) { var o = s.fr; s.fr = null; o.style.opacity = 0; if (!t.matches(':hover')) t.classList.remove('m-playing'); setTimeout(function(){ o.remove(); }, 380); } return; }
     if (s.fr || s.embT) return;
     s.embT = setTimeout(function(){ s.embT = 0;                         // only once the wheel has come to rest on this film
       if (mode !== 'wheel' || front < 0 || slots[front] !== s || s.fr) return;
-      var fr = document.createElement('iframe'); fr.className = 'm-emb m-emb-w'; fr.setAttribute('allow', 'autoplay'); fr.setAttribute('tabindex', '-1'); fr.setAttribute('aria-hidden', 'true');
-      fr.style.aspectRatio = String(SHAPE[id] || 16 / 9);
-      fr.src = 'https://player.vimeo.com/video/' + id + '?background=1&autoplay=1&loop=1&muted=1&dnt=1' + (t.dataset.vimeoHash ? '&h=' + t.dataset.vimeoHash : '') + '#t=3s';
-      fr._show = function(){ if (s.fr === fr) { fr.style.opacity = 1; t.classList.add('m-playing'); } };   // stays behind the still until the film is really playing
-      fr.addEventListener('load', function(){ try { fr.contentWindow.postMessage(JSON.stringify({ method: 'addEventListener', value: 'playProgress' }), 'https://player.vimeo.com'); } catch (e) {} });
+      var fr = document.createElement('iframe'); fr.className = 'm-emb m-emb-w'; fr.setAttribute('allow', 'autoplay; fullscreen'); fr.setAttribute('tabindex', '-1'); fr.setAttribute('aria-hidden', 'true');
+      fr.style.aspectRatio = String(SHAPE[id] || 16 / 9); fr._t0 = null;
+      fr.src = 'https://player.vimeo.com/video/' + id + '?background=1&autoplay=1&loop=1&muted=1&playsinline=1&dnt=1' + (t.dataset.vimeoHash ? '&h=' + t.dataset.vimeoHash : '') + '#t=3s';
+      var hear = function(){ try { ['playProgress', 'play', 'timeupdate'].forEach(function(ev){ fr.contentWindow.postMessage(JSON.stringify({ method: 'addEventListener', value: ev }), 'https://player.vimeo.com'); }); } catch (e) {} };
+      fr._hear = hear;
+      fr.addEventListener('load', function(){ hear(); setTimeout(function(){ showEmb(s, fr); }, 2600); });      // if the player never reports back, show it anyway
       t.insertBefore(fr, t.querySelector('.work-overlay')); s.fr = fr;
-    }, 700);
+    }, 320);
   }
+  // show a preview the moment its film is actually moving (not after a fixed wait)
+  window.addEventListener('message', function(e){
+    if (!/player\.vimeo\.com$/.test(e.origin || '')) return;
+    var s = null; for (var i = 0; i < n; i++) if (slots[i].fr && slots[i].fr.contentWindow === e.source) { s = slots[i]; break; }
+    if (!s) return;
+    var d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (x) { return; }
+    if (!d) return; var fr = s.fr;
+    if (d.event === 'ready') { fr._hear(); return; }
+    if (d.event === 'play') { setTimeout(function(){ showEmb(s, fr); }, 350); return; }
+    if ((d.event === 'playProgress' || d.event === 'timeupdate') && d.data && typeof d.data.seconds === 'number') {
+      if (fr._t0 === null) fr._t0 = d.data.seconds; else if (d.data.seconds - fr._t0 > 0.04) showEmb(s, fr); }
+  });
   function play(s, on){ var t = s.tile, v = t.querySelector('video.m-loop'); if (!v) { embed(s, on); return; }
     if (on) { t.classList.add('m-playing'); var p = v.play(); if (p && p.catch) p.catch(function(){}); }
     else if (!t.matches(':hover')) { t.classList.remove('m-playing'); v.pause(); } }
