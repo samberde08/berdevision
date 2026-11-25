@@ -131,3 +131,16 @@ footer.m-footer { display:block !important; padding:3.5rem 1.5rem 1.6rem !import
 .reel-wrap.roto .reel-center { display:none; }
 .reel-wrap.roto .reel-video { -webkit-mask-image:linear-gradient(to bottom, black 0%, black 90%, transparent 100%); mask-image:linear-gradient(to bottom, black 0%, black 90%, transparent 100%); }
 @media (max-width:768px){ .reel-wrap.roto { aspect-ratio:4 / 3 !important; min-height:0 !important; } }
+
+/* ===== colour: the page takes the reel's colour; a hovered project takes it over ===== */
+:root { --amb: 118,116,124; --amb-k: .55; }
+.m-amb { position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(120% 75% at 50% 0%, rgba(var(--amb), calc(.34 * var(--amb-k))) 0%, rgba(var(--amb), 0) 72%),
+    radial-gradient(70% 55% at 0% 100%, rgba(var(--amb), calc(.20 * var(--amb-k))) 0%, rgba(var(--amb), 0) 70%),
+    radial-gradient(70% 55% at 100% 100%, rgba(var(--amb), calc(.20 * var(--amb-k))) 0%, rgba(var(--amb), 0) 70%); }
+.work-title { color: color-mix(in srgb, #f1eee8 70%, rgb(var(--amb))) !important; }
+.m-clients .work-label { color: color-mix(in srgb, rgba(236,234,228,.6) 55%, rgb(var(--amb))) !important; }
+.work-strip .work-item { outline: 1px solid rgba(var(--amb), calc(.30 * var(--amb-k))); outline-offset: -1px; }
+.work-side-arrow { border-color: rgba(var(--amb), .55) !important; }
+.work-nav-counter { color: color-mix(in srgb, rgba(236,234,228,.6) 50%, rgb(var(--amb))) !important; }
