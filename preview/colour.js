@@ -70,5 +70,39 @@
       strip.addEventListener('scroll', ask, { passive: true });
     }
   }
+  // ---- opening a project: a shockwave in that project's colour runs out across the whole page ----
+  var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function wave(x, y, c){
+    if (still || !document.body.animate) return;
+    var w = window.innerWidth, h = window.innerHeight;
+    var R = Math.max(Math.hypot(x, y), Math.hypot(w - x, y), Math.hypot(x, h - y), Math.hypot(w - x, h - y)) * 1.12;
+    var rgb = Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]);
+    var box = document.createElement('div'); box.className = 'm-wave'; box.setAttribute('aria-hidden', 'true');
+    var mk = function(cls, bg){ var e = document.createElement('div'); e.className = cls;
+      e.style.cssText = 'left:' + (x - R) + 'px;top:' + (y - R) + 'px;width:' + (2 * R) + 'px;height:' + (2 * R) + 'px;background:' + bg; box.appendChild(e); return e; };
+    // a soft wash of colour, then a bright thin front, then a fainter echo behind it
+    var wash = mk('m-wave-d', 'radial-gradient(circle closest-side, rgba(' + rgb + ',.55) 0%, rgba(' + rgb + ',.32) 55%, rgba(' + rgb + ',0) 100%)');
+    var ring = mk('m-wave-d', 'radial-gradient(circle closest-side, rgba(' + rgb + ',0) 0%, rgba(' + rgb + ',0) 78%, rgba(' + rgb + ',.45) 90%, rgba(255,255,255,.95) 95.5%, rgba(' + rgb + ',.9) 97%, rgba(' + rgb + ',0) 100%)');
+    var echo = mk('m-wave-d', 'radial-gradient(circle closest-side, rgba(' + rgb + ',0) 0%, rgba(' + rgb + ',0) 86%, rgba(' + rgb + ',.5) 95%, rgba(' + rgb + ',0) 100%)');
+    document.body.appendChild(box);
+    var ease = 'cubic-bezier(.22,.61,.36,1)';
+    wash.animate([{ transform: 'scale(.04)', opacity: .9 }, { opacity: .5, offset: .6 }, { transform: 'scale(1)', opacity: 0 }], { duration: 1250, easing: ease, fill: 'forwards' });
+    ring.animate([{ transform: 'scale(.03)', opacity: 1 }, { opacity: 1, offset: .72 }, { transform: 'scale(1)', opacity: 0 }], { duration: 1050, easing: ease, fill: 'forwards' });
+    echo.animate([{ transform: 'scale(.02)', opacity: 0 }, { opacity: .8, offset: .5 }, { transform: 'scale(1)', opacity: 0 }], { duration: 1450, delay: 140, easing: ease, fill: 'forwards' });
+    setTimeout(function(){ box.remove(); }, 1750);
+  }
+  var lb = document.getElementById('lightbox'), held = false;
+  tiles.forEach(function(t){
+    t.addEventListener('click', function(e){
+      var c = tileColour(t) || reel.slice(), r = t.getBoundingClientRect();
+      var x = e.clientX || (r.left + r.width / 2), y = e.clientY || (r.top + r.height / 2);
+      // only when the player really opens (a drag on the strip cancels the click)
+      setTimeout(function(){ if (!lb || !lb.classList.contains('open')) return;
+        wave(x, y, c); hover = c; held = true; root.classList.add('m-amb-proj'); }, 0);
+    });
+  });
+  if (lb) new MutationObserver(function(){ if (held && !lb.classList.contains('open')) { held = false; hover = null; root.classList.remove('m-amb-proj'); } })
+    .observe(lb, { attributes: true, attributeFilter: ['class'] });
+  window.__wave = wave;
   window.__amb = function(){ return { reel: reel, reelK: reelK, hover: hover, cur: cur, ok: ok }; };
 })();

@@ -144,3 +144,21 @@ footer.m-footer { display:block !important; padding:3.5rem 1.5rem 1.6rem !import
 .work-strip .work-item { outline: 1px solid rgba(var(--amb), calc(.30 * var(--amb-k))); outline-offset: -1px; }
 .work-side-arrow { border-color: rgba(var(--amb), .55) !important; }
 .work-nav-counter { color: color-mix(in srgb, rgba(236,234,228,.6) 50%, rgb(var(--amb))) !important; }
+
+/* ===== opening a project: colour shockwave over the whole page, and the player sits in that colour ===== */
+.m-wave { position:fixed; inset:0; z-index:9500; pointer-events:none; overflow:hidden; mix-blend-mode:screen; }
+.m-wave-d { position:absolute; border-radius:50%; transform:scale(.03); will-change:transform, opacity; }
+.lightbox-backdrop { background:
+  radial-gradient(90% 80% at 50% 50%, rgba(var(--amb), .30) 0%, rgba(var(--amb), .10) 55%, rgba(var(--amb), 0) 100%), rgba(8,8,8,.86) !important; }
+.lightbox-frame { box-shadow: 0 0 140px 10px rgba(var(--amb), .35); }
+
+/* ===== client logos: larger and brighter ===== */
+.m-clients .logo-track img { height:52px !important; opacity:.92 !important; }
+.m-clients .logo-track { gap:4.2rem !important; }
+.m-clients .work-label { font-size:.7rem !important; margin-bottom:1.4rem !important; }
+.m-clients { padding:2rem 0 .8rem; }
+@media (max-width:768px){ .m-clients .logo-track img { height:36px !important; } .m-clients .logo-track { gap:2.6rem !important; } }
+
+/* ===== phone held upright: the tall 9:16 cut of the reel fills the screen ===== */
+@media (max-width:768px){ .reel-wrap.roto.tall { aspect-ratio:9 / 16 !important; max-height:100svh; min-height:0 !important; }
+  .reel-wrap.roto.tall .reel-video { object-fit:cover; object-position:50% 40%; } }
