@@ -276,3 +276,31 @@ footer.m-footer { display:block !important; padding:3.5rem 1.5rem 1.6rem !import
 .m-allwork:hover, .m-allwork.m-on { background:#fff; color:#0c0c0d; }
 .m-allwork:active { transform: scale(.97); }
 html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
+
+/* ===== Wheel / All: a quiet text switch beside the section title ===== */
+.work-header.m-has-tog { position:relative; }
+.m-viewtog { position:absolute; right:clamp(1.2rem, 4vw, 3.5rem); bottom:.5rem; display:flex; align-items:center; gap:.7rem; z-index:4;
+  font-family:'DM Sans',sans-serif; font-weight:500; font-size:.68rem; letter-spacing:.24em; text-transform:uppercase; }
+.m-viewtog button { background:none; border:0; padding:.35rem 0; margin:0; font:inherit; letter-spacing:inherit; text-transform:inherit; color:rgba(255,255,255,.45); cursor:pointer;
+  border-bottom:1px solid transparent; transition: color .25s ease, border-color .25s ease; }
+.m-viewtog button:hover { color:rgba(255,255,255,.85); }
+.m-viewtog button.m-on { color:#fff; border-bottom-color:rgba(255,255,255,.9); }
+.m-viewtog i { font-style:normal; color:rgba(255,255,255,.3); }
+@media (max-width:768px){ .m-viewtog { position:static; justify-content:center; margin-top:.9rem; font-size:.64rem; } }
+.m-allwork-bar { display:none !important; }
+
+/* ===== All view: films carry their own titles; no hover plate ===== */
+.work-strip.m-grid .work-item .work-overlay { display:none !important; }
+.work-strip.m-grid .work-item, .work-strip.m-grid .m-slot.m-front .work-item { box-shadow:none !important; border-radius:2px; }
+.m-gcap { position:absolute; left:0; right:0; bottom:0; z-index:6; pointer-events:none; opacity:0; transition: opacity .35s ease;
+  padding: calc(34px * var(--inv, 1)) calc(14px * var(--inv, 1)) calc(11px * var(--inv, 1));
+  background: linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.38) 45%, rgba(0,0,0,0) 100%); border-radius:0 0 2px 2px; }
+.work-strip.m-grid .m-gcap { opacity:1; transition: opacity .6s ease .55s; }
+.m-gc-name { font-family:'Manrope',sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:.01em; color:#fff; line-height:1.05; font-size: calc(13px * var(--inv, 1)); }
+.m-gc-tag { font-family:'DM Sans',sans-serif; font-weight:400; color:rgba(255,255,255,.7); margin-top: calc(3px * var(--inv, 1)); font-size: calc(10.5px * var(--inv, 1)); letter-spacing:.04em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.m-slot.m-big .m-gc-name { font-size: calc(21px * var(--inv, 1)); }
+.m-slot.m-big .m-gc-tag { font-size: calc(12.5px * var(--inv, 1)); }
+.m-slot.m-big .m-gcap { padding: calc(60px * var(--inv, 1)) calc(22px * var(--inv, 1)) calc(18px * var(--inv, 1)); }
+@media (max-width:768px){ .m-gc-name { font-size: calc(10.5px * var(--inv, 1)); } .m-gc-tag { display:none; } .m-slot.m-big .m-gc-name { font-size: calc(15px * var(--inv, 1)); } .m-slot.m-big .m-gc-tag { display:block; font-size: calc(10.5px * var(--inv, 1)); }
+  .m-gcap { padding: calc(22px * var(--inv, 1)) calc(9px * var(--inv, 1)) calc(8px * var(--inv, 1)); } }

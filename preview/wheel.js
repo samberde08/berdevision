@@ -10,15 +10,24 @@
   var slots = tiles.map(function(t){
     var s = document.createElement('div'); s.className = 'm-slot'; strip.appendChild(s); s.appendChild(t);
     var veil = document.createElement('div'); veil.className = 'm-veil'; s.appendChild(veil);
+    // in the All view each film carries its own title, set quietly in its lower corner
+    var gt = function(q){ var e = t.querySelector(q); return e ? e.textContent : ''; };
+    var gc = document.createElement('div'); gc.className = 'm-gcap'; gc.setAttribute('aria-hidden', 'true');
+    var gn = document.createElement('div'); gn.className = 'm-gc-name'; gn.textContent = gt('.work-name'); gc.appendChild(gn);
+    var gg = document.createElement('div'); gg.className = 'm-gc-tag'; gg.textContent = gt('.work-subtitle') || gt('.work-tag'); gc.appendChild(gg);
+    s.appendChild(gc);
     return { el: s, tile: t, veil: veil, shown: true };
   });
   var cap = document.createElement('div'); cap.className = 'm-wheel-cap';
   cap.innerHTML = '<div class="m-wc-tag"></div><div class="m-wc-name"></div><div class="m-wc-sub"></div>';
   strip.insertAdjacentElement('afterend', cap);
-  var all = document.createElement('button'); all.type = 'button'; all.className = 'm-allwork'; all.textContent = 'All work';
-  var bar = document.createElement('div'); bar.className = 'm-allwork-bar'; bar.appendChild(all);
+  // a quiet two-word switch beside the section title: Wheel / All
+  var tog = document.createElement('div'); tog.className = 'm-viewtog'; tog.setAttribute('role', 'group'); tog.setAttribute('aria-label', 'How the projects are shown');
+  tog.innerHTML = '<button type="button" data-v="wheel" class="m-on">Wheel</button><i>/</i><button type="button" data-v="grid">All</button>';
+  var hdr = document.querySelector('#work .work-header');
+  if (hdr) { hdr.classList.add('m-has-tog'); hdr.appendChild(tog); } else strip.insertAdjacentElement('beforebegin', tog);
+  function togState(){ Array.prototype.forEach.call(tog.querySelectorAll('button'), function(b){ b.classList.toggle('m-on', b.dataset.v === mode); b.setAttribute('aria-pressed', b.dataset.v === mode ? 'true' : 'false'); }); }
   var counter = document.getElementById('workNavCounter'), prevB = document.getElementById('workPrev'), nextB = document.getElementById('workNext');
-  (counter && counter.parentNode ? counter : cap).insertAdjacentElement('afterend', bar);
 
   var STEP = 24 * Math.PI / 180, W = 0, H = 0, R = 0, CY = 0, pos = 0, target = 0, front = -1, raf = 0, lastT = 0, mode = 'wheel', busy = 0;
   function count(){ if (counter && front >= 0) counter.textContent = (front < 9 ? '0' : '') + (front + 1) + ' / ' + n; }
@@ -73,19 +82,39 @@
   function goTo(p){ if (mode !== 'wheel') return; target = p; kick(); }
 
   // ---- all work: the wheel unfurls into a grid, and rolls back up ----
-  function gridOf(){
-    var SW = strip.clientWidth, vw = window.innerWidth, cols = vw <= 768 ? 2 : vw < 1100 ? 3 : 4, gap = vw <= 768 ? 8 : 12;
-    var side = vw <= 768 ? 16 : Math.max(24, (SW - Math.min(SW - 48, 1500)) / 2);
-    var cw = (SW - 2 * side - gap * (cols - 1)) / cols, ch = cw * 9 / 16;
-    return { SW: SW, cols: cols, gap: gap, side: side, cw: cw, ch: ch, rows: Math.ceil(n / cols) };
+  // The All view is laid out like a contact sheet with a rhythm: a large film beside two smaller ones, a row of three,
+  // then the large one on the other side - so the eye has places to land instead of a wall of equal tiles.
+  function cellsOf(){
+    var SW = strip.clientWidth, vw = window.innerWidth, phone = vw <= 768, cols = phone ? 2 : 3, gap = phone ? 10 : 22;
+    var maxW = Math.min(SW - (phone ? 32 : 96), 1360), side = (SW - maxW) / 2;
+    var cw = (maxW - gap * (cols - 1)) / cols, ch = cw * 9 / 16, bw = 2 * cw + gap, bh = bw * 9 / 16, rg = phone ? gap : gap * 9 / 16;   // row gap chosen so one large film is exactly two small ones tall
+    var out = [], y = 0, i = 0, ph = 0, X = function(c){ return side + c * (cw + gap); };
+    var small = function(c, yy){ out.push({ x: X(c), y: yy, w: cw, h: ch }); i++; };
+    while (i < n) {
+      var rem = n - i;
+      if (phone) {
+        if (ph % 3 === 0) { out.push({ x: side, y: y, w: bw, h: bh }); i++; y += bh + gap; }
+        else { for (var c = 0; c < 2 && i < n; c++) small(c, y); y += ch + gap; }
+      } else if (ph % 2 === 0 && rem >= 3) {
+        var left = (ph % 4 === 0);
+        out.push({ x: left ? X(0) : X(1), y: y, w: bw, h: bh }); i++;
+        small(left ? 2 : 0, y); small(left ? 2 : 0, y + ch + rg);
+        y += bh + gap;
+      } else if (rem >= 3) { for (var c2 = 0; c2 < 3; c2++) small(c2, y); y += ch + gap; }
+      else { var x0 = side + (maxW - (rem * cw + (rem - 1) * gap)) / 2;                    // the last one or two sit centred
+        for (var c3 = 0; c3 < rem; c3++) { out.push({ x: x0 + c3 * (cw + gap), y: y, w: cw, h: ch }); } i += rem; y += ch + gap; }
+      ph++;
+    }
+    return { cells: out, SW: SW, H: y - gap };
   }
   function layGrid(){
-    var G = gridOf(), sc = G.cw / W;
-    for (var i = 0; i < n; i++) { var s = slots[i], c = i % G.cols, r = (i / G.cols) | 0;
-      var x = G.side + c * (G.cw + G.gap) + G.cw / 2 - G.SW / 2, y = r * (G.ch + G.gap) + G.ch / 2 - CY;
+    var G = cellsOf();
+    for (var i = 0; i < n; i++) { var s = slots[i], c = G.cells[i], sc = c.w / W;
+      var x = c.x + c.w / 2 - G.SW / 2, y = c.y + c.h / 2 - CY;
       s.el.style.transform = 'translate(-50%,-50%) translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + sc.toFixed(4) + ')';
+      s.el.style.setProperty('--inv', (1 / sc).toFixed(4)); s.el.classList.toggle('m-big', c.w > W * 1.6 || (window.innerWidth <= 768 && c.w > W * 1.2));
       s.el.style.opacity = '1'; s.veil.style.opacity = '0'; s.el.style.zIndex = '1'; }
-    strip.style.height = (G.rows * (G.ch + G.gap) - G.gap).toFixed(0) + 'px';
+    strip.style.height = G.H.toFixed(0) + 'px';
   }
   function stagger(){ var f = front < 0 ? 0 : front;
     slots.forEach(function(s, i){ s.el.style.transitionDelay = still ? '0ms' : (Math.min(12, Math.abs(wrapD(i - f))) * 28).toFixed(0) + 'ms'; }); }
@@ -95,19 +124,19 @@
     if (front >= 0) play(slots[front], false);
     void strip.offsetWidth;
     mode = 'grid'; strip.classList.add('m-anim', 'm-grid'); stagger(); layGrid();
-    cap.classList.add('m-gone'); all.textContent = 'Back to the wheel'; all.classList.add('m-on'); document.documentElement.classList.add('m-allwork-on');
+    cap.classList.add('m-gone'); togState(); document.documentElement.classList.add('m-allwork-on');
     setTimeout(function(){ strip.classList.remove('m-anim'); slots.forEach(function(s){ s.el.style.transitionDelay = ''; }); busy = 0; }, still ? 60 : 1500);
-    var top = strip.getBoundingClientRect().top + window.scrollY - 110; if (Math.abs(window.scrollY - top) > 40) window.scrollTo({ top: top, behavior: still ? 'auto' : 'smooth' });
+    var top = (hdr || strip).getBoundingClientRect().top + window.scrollY - 90; if (Math.abs(window.scrollY - top) > 40) window.scrollTo({ top: top, behavior: still ? 'auto' : 'smooth' });
   }
   function furl(){
     if (mode !== 'grid' || busy) return; busy = 1;
     strip.classList.add('m-anim'); stagger(); mode = 'wheel'; strip.classList.remove('m-grid');
     strip.style.height = (2 * CY).toFixed(0) + 'px'; render(true);
-    cap.classList.remove('m-gone'); all.textContent = 'All work'; all.classList.remove('m-on'); document.documentElement.classList.remove('m-allwork-on');
+    cap.classList.remove('m-gone'); togState(); document.documentElement.classList.remove('m-allwork-on');
     setTimeout(function(){ strip.classList.remove('m-anim'); slots.forEach(function(s){ s.el.style.transitionDelay = ''; }); busy = 0; render(); if (front >= 0) play(slots[front], true); }, still ? 60 : 1500);
-    var top = strip.getBoundingClientRect().top + window.scrollY - 160; window.scrollTo({ top: top, behavior: still ? 'auto' : 'smooth' });
+    var top = (hdr || strip).getBoundingClientRect().top + window.scrollY - 90; window.scrollTo({ top: top, behavior: still ? 'auto' : 'smooth' });
   }
-  all.addEventListener('click', function(){ if (mode === 'wheel') unfurl(); else furl(); });
+  tog.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('button'); if (!b) return; if (b.dataset.v === 'grid') unfurl(); else furl(); });
 
   // ---- drag anywhere on the wheel ----
   var down = false, moved = false, sx = 0, sy = 0, sp = 0, lx = 0, lt = 0, vel = 0, pid = null, decided = false;
