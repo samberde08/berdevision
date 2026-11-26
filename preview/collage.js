@@ -217,7 +217,8 @@
     hallSeq.forEach(function(q,i){ var c=q.c, eh=c[2]+PAD*2, face=/face|portrait/.test(c[0]);
       q.bx = c[1] + c[2]*c[6]/2; q.by = (C.H - (c[3]-PAD) - eh) + eh*0.92; q.eh = eh;
       q.hz = HP.Z0 + i*HP.DZ; q.hs = (i%2 ? 1 : -1); q.hxw = HP.XW*(0.9 + 0.25*(((i*37)%11)/11));
-      q.hh = face ? HP.HF*0.62 : HP.HF; q.hy = face ? HP.FH - HP.HF*0.5 : HP.FH;      // portraits hang at eye level, bodies stand on the floor
+      q.hh = Math.min(face ? HP.HF*0.62 : HP.HF, (mobile ? 300 : 520)/c[6]);   // wide cut-outs are held to a sensible width
+      q.hxw = Math.max(q.hxw, q.hh*c[6]/2 + (mobile ? 36 : 100));                 // and nobody stands in front of the orb q.hy = face ? HP.FH - HP.HF*0.5 : HP.FH;      // portraits hang at eye level, bodies stand on the floor
       q.rank = Math.min(1, Math.abs(q.bx - C.CX)/(C.W/2)); q.f = null; });
     HP.END = HP.Z0 + (hallSeq.length-1)*HP.DZ + 140; HP.ZO = HP.END + HP.F;
     if (!orbOn) { orbOn = true; requestAnimationFrame(orbLoop); }
@@ -269,7 +270,7 @@
     var hp=clamp(prog/0.66), gp=clamp((prog-0.66)/0.34), F=HP.F, cam=hp*HP.END, E=C.earth, i, q;
     var go = gp*gp*(3-2*gp);
     // the orb: far down the corridor, growing as we approach; then it sinks and swells into the earth
-    var k0=F/(HP.ZO-cam), r0=Math.max(mobile?13:17, HP.RO*k0), sinkT=clamp(gp/0.62), se=sinkT*sinkT*(3-2*sinkT);
+    var k0=F/(HP.ZO-cam), r0=Math.max(mobile?20:28, HP.RO*k0), sinkT=clamp(gp/0.62), se=sinkT*sinkT*(3-2*sinkT);
     var ox=C.CX, oy=HP.VY + ((C.H - E.cy) - HP.VY)*se, orr=r0 + (E.R - r0)*se;
     orb.style.transform='translate3d('+(ox-200).toFixed(1)+'px,'+(oy-200).toFixed(1)+'px,0) scale('+(orr/200).toFixed(4)+')';
     var oo = 1 - clamp((gp-0.5)/0.3); orb.style.opacity=oo.toFixed(3); orb.style.zIndex = gp>0 ? 29 : 2; orbVis = oo>0.01;
