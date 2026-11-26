@@ -58,6 +58,14 @@
   function wrapD(d){ return ((d + n / 2) % n + n) % n - n / 2; }
   function wrapP(d){ return ((d + P / 2) % P + P) % P - P / 2; }
   var gkey = '';
+  // a far-side still is drawn from a small copy of the film's picture (it is never seen large), which keeps the ring light to turn
+  var smallCache = {};
+  function small(im){
+    if (!im) return ''; var src = im.currentSrc || im.src; if (smallCache[src]) return smallCache[src];
+    try { if (im.complete && im.naturalWidth) { var c = document.createElement('canvas'); c.width = 360; c.height = 203; var k = Math.max(360 / im.naturalWidth, 203 / im.naturalHeight), w = im.naturalWidth * k, h = im.naturalHeight * k;
+      c.getContext('2d').drawImage(im, (360 - w) / 2, (203 - h) / 2, w, h); return (smallCache[src] = c.toDataURL('image/jpeg', 0.72)); } } catch (e) {}
+    return src;
+  }
   function ensureGhosts(){
     var key = M + ':' + slots.map(function(x){ return allSlots.indexOf(x); }).join(',');
     if (key === gkey) return; gkey = key;
@@ -65,7 +73,7 @@
     if (M < 2) return;
     for (var i = 0; i < n; i++) for (var c = 1; c < M; c++) {
       var im = slots[i].tile.querySelector('img'), el = document.createElement('div'); el.className = 'm-slot m-ghost'; el.setAttribute('aria-hidden', 'true');
-      el.innerHTML = '<div class="work-item"><img alt="" src="' + (im ? (im.currentSrc || im.src) : '') + '" style="width:100%;height:100%;object-fit:cover;display:block;"></div><div class="m-veil"></div>';
+      el.innerHTML = '<div class="work-item"><img alt="" decoding="async" src="' + small(im) + '" style="width:100%;height:100%;object-fit:cover;display:block;"></div><div class="m-veil"></div>';
       strip.appendChild(el); ghosts.push({ el: el, veil: el.lastChild, i: i });
     }
   }
