@@ -75,9 +75,11 @@
     cur[0] += (t[0] - cur[0]) * e; cur[1] += (t[1] - cur[1]) * e; cur[2] += (t[2] - cur[2]) * e; curK += (k - curK) * e;
     var s = rgbOf(cur) + '|' + curK.toFixed(2);
     var nowT = performance.now();
-    if (s !== last && nowT - lastVarT > 70) { last = s; lastVarT = nowT; root.style.setProperty('--amb', s.split('|')[0]); root.style.setProperty('--amb-k', curK.toFixed(2));
+    // while the colour is only drifting slowly, the page is re-tinted twice a second; while it is moving to a new film or shot, about 14 times a second
+    var moving = Math.abs(t[0] - cur[0]) + Math.abs(t[1] - cur[1]) + Math.abs(t[2] - cur[2]) > 6 || Math.abs(k - curK) > 0.04;
+    if (s !== last && nowT - lastVarT > (moving ? 70 : 500)) { last = s; lastVarT = nowT; root.style.setProperty('--amb', s.split('|')[0]); root.style.setProperty('--amb-k', curK.toFixed(2));
       root.style.setProperty('--amb2', rgbOf(rot(cur, 34))); root.style.setProperty('--amb3', rgbOf(rot(cur, -30))); }   // neighbouring hues for the other pools
-    if (nowT - lastDrawT > 45) { lastDrawT = nowT; drawAmb(nowT / 1000); }
+    if (nowT - lastDrawT > (moving ? 45 : 160)) { lastDrawT = nowT; drawAmb(nowT / 1000); }
     requestAnimationFrame(tick);
   }
   // The four drifting pools of colour are painted into one very small picture that the browser stretches over the page.
