@@ -28,3 +28,10 @@
 .bvc-orb canvas { position:relative; z-index:1; }
 .bvc-orb canvas { width:100%; height:100%; display:block; border-radius:50%; }
 .bvc-hall { -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent), linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent), linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent); mask-composite: intersect; }
+
+/* the torrent entrance + shimmering wordmark (Nov 26) */
+.bvc-torrent { position:fixed; inset:0; width:100vw; height:100vh; z-index:90; pointer-events:none; opacity:0; background:#000; }
+@keyframes bvc-shim { 0% { background-position:135% 0; } 100% { background-position:-135% 0; } }
+@keyframes bvc-glow { 0%,100% { filter: drop-shadow(0 0 10px rgba(255,255,255,.28)) drop-shadow(0 8px 18px rgba(0,0,0,.45)); } 50% { filter: drop-shadow(0 0 22px rgba(255,255,255,.6)) drop-shadow(0 8px 18px rgba(0,0,0,.45)); } }
+.bvc.shim .jl { background: linear-gradient(105deg, #d8d3c6 0%, #d8d3c6 36%, #ffffff 50%, #d8d3c6 64%, #d8d3c6 100%); background-size:270% 100%; -webkit-background-clip:text; background-clip:text;
+  color:transparent; -webkit-text-fill-color:transparent; text-shadow:none; animation: bvc-shim 4.4s linear infinite, bvc-glow 3.6s ease-in-out infinite; }

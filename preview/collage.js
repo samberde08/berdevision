@@ -29,7 +29,7 @@
   var SIL = !reduce;
   // (Nov 26, Sam) the hallway: scroll flies down a corridor past every figure toward a white plasma orb; the orb then sinks and
   // becomes the earth, and the figures land on it as the full collage. ?hall=0 shows the earlier entrance.
-  var HALL = !reduce && !/[?&]hall=0/.test(qs); if (HALL) SIL = false;
+  var HALL = !reduce && /[?&]hall=1/.test(qs);   // (Nov 26) rejected by Sam; kept only behind ?hall=1 if (HALL) SIL = false;
   var extraEls = null;
   var C=DESK, mobile=false, plates=[], letters=[], cuts=[], dropAll=0, earthEl, s=1, pin=0, anchor=8, builtW=-1, mx=0, my=0;
   var meas = document.createElement('canvas').getContext('2d');
@@ -64,6 +64,7 @@
     mobile = builtW < 720; C = mobile ? MOB : DESK;
     var H=C.H, CX=C.CX, E=C.earth;
     col.innerHTML=''; plates=[]; letters=[]; cuts=[];
+    col.classList.toggle('shim', !reduce && !HALL);
     col.style.width=C.W+'px'; col.style.height=H+'px'; col.style.marginLeft=(-C.W/2)+'px';
     var stars=document.createElement('div'); stars.className='stars'; stars.style.zIndex=1; col.appendChild(stars);
     buildType();
@@ -357,6 +358,57 @@
     for (var i=0;i<rv.length;i++){ var r=rv[i], top=r.el.getBoundingClientRect().top, t=clamp((vh*(0.9-r.lag) - top)/(vh*0.2)); t=Math.round(t*50)/50;
       if (t===r.t) continue; r.t=t; r.el.style.opacity=(0.08+0.92*t).toFixed(2); r.el.style.transform = t>=1 ? 'none' : 'translate3d(0,'+((1-t)*26).toFixed(1)+'px,0)'; }
   }
+  // ---------------- the entrance (Nov 26, Sam): we are pulled down a glowing torrent of energy; it gets brighter and brighter, whites out,
+  // and clears to the BERDEVISION wordmark. A real fragment shader, so the depth is true perspective, not flat shapes. Scrolling then reveals the collage.
+  var TFS = 'precision highp float;uniform vec2 R;uniform float T;uniform float P;'
+    + 'float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}'
+    + 'float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),f.x),f.y);}'
+    + 'float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*noise(p);p=p*2.03+vec2(17.,9.);a*=.5;}return s;}'
+    + 'vec3 pal(float t){return .55+.45*cos(6.2832*(t+vec3(0.,.33,.67)));}'
+    + 'void main(){vec2 uv=(gl_FragCoord.xy-.5*R)/R.y;float r=length(uv),a=atan(uv.y,uv.x);'
+    + 'float z=T*.22+P*P*7.5;float tw=T*.12+P*P*3.2;vec3 col=vec3(0.);'
+    + 'for(int i=0;i<4;i++){float fi=float(i);float d=(.30+.07*fi)/(r+.015);float ang=a+tw*(.55+.3*fi)+d*(.16+.05*fi);'   // each shell of the torrent sits at its own depth and twists at its own rate
+    + 'vec2 c=vec2(cos(ang),sin(ang))*(1.1+.55*fi);float q=d+z*(1.+.45*fi);'
+    + 'float n=fbm(vec2(c.x+q*.9,c.y-q*.55)+fi*13.7);float n2=fbm(vec2(c.y*2.+q*1.7,c.x*2.-q)+fi*5.1);'
+    + 'float fil=pow(smoothstep(.42,.80,n),2.2)+.55*pow(smoothstep(.55,.9,n2),3.);'
+    + 'float depth=smoothstep(.0,.28,r)*(1.-.55*smoothstep(.5,1.3,r));'                                           // dim far down the throat and at the rim: the wall curves away
+    + 'col+=pal(n*.55+d*.035+fi*.19+T*.04)*fil*depth*(.5+.28*fi);}'
+    + 'float sid=floor((a+3.14159)/6.2832*110.);float h1=hash(vec2(sid,3.));float cell=fract((a+3.14159)/6.2832*110.);'
+    + 'float f=fract(log(r+.0001)*.9-z*(.35+.6*h1)+h1*9.);float st=smoothstep(.0,.06,f)*smoothstep(.5,.06,f)*step(.55,h1)*smoothstep(.5,.15,abs(cell-.5));'
+    + 'col+=vec3(.85,.93,1.)*st*smoothstep(.03,.4,r)*(.35+1.3*P);'                                                // sparks streaking past
+    + 'float core=.085/(r+.03);col+=vec3(1.,.96,.9)*core*core*(.5+3.2*P*P);'                                      // the light we are being pulled into
+    + 'col*=.75+2.2*P*P;col=1.-exp(-col*1.35);'
+    + 'float wr=smoothstep(.58,.92,P);col=mix(col,vec3(1.),clamp(wr*(1.25-.5*r),0.,1.));gl_FragColor=vec4(col,1.);}';
+  var tor=null, tgl=null, tprog=null, tU=null, tRaf=0, TDUR=5600, tFast=false;
+  function torrentInit(){
+    if (tor) return true;
+    var c=document.createElement('canvas'); c.className='bvc-torrent';
+    var gl=c.getContext('webgl',{antialias:false, alpha:false, powerPreference:'high-performance'}); if (!gl) return false;
+    function sh(t,src){ var o=gl.createShader(t); gl.shaderSource(o,src); gl.compileShader(o); return gl.getShaderParameter(o,gl.COMPILE_STATUS) ? o : null; }
+    var vs=sh(gl.VERTEX_SHADER,'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'), fs=sh(gl.FRAGMENT_SHADER,TFS); if (!vs||!fs) return false;
+    var pr=gl.createProgram(); gl.attachShader(pr,vs); gl.attachShader(pr,fs); gl.linkProgram(pr); if (!gl.getProgramParameter(pr,gl.LINK_STATUS)) return false;
+    gl.useProgram(pr); var b=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    var loc=gl.getAttribLocation(pr,'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    tor=c; tgl=gl; tU={R:gl.getUniformLocation(pr,'R'), T:gl.getUniformLocation(pr,'T'), P:gl.getUniformLocation(pr,'P')}; return true;
+  }
+  function torrentFrame(P, secs){
+    var k=Math.min(1, 900/Math.max(window.innerWidth, window.innerHeight)) * 0.75, w=Math.max(2,Math.round(window.innerWidth*k)), h=Math.max(2,Math.round(window.innerHeight*k));
+    if (tor.width!==w || tor.height!==h) { tor.width=w; tor.height=h; tgl.viewport(0,0,w,h); }
+    tgl.uniform2f(tU.R,w,h); tgl.uniform1f(tU.T,secs); tgl.uniform1f(tU.P,P); tgl.drawArrays(tgl.TRIANGLES,0,3);
+    tor.style.opacity = P<0.05 ? (P/0.05).toFixed(3) : (P>0.9 ? Math.max(0,(1-P)/0.1).toFixed(3) : '1');
+  }
+  function torrentRun(){
+    if (reduce || HALL) return;
+    var fp=(qs.match(/[?&]tp=([0-9.]+)/)||[])[1];
+    if (!torrentInit()) return;
+    cancelAnimationFrame(tRaf); if (!tor.parentNode) document.body.appendChild(tor);
+    if (fp!==undefined) { torrentFrame(parseFloat(fp), parseFloat(fp)*TDUR/1000); return; }                     // ?tp=0.5 holds one frame, for checking
+    var t0=performance.now(), el=0, last=t0; tFast=false;
+    var hurry=function(){ tFast=true; }; window.addEventListener('wheel',hurry,{passive:true,once:true}); window.addEventListener('touchmove',hurry,{passive:true,once:true}); window.addEventListener('keydown',hurry,{once:true});
+    (function step(){ tRaf=requestAnimationFrame(function(now){ el+=(now-last)*(tFast?5:1); last=now; var P=Math.min(1,el/TDUR);
+      torrentFrame(P, (now-t0)/1000);
+      if (P<1 && page && page.classList.contains('active')) step(); else if (tor.parentNode) tor.parentNode.removeChild(tor); }); })();   // anyone who starts scrolling is let through quickly
+  }
   var raf=0; function tick(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; update(); }); }
   window.addEventListener('scroll', tick, {passive:true});
   var rt=0; window.addEventListener('resize', function(){ clearTimeout(rt); rt=setTimeout(function(){ if (Math.abs(wrap.clientWidth-builtW) > 2) build(); }, 150); });
@@ -365,7 +417,7 @@
     wrap.addEventListener('mouseleave', function(){ mx=0; my=0; tick(); });
   }
   var page=document.getElementById('page-about');
-  if (page) new MutationObserver(function(){ if (page.classList.contains('active')) { build(); introRun(); } }).observe(page, {attributes:true, attributeFilter:['class']});
+  if (page) new MutationObserver(function(){ if (page.classList.contains('active')) { build(); introRun(); torrentRun(); } }).observe(page, {attributes:true, attributeFilter:['class']});
   build();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ build(); });
   if (/[?&]page=about/.test(qs)) { var a2=document.querySelector('a[data-page="about"]'); if (a2) setTimeout(function(){ a2.click(); setTimeout(function(){ window.scrollTo(0, wrap.getBoundingClientRect().top + window.scrollY - anchor); document.documentElement.setAttribute('data-bvc-ready','1'); }, 900); }, 300); }
