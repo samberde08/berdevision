@@ -395,7 +395,7 @@
         op=(clamp(u*7)*clamp((1-u)*5)*wr).toFixed(2); }
       if (q.o!==op) { q.o=op; q.el.style.opacity=op; } }
   }
-  var tor=null, tgl=null, tprog=null, tU=null, tRaf=0, TDUR=5600, tFast=false;
+  var tor=null, tgl=null, tprog=null, tU=null, tRaf=0, TDUR=3000, tFast=false;
   function torrentInit(){
     if (tor) return true;
     var c=document.createElement('canvas'); c.className='bvc-torrent';
