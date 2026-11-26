@@ -437,3 +437,15 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-ba-sec + .m-ba-sec { margin-top: 1rem; }
 @media (max-width:768px){ .m-ba-list.m-ba-tall { grid-template-columns: 1fr; max-width: 340px; gap:1.8rem; } }
 .m-ba-list.m-ba-narrow { max-width: 880px; margin: 0 auto; }
+
+/* before/after: a project with several shots shows one at a time, with arrows */
+.m-ba-list.m-ba-one { display:block; }
+.m-ba-one .m-ba { display:none; } .m-ba-one .m-ba.m-on { display:block; animation: mBaIn .45s ease both; }
+@keyframes mBaIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+.m-ba-list.m-ba-tall, .m-ba-list.m-ba-tall.m-ba-one { display:block; max-width: 400px; margin: 0 auto; }
+.m-ba-nav { display:flex; align-items:center; justify-content:center; gap:1.1rem; margin-top:1.2rem; }
+.m-ba-nav button { width:42px; height:42px; border-radius:50%; border:1px solid rgba(255,255,255,.55); background:rgba(0,0,0,.18); color:#fff; display:grid; place-items:center; cursor:pointer; padding:0; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+.m-ba-nav button:hover { background:rgba(255,255,255,.16); border-color:#fff; transform:scale(1.06); }
+.m-ba-nav svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.m-ba-count { font-family:'DM Sans',sans-serif; font-weight:500; font-size:.7rem; letter-spacing:.24em; color:rgba(255,255,255,.8); min-width:4.2em; text-align:center; }
+@media (max-width:768px){ .m-ba-list.m-ba-tall, .m-ba-list.m-ba-tall.m-ba-one { max-width: 300px; } }
