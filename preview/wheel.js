@@ -149,12 +149,12 @@
       var p = v.play(); if (p && p.catch) p.catch(function(){}); }
     else if (TOUCH || !t.matches(':hover')) { v._want = 0; t.classList.remove('m-playing'); v.pause(); } }   // a finger leaves no hover behind, so on a phone the clip always stops
   // previews start once the wheel has come to rest on a film, not on every film that passes the front
-  var pt = 0, lp = NaN;
+  var pt = 0, lp = NaN, front0 = 1;
   function playSoon(){ clearTimeout(pt); lp = NaN; pt = setTimeout(function chk(){
       if (mode !== 'wheel' || front < 0) return;
       var moving = !(Math.abs(pos - lp) < 0.012); lp = pos;
       if (moving) { pt = setTimeout(chk, 90); return; }
-      play(slots[front], true); }, 30); }
+      play(slots[front], true); strip.dispatchEvent(new CustomEvent('m-spin')); }, 30); }
   function warm(i){ var s = slots[((i % n) + n) % n], v = s && s.tile.querySelector('video.m-loop'); if (v && v.preload !== 'auto') v.preload = 'auto'; }   // the films either side load ahead
   function setFront(f){
     if (front >= 0) { slots[front].el.classList.remove('m-front'); play(slots[front], false); }
@@ -166,7 +166,7 @@
     cap.children[0].textContent = g('.work-tag'); cap.children[1].textContent = g('.work-name'); cap.children[2].textContent = g('.work-subtitle');
     cap.classList.add('m-in'); count();
     if (prevB) prevB.disabled = false; if (nextB) nextB.disabled = false;
-    strip.dispatchEvent(new CustomEvent('m-spin'));
+    if (front0) { front0 = 0; strip.dispatchEvent(new CustomEvent('m-spin')); }      // the page takes its colour from the front film once the wheel rests on it (see playSoon), not from every film that passes
   }
   function loop(now){
     raf = 0; if (mode !== 'wheel') return;

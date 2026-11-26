@@ -2324,13 +2324,7 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
     });
 
 
-    document.querySelectorAll('.work-item').forEach(function(el) {
-      var rect = el.getBoundingClientRect();
-      var elX = ((gMouseX / 100 * window.innerWidth) - rect.left) / rect.width * 100;
-      var elY = ((gMouseY / 100 * window.innerHeight) - rect.top) / rect.height * 100;
-      el.style.setProperty('--gloss-x', elX + '%');
-      el.style.setProperty('--gloss-y', elY + '%');
-    });
+    // (preview) the per-film gloss highlight is off: it measured and restyled all 28 films on every mouse move, which made the wheel flicker while it turned
   }
 
   window.addEventListener('scroll', function() {
@@ -2356,7 +2350,7 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
 
   function getDofTargets() {
     return document.querySelectorAll(
-      '.work-item, .reel-slogan, .btn-reel, .work-title, .about-body p'
+      '.reel-slogan, .btn-reel, .work-title, .about-body p'   /* (preview) films are left out: blurring and dimming them by screen position fought the wheel */
     );
   }
 
@@ -2767,5 +2761,5 @@ footer p { color: rgba(236,234,228,0.5); }
 })();
 </script>
 
-<link rel="stylesheet" href="mock.css?v=col34"><script src="ideas.js?v=2"></script><script src="mock.js?v=12"></script><script src="scrollfx.js?v=4"></script><script src="wheel.js?v=23"></script><script src="colour.js?v=17"></script><link rel="stylesheet" href="collage.css"><script src="collage.js?v=6"></script><script src="ba.js?v=12"></script></body>
+<link rel="stylesheet" href="mock.css?v=col34"><script src="ideas.js?v=2"></script><script src="mock.js?v=12"></script><script src="scrollfx.js?v=4"></script><script src="wheel.js?v=24"></script><script src="colour.js?v=17"></script><link rel="stylesheet" href="collage.css"><script src="collage.js?v=6"></script><script src="ba.js?v=12"></script></body>
 </html>
