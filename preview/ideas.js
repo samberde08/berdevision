@@ -4,8 +4,8 @@
   var q = new URLSearchParams(location.search), TRY = (q.get('try') || '').split(',').filter(Boolean);
   var has = function(k){ return TRY.indexOf(k) >= 0; };
   window.__TRY = TRY;
-  // the ten films the wheel would open on (idea: "Selected")
-  if (has('sel')) window.__SEL = ['1249151789', '1249151605', '1249151719', '1249151866', '1249151733', '1249151670', '1249151833', 'ladybird', 'something-special', 'distant-lover', 'breakdown'];
+  // the ten films the wheel opens on ("Selected", approved Nov 26; list is Claude's pick until Sam gives his own)
+  window.__SEL = ['1249151789', '1249151605', '1249151719', '1249151866', '1249151733', '1249151670', '1249151833', 'ladybird', 'something-special', 'distant-lover', 'breakdown'];
 
   // ---- hire link (always on) ----
   var hire = document.createElement('a'); hire.className = 'm-hire'; hire.href = 'mailto:samberde@gmail.com?subject=Project%20enquiry';
@@ -30,12 +30,12 @@
       t.innerHTML = '<img src="thumbs/breakdown.jpg?v=1" alt="VFX breakdown reel" style="width:100%;height:100%;object-fit:cover;display:block;"><div class="work-overlay"><p class="work-tag">Reel · 2026</p><p class="work-name">VFX Breakdown</p><p class="work-subtitle">Before and after · draft</p></div>';
       strip.insertBefore(t, strip.firstElementChild); }
   }
-  // ---- idea: the before/afters on the home page, under the wheel ----
-  if (has('ba')) window.addEventListener('load', function(){ if (window.__baHome) window.__baHome(); });
+  // ---- the before/afters on the home page, under the wheel (approved Nov 26) ----
+  window.addEventListener('load', function(){ if (window.__baHome) window.__baHome(); });
 
   // ---- the panel that switches ideas on and off ----
   if (q.has('ideas') || TRY.length) {
-    var IDEAS = [['who', 'Who I am, up top'], ['ba', 'Before / after on home'], ['sel', 'Wheel opens on Selected'], ['reel', 'Breakdown reel first (draft)']];
+    var IDEAS = [['who', 'Who I am, up top'], ['reel', 'Breakdown reel first (draft)']];
     var p = document.createElement('div'); p.className = 'm-ideas';
     p.innerHTML = '<p>Ideas · preview only</p>' + IDEAS.map(function(i){ return '<label><input type="checkbox" value="' + i[0] + '"' + (has(i[0]) ? ' checked' : '') + '><span>' + i[1] + '</span></label>'; }).join('');
     p.addEventListener('change', function(){ var on = [].slice.call(p.querySelectorAll('input:checked')).map(function(x){ return x.value; });

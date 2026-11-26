@@ -37,11 +37,16 @@
   function togState(){ Array.prototype.forEach.call(tog.querySelectorAll('button'), function(b){ b.classList.toggle('m-on', b.dataset.v === mode); b.setAttribute('aria-pressed', b.dataset.v === mode ? 'true' : 'false'); }); }
   var counter = document.getElementById('workNavCounter'), prevB = document.getElementById('workPrev'), nextB = document.getElementById('workNext');
 
+  var P = n, M = 1, ghosts = [];
   var STEP = 2 * Math.PI / n, TILT = -7, BUMP = .22, W = 0, H = 0, R = 0, CY = 0, pos = 0, target = 0, front = -1, raf = 0, lastT = 0, mode = 'wheel', busy = 0;
   function count(){ if (counter && front >= 0) counter.textContent = (front < 9 ? '0' : '') + (front + 1) + ' / ' + n; }
   function size(){
     var vw = window.innerWidth, small = vw <= 768;
-    STEP = 2 * Math.PI / allSlots.length;                               // the ring never changes size: a shorter list fills an arc of it, so the films keep their size and spacing
+    // The ring is always a full ring. A short list (Selected, or one kind of work) is repeated round it two to four times,
+    // so the far side is still there to look across at; the copies are stills, and the real film is always the copy nearest you.
+    M = n >= 20 ? 1 : Math.max(1, Math.min(4, Math.round(allSlots.length / n))); P = n * M;
+    STEP = 2 * Math.PI / P;
+    ensureGhosts();
     W = small ? vw * 0.40 : Math.min(vw * 0.22, 430);                 // each film's width on the ring; the one at the front is pulled forward and reads larger
     H = W * 9 / 16; BUMP = small ? .62 : .78;                            // the front film is much larger and sits over the edges of its neighbours
     R = W / (2 * Math.tan(STEP / 2)) * 1.03;                           // the radius at which every film has its own place and none cuts into its neighbour
@@ -51,6 +56,27 @@
     if (mode === 'wheel') { strip.style.height = (CY + W * (0.50 + 0.28 * (1 + BUMP)) + (small ? 10 : 16)).toFixed(0) + 'px'; render(); } else layGrid();
   }
   function wrapD(d){ return ((d + n / 2) % n + n) % n - n / 2; }
+  function wrapP(d){ return ((d + P / 2) % P + P) % P - P / 2; }
+  var gkey = '';
+  function ensureGhosts(){
+    var key = M + ':' + slots.map(function(x){ return allSlots.indexOf(x); }).join(',');
+    if (key === gkey) return; gkey = key;
+    ghosts.forEach(function(g){ g.el.remove(); }); ghosts = [];
+    if (M < 2) return;
+    for (var i = 0; i < n; i++) for (var c = 1; c < M; c++) {
+      var im = slots[i].tile.querySelector('img'), el = document.createElement('div'); el.className = 'm-slot m-ghost'; el.setAttribute('aria-hidden', 'true');
+      el.innerHTML = '<div class="work-item"><img alt="" src="' + (im ? (im.currentSrc || im.src) : '') + '" style="width:100%;height:100%;object-fit:cover;display:block;"></div><div class="m-veil"></div>';
+      strip.appendChild(el); ghosts.push({ el: el, veil: el.lastChild, i: i });
+    }
+  }
+  function put(el, veil, d, real){
+    var ad = Math.abs(d), depth = (1 - Math.cos(d * STEP)) / 2;                                                   // 0 at the front, 1 at the very back
+    el.style.transform = wheelT(d);
+    el.style.zIndex = String(100 - Math.round(depth * 90));
+    veil.style.opacity = (ad < .5 ? ad * .12 : Math.min(.7, .06 + .68 * depth)).toFixed(3);                     // further round = deeper in shadow
+    el.style.opacity = '1';
+    if (real) el.style.pointerEvents = depth > .42 ? 'none' : '';                                                 // only the near side can be clicked or hovered
+  }
   // The whole wheel is drawn: a ring tipped slightly towards you, so the films on the far side are seen small, above and behind, travelling round.
   function wheelT(d){
     var a = d * STEP * 180 / Math.PI, far = Math.cos(a * Math.PI / 180) < 0.588, k = Math.max(0, 1 - Math.abs(d))   /* past ~54deg a film shows its back to the viewer (who stands 1.7 radii from the centre), so it turns to face you from there on: no empty stretch at the two turns */, sc = 1 + BUMP * k * k;
@@ -62,14 +88,13 @@
   function render(){
     var f = ((Math.round(pos) % n) + n) % n;
     for (var i = 0; i < n; i++) {
-      var s = slots[i], d = wrapD(i - pos), ad = Math.abs(d), depth = (1 - Math.cos(d * STEP)) / 2;                // 0 at the front, 1 at the very back
+      var s = slots[i];
       if (!s.shown) { s.el.style.display = ''; s.shown = true; }
-      s.el.style.transform = wheelT(d);
-      s.el.style.zIndex = String(100 - Math.round(depth * 90));
-      s.veil.style.opacity = (ad < .5 ? ad * .12 : Math.min(.7, .06 + .68 * depth)).toFixed(3);                    // further round = deeper in shadow
-      var seam = n < allSlots.length ? Math.max(0, Math.min(1, (n / 2 - ad) / 0.6)) : 1;                                       // on a short list, a film fades as it leaves one end and re-enters the other
-      s.el.style.opacity = seam.toFixed(3);
-      s.el.style.pointerEvents = (depth > .42 || seam < .5) ? 'none' : '';                                                        // only the near side can be clicked or hovered
+      if (M < 2) { put(s.el, s.veil, wrapP(i - pos), true); continue; }
+      var ds = []; for (var c = 0; c < M; c++) ds.push(wrapP(i + c * n - pos));
+      ds.sort(function(a, b){ return Math.abs(a) - Math.abs(b); });
+      put(s.el, s.veil, ds[0], true);                                                                              // the real film takes the place nearest the front
+      var gi = 1; for (var g = 0; g < ghosts.length; g++) if (ghosts[g].i === i) put(ghosts[g].el, ghosts[g].veil, ds[gi++], false);
     }
     if (f !== front) setFront(f);
   }

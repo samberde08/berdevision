@@ -486,3 +486,7 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-ideas input { accent-color:#fff; width:15px; height:15px; margin:0; }
 @media (max-width:768px){ .m-ideas { left:8px; bottom:56px; font-size:.72rem; } }
 .reel-cta:has(.m-who) { display:flex; flex-direction:column; align-items:center; }
+
+/* stills that fill the far side of the ring when a short list is showing */
+.m-slot.m-ghost { pointer-events:none !important; }
+.work-strip.m-grid .m-slot.m-ghost { display:none !important; }
