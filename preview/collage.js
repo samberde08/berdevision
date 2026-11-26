@@ -434,7 +434,7 @@
     wrap.addEventListener('mouseleave', function(){ mx=0; my=0; tick(); });
   }
   var page=document.getElementById('page-about');
-  if (page) new MutationObserver(function(){ if (page.classList.contains('active')) { build(); introRun(); torrentRun(); } }).observe(page, {attributes:true, attributeFilter:['class']});
+  if (page) new MutationObserver(function(){ if (page.classList.contains('active')) { build(); introRun(); if (/[?&]torrent=1/.test(qs)) torrentRun(); } })   // (Nov 26) Sam dropped the torrent entrance; kept only behind ?torrent=1.observe(page, {attributes:true, attributeFilter:['class']});
   build();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ build(); });
   if (/[?&]page=about/.test(qs)) { var a2=document.querySelector('a[data-page="about"]'); if (a2) setTimeout(function(){ a2.click(); setTimeout(function(){ window.scrollTo(0, wrap.getBoundingClientRect().top + window.scrollY - anchor); document.documentElement.setAttribute('data-bvc-ready','1'); }, 900); }, 300); }
