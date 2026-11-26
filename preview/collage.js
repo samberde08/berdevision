@@ -250,6 +250,7 @@
   }
   function hallDraw(cam, alpha, orbR){
     var w=hc.width, h=hc.height, sc=s*dpr, cx=w/2, vy=HP.VY*sc, F=HP.F; hx.clearRect(0,0,w,h); if (alpha<=0.004) return;
+    hx.fillStyle='rgba(5,7,12,'+(0.94*alpha).toFixed(3)+')'; hx.fillRect(0,0,w,h);          // the corridor is dark, so the orb is the light source
     // light spilling down the corridor from the orb
     var gr=hx.createRadialGradient(cx,vy,0,cx,vy,Math.max(60,orbR*sc*5)); gr.addColorStop(0,'rgba(210,228,255,'+(0.34*alpha)+')'); gr.addColorStop(1,'rgba(210,228,255,0)'); hx.fillStyle=gr; hx.fillRect(0,0,w,h);
     // the four edges of the corridor
