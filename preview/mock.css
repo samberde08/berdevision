@@ -359,3 +359,8 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 /* the wheel's own box never takes the click; only the films do (drags still start on any film) */
 .work-strip.m-wheel { pointer-events:none; }
 .work-strip.m-wheel .m-slot { pointer-events:auto; }
+
+/* each film is ONE flat card in the 3D wheel: its picture, shadow veil and caption are no longer depth-sorted separately (that drew stray edges across the frames) */
+.m-slot { transform-style: flat !important; overflow: visible; }
+.work-strip.m-wheel .work-item::after, .work-strip.m-wheel .work-item::before { display:none !important; content:none !important; }
+.m-slot.m-front .work-item { box-shadow: 0 0 110px 8px rgba(var(--tile, var(--amb)), .5), 0 30px 70px rgba(0,0,0,.7) !important; }

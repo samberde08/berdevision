@@ -36,7 +36,7 @@
   function size(){
     var vw = window.innerWidth, small = vw <= 768;
     W = small ? vw * 0.40 : Math.min(vw * 0.22, 430);                 // each film's width on the ring; the one at the front is pulled forward and reads larger
-    H = W * 9 / 16; BUMP = small ? .34 : .30;
+    H = W * 9 / 16; BUMP = small ? .62 : .78;                            // the front film is much larger and sits over the edges of its neighbours
     R = W / (2 * Math.tan(STEP / 2)) * 1.03;                           // the radius at which every film has its own place and none cuts into its neighbour
     CY = W * 0.30 + (small ? 10 : 14);                                 // the ring's centre line: the far side rises above it, the front hangs below
     strip.style.setProperty('--ww', W.toFixed(1) + 'px'); strip.style.setProperty('--wh', H.toFixed(1) + 'px'); strip.style.setProperty('--cy', CY.toFixed(1) + 'px');
@@ -49,7 +49,7 @@
     var a = d * STEP * 180 / Math.PI, far = Math.abs(a) > 90, k = Math.max(0, 1 - Math.abs(d)), sc = 1 + BUMP * k * k;
     // the ring is nudged towards you by a few pixels so the front film always sits in front of the wheel's own (invisible) plane and can be clicked
     var tr = Math.abs(TILT) * Math.PI / 180, dz = R * (1 - Math.cos(tr)) + H * 0.7 * Math.sin(tr) + 3;
-    return 'translate(-50%,-50%) translateZ(' + (dz - R).toFixed(1) + 'px) rotateX(' + TILT + 'deg) rotateY(' + a.toFixed(2) + 'deg) translateZ(' + R.toFixed(1) + 'px)' +
+    return 'translate(-50%,-50%) translateZ(' + (dz - R).toFixed(1) + 'px) rotateX(' + TILT + 'deg) rotateY(' + a.toFixed(2) + 'deg) translateZ(' + (R + W * 0.2 * k * k).toFixed(1) + 'px)' +
       (far ? ' rotateY(180deg)' : '') + (sc > 1.001 ? ' scale(' + sc.toFixed(4) + ')' : '');          // films on the far side turn to face you
   }
   function render(){
@@ -57,9 +57,7 @@
     for (var i = 0; i < n; i++) {
       var s = slots[i], d = wrapD(i - pos), ad = Math.abs(d), depth = (1 - Math.cos(d * STEP)) / 2;                // 0 at the front, 1 at the very back
       if (!s.shown) { s.el.style.display = ''; s.shown = true; }
-      // the front film is larger, so its neighbours step aside for it: nothing ever overlaps (overlaps showed as lines across the front film)
-      var sd = d < 0 ? -1 : 1, open = sd * BUMP * 0.72 * Math.min(1, ad) * Math.max(0, 1 - ad / (n / 2));
-      s.el.style.transform = wheelT(d + open);
+      s.el.style.transform = wheelT(d);
       s.el.style.zIndex = String(100 - Math.round(depth * 90));
       s.veil.style.opacity = (ad < .5 ? ad * .12 : Math.min(.7, .06 + .68 * depth)).toFixed(3);                    // further round = deeper in shadow
       s.el.style.opacity = '1';
