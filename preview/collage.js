@@ -152,17 +152,25 @@
     }
     // the figures stand still in their final places; dots gather into them, then the real pictures come up through the dots
     var cloud = !!(pc && PT), dom = cloud ? Math.max(0, Math.min(1, (prog - 0.80)/0.13)) : 1;
-    earthEl.style.transform='translate3d('+(mx*8)+'px,'+(my*3)+'px,0)'; earthEl.style.opacity=dom.toFixed(3);
+    // (idea preview, ?try=c3d) the collage as a diorama: the three layers of figures, the wordmark and the earth sit at real depths,
+    // and the whole scene turns a few degrees with the pointer and as it scrolls through the screen
+    var D3 = !reduce && window.__TRY && window.__TRY.indexOf('c3d') >= 0, ZS = D3 ? 150 : 0;
+    earthEl.style.transform='translate3d('+(mx*8)+'px,'+(my*3)+'px,'+(D3 ? -260 : 0)+'px)'; earthEl.style.opacity=dom.toFixed(3);
     for (var i=0;i<plates.length;i++){ var o=plates[i];
-      o.el.style.transform='translate3d('+(mx*o.depth*16)+'px,'+(my*o.depth*6)+'px,0)'; }
+      o.el.style.transform='translate3d('+(mx*o.depth*16)+'px,'+(my*o.depth*6)+'px,'+(o.depth*ZS).toFixed(0)+'px)'; }
     for (var k=0;k<cuts.length;k++){ var q2=cuts[k]; q2.el.style.transform='rotate('+q2.rot+'deg)'; q2.el.style.opacity=dom.toFixed(3); }
-    col.style.transform='scale('+s.toFixed(4)+')';
+    if (D3) {
+      var sr = stage.getBoundingClientRect(), sc3 = Math.max(-1, Math.min(1, ((sr.top + sr.height / 2) - window.innerHeight / 2) / window.innerHeight));
+      var hh3 = (sr.height / 2 / s).toFixed(0);
+      stage.style.perspective = '1500px'; col.style.transformStyle = 'preserve-3d';
+      col.style.transform='scale('+s.toFixed(4)+') translateY('+hh3+'px) rotateY('+(-mx*7 + sc3*7).toFixed(2)+'deg) rotateX('+(my*3.5 - sc3*6).toFixed(2)+'deg) translateY(-'+hh3+'px)';
+    } else col.style.transform='scale('+s.toFixed(4)+')';
     if (cloud) { var fadeOut = Math.max(0, Math.min(1, (prog - 0.86)/0.11));
       pc.style.opacity=(1-fadeOut).toFixed(3);
       if (fadeOut < 1) pcDraw(ease(Math.min(1, prog/0.80))); else if (!pcClear) { pcCtx.clearRect(0,0,pcW,pcH); pcClear=true; } }
     var jp = mobile ? 0 : ease(prog/0.45);                                   // the wordmark starts straight and jumbles as you scroll
     for (var j=0;j<letters.length;j++){ var q=letters[j];
-      q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+(my*q.depth*7)+'px,0) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }
+      q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+(my*q.depth*7)+'px,'+(q.depth*ZS).toFixed(0)+'px) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }
     hint.style.opacity = prog > 0.06 ? 0 : 1;
   }
   var raf=0; function tick(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; update(); }); }
