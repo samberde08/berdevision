@@ -414,3 +414,7 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-clients .logo-track img[alt="Lids"], .about-body .logo-track img[alt="Lids"] { height:34px !important; }
 .m-clients .logo-track img[alt="Rolling Loud"], .about-body .logo-track img[alt="Rolling Loud"] { height:46px !important; }
 @media (max-width:768px){ .m-clients .logo-track img[alt="Netflix"], .about-body .logo-track img[alt="Netflix"] { height:20px !important; } .m-clients .logo-track img[alt="Lids"], .about-body .logo-track img[alt="Lids"] { height:24px !important; } .m-clients .logo-track img[alt="Rolling Loud"], .about-body .logo-track img[alt="Rolling Loud"] { height:32px !important; } }
+
+/* per-logo heights for the newer marks */
+.logo-track img[alt="Seattle Seahawks"] { height:40px !important; } .logo-track img[alt="Lady Bird"] { height:40px !important; } .logo-track img[alt="Cal"] { height:50px !important; }
+@media (max-width:768px){ .logo-track img[alt="Seattle Seahawks"], .logo-track img[alt="Lady Bird"] { height:28px !important; } .logo-track img[alt="Cal"] { height:34px !important; } }
