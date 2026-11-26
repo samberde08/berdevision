@@ -430,3 +430,9 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 /* phone wheel: colour filters only on the front film (28 filtered films inside a 3D ring stall an iPhone), and no long-press image menu while dragging */
 @media (max-width:768px), (hover:none){ .work-strip.m-wheel .m-slot:not(.m-front) .work-item img, .work-strip.m-wheel .m-slot:not(.m-front) .work-item video.m-loop, .work-strip.m-wheel .m-slot:not(.m-front) .work-item iframe.m-emb { filter:none !important; } }
 .work-strip, .work-strip * { -webkit-touch-callout:none; } .work-strip img { -webkit-user-drag:none; }
+
+/* before/after: upright shots sit three across (one per row on a phone) */
+.m-ba-list.m-ba-tall { grid-template-columns: repeat(3, 1fr); gap:1.6rem; max-width: 980px; margin: 0 auto; }
+.m-ba-tall figcaption { flex-direction:column; gap:.25rem; align-items:center; }
+.m-ba-sec + .m-ba-sec { margin-top: 1rem; }
+@media (max-width:768px){ .m-ba-list.m-ba-tall { grid-template-columns: 1fr; max-width: 340px; gap:1.8rem; } }
