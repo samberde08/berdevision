@@ -53,7 +53,7 @@
   function wrapD(d){ return ((d + n / 2) % n + n) % n - n / 2; }
   // The whole wheel is drawn: a ring tipped slightly towards you, so the films on the far side are seen small, above and behind, travelling round.
   function wheelT(d){
-    var a = d * STEP * 180 / Math.PI, far = Math.abs(a) > 90, k = Math.max(0, 1 - Math.abs(d)), sc = 1 + BUMP * k * k;
+    var a = d * STEP * 180 / Math.PI, far = Math.cos(a * Math.PI / 180) < 0.588, k = Math.max(0, 1 - Math.abs(d))   /* past ~54deg a film shows its back to the viewer (who stands 1.7 radii from the centre), so it turns to face you from there on: no empty stretch at the two turns */, sc = 1 + BUMP * k * k;
     // the ring is nudged towards you by a few pixels so the front film always sits in front of the wheel's own (invisible) plane and can be clicked
     var tr = Math.abs(TILT) * Math.PI / 180, dz = R * (1 - Math.cos(tr)) + H * 0.7 * Math.sin(tr) + 3;
     return 'translate(-50%,-50%) translateZ(' + (dz - R).toFixed(1) + 'px) rotateX(' + TILT + 'deg) rotateY(' + a.toFixed(2) + 'deg) translateZ(' + (R + W * 0.2 * k * k).toFixed(1) + 'px)' +

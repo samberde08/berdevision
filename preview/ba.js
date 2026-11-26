@@ -29,8 +29,8 @@
     var cards = SET.shots.map(function(S){
       var card = document.createElement('figure'); card.className = 'm-ba';
       card.innerHTML = '<div class="m-ba-frame" tabindex="0" role="slider" aria-label="Before and after: ' + S.title + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">' +
-        '<video class="m-ba-a" muted loop playsinline preload="none" src="ba/' + S.id + '_after.mp4?v=' + V + '"></video>' +
-        '<div class="m-ba-clip"><video class="m-ba-b" muted loop playsinline preload="none" src="ba/' + S.id + '_before.mp4?v=' + V + '"></video></div>' +
+        '<video class="m-ba-a" muted playsinline preload="none" src="ba/' + S.id + '_after.mp4?v=' + V + '"></video>' +
+        '<div class="m-ba-clip"><video class="m-ba-b" muted playsinline preload="none" src="ba/' + S.id + '_before.mp4?v=' + V + '"></video></div>' +
         '<span class="m-ba-tag m-ba-tb">Before</span><span class="m-ba-tag m-ba-ta">After</span>' +
         '<div class="m-ba-line"><i></i></div></div>' +
         '<figcaption><b>' + S.title + '</b><span>' + S.note + '</span></figcaption>';
@@ -47,12 +47,18 @@
       set(50);
       var it = { fr: fr, va: va, vb: vb, card: card, raf: 0, on: false };
       // keep the two sides on the same frame: small drifts are eased out by nudging the speed (no visible jump); only a big gap, such as the loop point, is a hard seek
+      // The two clips never loop on their own: when the finished side ends, both go back to the first frame and start together,
+      // so there is no catch-up jump at the loop point. In between, a small drift is eased out by a slight speed change.
+      it.restart = function(){ try { va.currentTime = 0; vb.currentTime = 0; } catch (x) {} vb.playbackRate = 1;
+        if (it.on) [va, vb].forEach(function(v){ var p = v.play(); if (p && p.catch) p.catch(function(){}); }); };
+      va.addEventListener('ended', it.restart);
+      vb.addEventListener('ended', function(){ if (!va.ended && va.duration - va.currentTime < 0.12) it.restart(); });
       it.tick = function(){
         it.raf = 0; if (!it.on) return;
-        if (!va.paused && va.readyState > 2 && vb.readyState > 2) {
+        if (!va.paused && !vb.paused && va.readyState > 2 && vb.readyState > 2) {
           var d = vb.currentTime - va.currentTime;
-          if (Math.abs(d) > 0.25) { try { vb.currentTime = va.currentTime; } catch (x) {} vb.playbackRate = 1; }
-          else vb.playbackRate = d > 0.015 ? 0.9 : d < -0.015 ? 1.1 : 1;
+          if (Math.abs(d) > 0.2) { try { vb.currentTime = va.currentTime; } catch (x) {} vb.playbackRate = 1; }
+          else { var want = d > 0.03 ? 0.96 : d < -0.03 ? 1.04 : 1; if (vb.playbackRate !== want) vb.playbackRate = want; }
         }
         it.raf = requestAnimationFrame(it.tick);
       };
@@ -70,8 +76,15 @@
   // play only while on screen (a hidden example is never on screen, so it stays paused)
   function run(it, on){
     it.on = on;
-    [it.va, it.vb].forEach(function(v){ if (on) { if (v.preload === 'none') v.preload = 'auto'; var p = v.play(); if (p && p.catch) p.catch(function(){}); } else v.pause(); });
-    if (on) { try { it.vb.currentTime = it.va.currentTime; } catch (x) {} if (!it.raf) it.raf = requestAnimationFrame(it.tick); }
+    if (!on) { it.va.pause(); it.vb.pause(); return; }
+    [it.va, it.vb].forEach(function(v){ if (v.preload === 'none') v.preload = 'auto'; });
+    // start only once both sides can play, and from the same frame
+    var go = function(){ if (!it.on) return;
+      if (it.va.readyState < 3 || it.vb.readyState < 3) { setTimeout(go, 120); return; }
+      if (it.va.ended || it.vb.ended) { it.restart(); } else { try { it.vb.currentTime = it.va.currentTime; } catch (x) {} [it.va, it.vb].forEach(function(v){ var p = v.play(); if (p && p.catch) p.catch(function(){}); }); }
+      if (!it.raf) it.raf = requestAnimationFrame(it.tick); };
+    it.va.load && it.va.readyState === 0 && it.va.load(); it.vb.load && it.vb.readyState === 0 && it.vb.load();
+    go();
   }
   if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function(en){ en.forEach(function(x){ var it = items.filter(function(i){ return i.fr === x.target; })[0]; if (it) run(it, x.isIntersecting); }); }, { threshold: 0.25 });
     items.forEach(function(it){ io.observe(it.fr); }); }
