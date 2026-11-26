@@ -2,12 +2,12 @@
 (function(){
   var ab = document.querySelector('.about-page .about-body'); if (!ab) return;
   var SHOTS = [
-    { id: 'lb1', title: 'Can shockwave', note: 'After Effects displacement shockwave and vapour' },
-    { id: 'lb2', title: 'Door to keyhole zoom', note: 'After Effects comp: the room rebuilt for one continuous push-in' },
-    { id: 'lb3', title: 'Sunset end card', note: 'Shot clean-up and the animated logo' }
+    { id: 'st1', title: 'Ball toss', note: 'Empty sky replaced with a moving storm front' },
+    { id: 'st2', title: 'Rally', note: 'Every sky in the run swapped, shot by shot, and matched to the players' },
+    { id: 'st3', title: 'Courtside', note: 'Storm clouds behind both athletes, then the film finish' }
   ];
   var sec = document.createElement('section'); sec.className = 'm-ba-sec';
-  sec.innerHTML = '<p class="m-ba-kicker">Before / After</p><h3 class="m-ba-h">Lady Bird · Follow the Fizz</h3><p class="m-ba-sub">Drag the line. Left is the plate as it was shot, right is what aired.</p><div class="m-ba-list"></div>';
+  sec.innerHTML = '<p class="m-ba-kicker">Before / After</p><h3 class="m-ba-h">Storm x US Open</h3><p class="m-ba-sub">Drag the line. Left is the cut as it came in, right is the finished spot.</p><div class="m-ba-list"></div>';
   var list = sec.querySelector('.m-ba-list');
   var anchor = ab.querySelector('.services-grid'); if (anchor) anchor.insertAdjacentElement('afterend', sec); else ab.appendChild(sec);
   var items = SHOTS.map(function(S){
@@ -28,6 +28,7 @@
     fr.addEventListener('keydown', function(e){ if (e.key === 'ArrowLeft') { set(pos - 5); e.preventDefault(); } if (e.key === 'ArrowRight') { set(pos + 5); e.preventDefault(); } });
     // keep the two sides on the same frame
     va.addEventListener('timeupdate', function(){ if (Math.abs(vb.currentTime - va.currentTime) > 0.07) { try { vb.currentTime = va.currentTime; } catch (x) {} } });
+    fr.style.aspectRatio = '16 / 9';
     set(50);
     return { fr: fr, va: va, vb: vb };
   });
