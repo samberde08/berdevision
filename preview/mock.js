@@ -88,7 +88,14 @@
     '1249151833': [['Role','Shot · Edited · VFX'],['Artist','Esdeekid']],
     'ladybird': [['Role','Editor · VFX'],['Client','Lady Bird']],
     'something-special': [['Role','VFX'],['Artists','Khalid · Ahn Hyo-seop'],['Label','FANDOM']],
-    'distant-lover': [['Role','VFX'],['Artists','JIHYO · Shenseea'],['Label','FANDOM']]
+    'distant-lover': [['Role','VFX'],['Artists','JIHYO · Shenseea'],['Label','FANDOM']],
+    // roles below are taken from Sam's own Instagram captions for each film
+    '1204418162': [['Role','Edit · VFX'],['Artist','Lihtz'],['Director','feltonamus']],
+    '1204589600': [['Role','Edit'],['Artist','DANNA']],
+    '1204586020': [['Role','Editing'],['Artist','Madison Beer']],
+    '1204680193': [['Role','VFX · Animated intro'],['Client','Dallas Wings']],
+    '1203340055': [['Role','Director · Writer · Voice'],['Client','Mississippi State Men\'s Basketball']],
+    '1204398806': [['Role','3D · Edit · Comp'],['Tools','Blender · Premiere · After Effects']]
   };
   var inner = document.querySelector('.lightbox-inner');
   var panel = document.createElement('div'); panel.className = 'm-credits'; inner.appendChild(panel);

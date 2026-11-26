@@ -485,3 +485,4 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-ideas label { display:flex; gap:.55rem; align-items:center; cursor:pointer; }
 .m-ideas input { accent-color:#fff; width:15px; height:15px; margin:0; }
 @media (max-width:768px){ .m-ideas { left:8px; bottom:56px; font-size:.72rem; } }
+.reel-cta:has(.m-who) { display:flex; flex-direction:column; align-items:center; }
