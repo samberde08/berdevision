@@ -57,7 +57,9 @@
     for (var i = 0; i < n; i++) {
       var s = slots[i], d = wrapD(i - pos), ad = Math.abs(d), depth = (1 - Math.cos(d * STEP)) / 2;                // 0 at the front, 1 at the very back
       if (!s.shown) { s.el.style.display = ''; s.shown = true; }
-      s.el.style.transform = wheelT(d);
+      // the front film is larger, so its neighbours step aside for it: nothing ever overlaps (overlaps showed as lines across the front film)
+      var sd = d < 0 ? -1 : 1, open = sd * BUMP * 0.72 * Math.min(1, ad) * Math.max(0, 1 - ad / (n / 2));
+      s.el.style.transform = wheelT(d + open);
       s.el.style.zIndex = String(100 - Math.round(depth * 90));
       s.veil.style.opacity = (ad < .5 ? ad * .12 : Math.min(.7, .06 + .68 * depth)).toFixed(3);                    // further round = deeper in shadow
       s.el.style.opacity = '1';
