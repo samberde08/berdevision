@@ -364,3 +364,47 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-slot { transform-style: flat !important; overflow: visible; }
 .work-strip.m-wheel .work-item::after, .work-strip.m-wheel .work-item::before { display:none !important; content:none !important; }
 .m-slot.m-front .work-item { box-shadow: 0 0 110px 8px rgba(var(--tile, var(--amb)), .5), 0 30px 70px rgba(0,0,0,.7) !important; }
+
+/* ===== instant-start hero: the light intro clip sits on top of the full reel until the full reel is ready ===== */
+.reel-intro { z-index:1; transition: opacity .4s ease; }
+.reel-wrap.m-push .reel-video { transform: scale(var(--hs, 1)); opacity: var(--ho, 1); transform-origin:50% 46%; will-change: transform, opacity; }
+.reel-wrap.m-push .reel-intro { opacity: var(--ho, 1); }
+
+/* ===== behind the player: the film keeps moving, soft and dim ===== */
+.m-lb-bg { position:absolute; left:-10%; top:-10%; width:120%; height:120%; object-fit:cover; pointer-events:none; opacity:0; transition: opacity .9s ease;
+  filter: blur(42px) saturate(1.35) brightness(.5); }
+.m-lb-bg.m-on { opacity:.9; }
+.lightbox-backdrop { overflow:hidden; }
+
+/* ===== wheel: kind-of-work sorter (left) and Wheel / All (right) on one slim line ===== */
+.m-viewbar { justify-content:space-between !important; align-items:center; gap:1rem; flex-wrap:wrap; }
+.m-cats { display:flex; align-items:center; gap:1.25rem; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.7rem; letter-spacing:.22em; text-transform:uppercase; }
+.m-cats button { background:none; border:0; padding:.4rem 0; margin:0; font:inherit; letter-spacing:inherit; text-transform:inherit; color:rgba(255,255,255,.6); cursor:pointer;
+  border-bottom:1px solid transparent; transition: color .2s ease, border-color .2s ease; }
+.m-cats button:hover { color:#fff; }
+.m-cats button.m-on { color:#fff; border-bottom-color:#fff; }
+.m-cnt { font-weight:500; }
+.work-strip.m-wheel.m-swap { opacity:0 !important; transition: opacity .18s ease !important; }
+@media (max-width:768px){ .m-viewbar { justify-content:center !important; row-gap:.7rem; } .m-cats { gap:.95rem; font-size:.62rem; letter-spacing:.18em; width:100%; justify-content:center; } }
+
+/* ===== About: before / after ===== */
+.m-ba-sec { margin: 4.5rem auto 3.5rem; max-width: 1180px; text-align:center; }
+.m-ba-kicker { font-family:'DM Sans',sans-serif !important; font-weight:500; font-size:.66rem !important; letter-spacing:.26em; text-transform:uppercase; color:rgba(255,255,255,.6) !important; margin:0 0 .8rem !important; }
+.m-ba-h { font-family:'Manrope',sans-serif; font-weight:800; text-transform:uppercase; font-size:clamp(1.7rem,3.6vw,2.9rem); line-height:1; color:#fff; margin:0 0 .7rem; letter-spacing:-.01em; }
+.m-ba-sub { font-family:'DM Sans',sans-serif; font-size:.95rem !important; color:rgba(255,255,255,.72) !important; margin:0 0 2.2rem !important; }
+.m-ba-list { display:grid; gap:2.6rem; }
+.m-ba { margin:0; }
+.m-ba-frame { --p:50%; position:relative; aspect-ratio: 1280 / 694; overflow:hidden; border-radius:3px; background:#000; cursor:ew-resize; touch-action:pan-y; outline:none;
+  box-shadow: 0 30px 80px rgba(0,0,0,.55), 0 0 120px rgba(var(--amb), .18); -webkit-user-select:none; user-select:none; }
+.m-ba-frame video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+.m-ba-clip { position:absolute; inset:0; clip-path: inset(0 calc(100% - var(--p)) 0 0); }
+.m-ba-line { position:absolute; top:0; bottom:0; left:var(--p); width:2px; margin-left:-1px; background:#fff; box-shadow:0 0 14px rgba(0,0,0,.6); pointer-events:none; }
+.m-ba-line i { position:absolute; top:50%; left:50%; width:44px; height:44px; margin:-22px 0 0 -22px; border-radius:50%; border:2px solid #fff; background:rgba(0,0,0,.35); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+.m-ba-line i::before, .m-ba-line i::after { content:''; position:absolute; top:50%; width:7px; height:7px; border:solid #fff; border-width:2px 2px 0 0; margin-top:-4px; }
+.m-ba-line i::before { left:9px; transform:rotate(-135deg); } .m-ba-line i::after { right:9px; transform:rotate(45deg); }
+.m-ba-tag { position:absolute; top:14px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.62rem; letter-spacing:.24em; text-transform:uppercase; color:#fff; padding:.4rem .7rem; background:rgba(0,0,0,.45); border-radius:999px; pointer-events:none; }
+.m-ba-tb { left:14px; } .m-ba-ta { right:14px; }
+.m-ba figcaption { display:flex; gap:.8rem; justify-content:center; align-items:baseline; flex-wrap:wrap; margin-top:1rem; font-family:'DM Sans',sans-serif; }
+.m-ba figcaption b { font-family:'Manrope',sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:.02em; color:#fff; font-size:.95rem; }
+.m-ba figcaption span { color:rgba(255,255,255,.68); font-size:.9rem; }
+@media (max-width:768px){ .m-ba-sec { margin:3rem auto 2.4rem; } .m-ba-list { gap:1.8rem; } .m-ba-line i { width:36px; height:36px; margin:-18px 0 0 -18px; } .m-ba figcaption { flex-direction:column; gap:.2rem; align-items:center; } }

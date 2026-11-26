@@ -7,7 +7,9 @@
   var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   strip.classList.add('m-wheel');
   // each film sits in its own slot; the slot is what moves, so the tile keeps its own hover behaviour
-  var slots = tiles.map(function(t){
+  // which kinds of work each film is (a film can be two)
+  var CATS = {'1249151789':'music','1249151605':'brand sports','1249151719':'brand','1249151866':'music','1249151733':'sports','1249151670':'brand','1249151833':'music','1204418162':'music','1204561560':'brand','1203337382':'sports','1204589600':'music','1204409147':'sports','1204586020':'music','1204680193':'sports','1204548410':'music','1203340055':'sports','1204579585':'music','1203344844':'sports','1204398806':'sports','1204416675':'brand sports','1204403981':'sports','1204407984':'sports','1203256076':'personal','1204401806':'personal','1204593129':'personal'};
+  var allSlots = tiles.map(function(t){
     var s = document.createElement('div'); s.className = 'm-slot'; strip.appendChild(s); s.appendChild(t);
     var veil = document.createElement('div'); veil.className = 'm-veil'; s.appendChild(veil);
     // in the All view each film carries its own title, set quietly in its lower corner
@@ -16,18 +18,22 @@
     var gn = document.createElement('div'); gn.className = 'm-gc-name'; gn.textContent = gt('.work-name'); gc.appendChild(gn);
     var gg = document.createElement('div'); gg.className = 'm-gc-tag'; gg.textContent = gt('.work-subtitle') || gt('.work-tag'); gc.appendChild(gg);
     s.appendChild(gc);
-    return { el: s, tile: t, veil: veil, shown: true };
+    return { el: s, tile: t, veil: veil, shown: true, cat: (CATS[t.dataset.vimeo] || '').split(' ') };
   });
+  var slots = allSlots.slice();          // the films currently on the wheel (all of them, or one kind)
   var cap = document.createElement('div'); cap.className = 'm-wheel-cap';
   cap.innerHTML = '<div class="m-wc-tag"></div><div class="m-wc-name"></div><div class="m-wc-sub"></div>';
   strip.insertAdjacentElement('afterend', cap);
   // a quiet two-word switch beside the section title: Wheel / All
   var tog = document.createElement('div'); tog.className = 'm-viewtog'; tog.setAttribute('role', 'group'); tog.setAttribute('aria-label', 'How the projects are shown');
   tog.innerHTML = '<button type="button" data-v="wheel" class="m-on"><svg viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6.2" ry="3.4"/><path d="M8 4.6v6.8"/></svg>Wheel</button>' +
-    '<button type="button" data-v="grid"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2.5" width="5" height="4.6"/><rect x="9" y="2.5" width="5" height="4.6"/><rect x="2" y="8.9" width="5" height="4.6"/><rect x="9" y="8.9" width="5" height="4.6"/></svg>All ' + n + '</button>';
+    '<button type="button" data-v="grid"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2.5" width="5" height="4.6"/><rect x="9" y="2.5" width="5" height="4.6"/><rect x="2" y="8.9" width="5" height="4.6"/><rect x="9" y="8.9" width="5" height="4.6"/></svg>All <b class="m-cnt">' + n + '</b></button>';
   var hdr = document.querySelector('#work .work-header');
   // (the section title is hidden on this page, so the switch gets its own slim line directly above the films)
-  var vbar = document.createElement('div'); vbar.className = 'm-viewbar'; vbar.appendChild(tog); strip.insertAdjacentElement('beforebegin', vbar); hdr = vbar;
+  // a small sorter: show every film, or one kind of work
+  var cats = document.createElement('div'); cats.className = 'm-cats'; cats.setAttribute('role', 'group'); cats.setAttribute('aria-label', 'Kind of work');
+  cats.innerHTML = [['all','All'],['music','Music'],['sports','Sports'],['brand','Brand'],['personal','Personal']].map(function(c, i){ return '<button type="button" data-c="' + c[0] + '"' + (i ? '' : ' class="m-on"') + '>' + c[1] + '</button>'; }).join('');
+  var vbar = document.createElement('div'); vbar.className = 'm-viewbar'; vbar.appendChild(cats); vbar.appendChild(tog); strip.insertAdjacentElement('beforebegin', vbar); hdr = vbar;
   function togState(){ Array.prototype.forEach.call(tog.querySelectorAll('button'), function(b){ b.classList.toggle('m-on', b.dataset.v === mode); b.setAttribute('aria-pressed', b.dataset.v === mode ? 'true' : 'false'); }); }
   var counter = document.getElementById('workNavCounter'), prevB = document.getElementById('workPrev'), nextB = document.getElementById('workNext');
 
@@ -35,6 +41,7 @@
   function count(){ if (counter && front >= 0) counter.textContent = (front < 9 ? '0' : '') + (front + 1) + ' / ' + n; }
   function size(){
     var vw = window.innerWidth, small = vw <= 768;
+    STEP = 2 * Math.PI / Math.max(n, 12);                               // a short list still sits on a 12-place ring, so the films keep their spacing
     W = small ? vw * 0.40 : Math.min(vw * 0.22, 430);                 // each film's width on the ring; the one at the front is pulled forward and reads larger
     H = W * 9 / 16; BUMP = small ? .62 : .78;                            // the front film is much larger and sits over the edges of its neighbours
     R = W / (2 * Math.tan(STEP / 2)) * 1.03;                           // the radius at which every film has its own place and none cuts into its neighbour
@@ -60,8 +67,9 @@
       s.el.style.transform = wheelT(d);
       s.el.style.zIndex = String(100 - Math.round(depth * 90));
       s.veil.style.opacity = (ad < .5 ? ad * .12 : Math.min(.7, .06 + .68 * depth)).toFixed(3);                    // further round = deeper in shadow
-      s.el.style.opacity = '1';
-      s.el.style.pointerEvents = depth > .42 ? 'none' : '';                                                        // only the near side can be clicked or hovered
+      var seam = n < 12 ? Math.max(0, Math.min(1, (n / 2 - ad) / 0.6)) : 1;                                       // on a short list, a film fades as it leaves one end and re-enters the other
+      s.el.style.opacity = seam.toFixed(3);
+      s.el.style.pointerEvents = (depth > .42 || seam < .5) ? 'none' : '';                                                        // only the near side can be clicked or hovered
     }
     if (f !== front) setFront(f);
   }
@@ -162,6 +170,19 @@
     setTimeout(function(){ strip.classList.remove('m-anim'); slots.forEach(function(s){ s.el.style.transitionDelay = ''; }); busy = 0; render(); if (front >= 0) play(slots[front], true); }, still ? 60 : 1500);
     var top = (hdr || strip).getBoundingClientRect().top + window.scrollY - 90; window.scrollTo({ top: top, behavior: still ? 'auto' : 'smooth' });
   }
+  function setFilter(c){
+    if (busy) return;
+    Array.prototype.forEach.call(cats.querySelectorAll('button'), function(b){ b.classList.toggle('m-on', b.dataset.c === c); b.setAttribute('aria-pressed', b.dataset.c === c ? 'true' : 'false'); });
+    strip.classList.add('m-swap');
+    setTimeout(function(){
+      if (front >= 0 && slots[front]) { slots[front].el.classList.remove('m-front'); play(slots[front], false); }
+      slots = allSlots.filter(function(s){ return c === 'all' || s.cat.indexOf(c) >= 0; }); n = slots.length;
+      allSlots.forEach(function(s){ var on = slots.indexOf(s) >= 0; s.el.style.display = on ? '' : 'none'; s.shown = on; });
+      front = -1; pos = target = 0; var cn = tog.querySelector('.m-cnt'); if (cn) cn.textContent = n;
+      size(); strip.classList.remove('m-swap');
+    }, still ? 0 : 190);
+  }
+  cats.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('button'); if (b && !b.classList.contains('m-on')) setFilter(b.dataset.c); });
   tog.addEventListener('click', function(e){ var b = e.target.closest && e.target.closest('button'); if (!b) return; if (b.dataset.v === 'grid') unfurl(); else furl(); });
 
   // ---- drag anywhere on the wheel ----
@@ -225,5 +246,5 @@
   var rt = 0; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ size(); count(); }, 120); });
   size();
   setTimeout(function(){ if (front >= 0) { var rgb = slots[front].tile.dataset.glowRGB; if (rgb) slots[front].el.style.setProperty('--tile', rgb); count(); } }, 1200);
-  window.__wheel = { goTo: goTo, unfurl: unfurl, furl: furl, state: function(){ return { pos: pos, target: target, front: front, n: n, W: W, mode: mode, busy: busy }; } };
+  window.__wheel = { goTo: goTo, unfurl: unfurl, furl: furl, filter: setFilter, state: function(){ return { pos: pos, target: target, front: front, n: n, W: W, mode: mode, busy: busy }; } };
 })();

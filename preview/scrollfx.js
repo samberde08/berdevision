@@ -5,13 +5,13 @@
   var v = document.getElementById('reelVideo'), wrap = document.querySelector('.reel-wrap'), cta = document.querySelector('.reel-cta'), raf = 0;
   function hero(){ raf = 0; if (!v || !wrap) return;
     var h = wrap.offsetHeight || 1, p = Math.max(0, Math.min(1, window.scrollY / (h * 0.92)));
-    if (p <= 0) { v.style.transform = ''; v.style.opacity = ''; if (cta) cta.style.opacity = ''; return; }
+    if (p <= 0) { wrap.style.setProperty('--hs', '1'); wrap.style.setProperty('--ho', '1'); if (cta) cta.style.opacity = ''; return; }
     var e = p * p * (3 - 2 * p);
-    v.style.transform = 'scale(' + (1 + 0.34 * e).toFixed(4) + ')'; v.style.opacity = (1 - 0.9 * Math.pow(p, 1.6)).toFixed(3);
+    wrap.style.setProperty('--hs', (1 + 0.34 * e).toFixed(4)); wrap.style.setProperty('--ho', (1 - 0.9 * Math.pow(p, 1.6)).toFixed(3));
     if (cta) cta.style.opacity = Math.max(0, 1 - p * 3).toFixed(3);
   }
   window.addEventListener('scroll', function(){ if (!raf) raf = requestAnimationFrame(hero); }, { passive: true });
-  if (v) { v.style.transformOrigin = '50% 46%'; v.style.willChange = 'transform, opacity'; }
+  if (wrap) wrap.classList.add('m-push');
   // 2. big titles assemble: each letter drops into place, one after another, when its line arrives
   var titles = Array.prototype.slice.call(document.querySelectorAll('.contact-big'));
   titles.forEach(function(el){

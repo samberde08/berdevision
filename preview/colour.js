@@ -29,9 +29,10 @@
     return [Math.min(255, r * s), Math.min(255, g * s), Math.min(255, b * s)];
   }
   function sample(){
-    if (!ok || !v || v.readyState < 2 || v.paused || document.hidden) return;
+    var sv = window.__reelLive || v;                       // the light intro clip while it is on screen, then the full reel
+    if (!ok || !sv || sv.readyState < 2 || sv.paused || document.hidden) return;
     try {
-      cx.drawImage(v, 0, 0, 16, 12);
+      cx.drawImage(sv, 0, 0, 16, 12);
       var d = cx.getImageData(0, 0, 16, 12).data, r = 0, g = 0, b = 0, n = 0, lumAll = 0;
       for (var i = 0; i < d.length; i += 4) {
         var l = d[i] * 0.3 + d[i+1] * 0.59 + d[i+2] * 0.11; lumAll += l;
@@ -97,7 +98,7 @@
   function px(n){ return n.toFixed(1) + 'px'; }
   function hold(c){ stick = c; stickAt = performance.now(); hover = null; }
   function clearFx(){ fxRun++; release = null; mover = null;
-    document.querySelectorAll('.m-grow').forEach(function(e){ e.remove(); });
+    document.querySelectorAll('.m-grow, .m-lb-bg').forEach(function(e){ e.remove(); });
     if (lb && lb.classList.contains('m-mat')) lb.classList.remove('m-mat'); }
 
   function openFx(t, r, c){
@@ -106,6 +107,12 @@
     if (still || !fr || !img || !document.body.animate) return;
     clearFx(); var run = fxRun;
     lb.classList.add('m-mat');                                       // the player's own frame stays hidden until the panel has arrived
+    // behind the player the page is not a frozen dark sheet: the film's own loop (or the reel) keeps moving, soft and dim
+    var bd = document.getElementById('lightboxBackdrop'), lp0 = t.querySelector('video.m-loop');
+    if (bd) { var bg = document.createElement('video'); bg.className = 'm-lb-bg'; bg.muted = true; bg.loop = true; bg.playsInline = true; bg.setAttribute('playsinline', ''); bg.setAttribute('aria-hidden', 'true');
+      bg.src = (lp0 && lp0.currentSrc) || 'hero/reel_roto_lit_720.mp4?v=10';
+      bg.addEventListener('loadeddata', function(){ if (!lp0 && v && v.currentTime) { try { bg.currentTime = v.currentTime; } catch (e) {} } var p = bg.play(); if (p && p.catch) p.catch(function(){}); bg.classList.add('m-on'); });
+      bd.appendChild(bg); }
     var f = fr.getBoundingClientRect();
     var m = document.createElement('div'); m.className = 'm-grow'; m.setAttribute('aria-hidden', 'true');
     var pos = getComputedStyle(img).objectPosition;
