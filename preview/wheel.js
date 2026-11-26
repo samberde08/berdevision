@@ -49,7 +49,6 @@
     strip.style.setProperty('--ww', W.toFixed(1) + 'px'); strip.style.setProperty('--wh', H.toFixed(1) + 'px'); strip.style.setProperty('--cy', CY.toFixed(1) + 'px');
     strip.style.perspective = (R * 0.7).toFixed(0) + 'px'; strip.style.perspectiveOrigin = '50% ' + CY.toFixed(0) + 'px';   // a closer viewpoint, so the ring's left and right turns fit inside the screen
     if (mode === 'wheel') { strip.style.height = (CY + W * (0.50 + 0.28 * (1 + BUMP)) + (small ? 10 : 16)).toFixed(0) + 'px'; render(); } else layGrid();
-    if (spacer) pinSize();
   }
   function wrapD(d){ return ((d + n / 2) % n + n) % n - n / 2; }
   // The whole wheel is drawn: a ring tipped slightly towards you, so the films on the far side are seen small, above and behind, travelling round.
@@ -175,7 +174,7 @@
     if (front >= 0) play(slots[front], false);
     void strip.offsetWidth;
     mode = 'grid'; strip.classList.add('m-anim', 'm-grid'); stagger(); layGrid();
-    cap.classList.add('m-gone'); togState(); document.documentElement.classList.add('m-allwork-on'); pinSize();
+    cap.classList.add('m-gone'); togState(); document.documentElement.classList.add('m-allwork-on');
     setTimeout(function(){ strip.classList.remove('m-anim'); slots.forEach(function(s){ s.el.style.transitionDelay = ''; }); busy = 0; }, still ? 60 : 1500);
     var top = (hdr || strip).getBoundingClientRect().top + window.scrollY - 90; if (Math.abs(window.scrollY - top) > 40) window.scrollTo({ top: top, behavior: still ? 'auto' : 'smooth' });
   }
@@ -262,28 +261,6 @@
     var t = Math.max(-13, Math.min(-2.5, -7 - (c - 0.5) * 11)); if (Math.abs(t - TILT) > 0.05) { TILT = +t.toFixed(2); render(); } }
   window.addEventListener('scroll', function(){ if (!tr) tr = requestAnimationFrame(tip); }, { passive: true });
   var rt = 0; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ size(); count(); }, 120); });
-  // ---- scrolling the page turns the wheel: the section holds in place while the ring goes all the way round, then the page moves on ----
-  var wrap = strip.parentElement, spacer = document.createElement('div'), lastSp = null, st2 = 0, travel = 0, stickTop = 0, snapT = 0;
-  spacer.className = 'm-pin-space'; spacer.setAttribute('aria-hidden', 'true'); spacer.style.cssText = 'height:0;pointer-events:none';
-  wrap.insertAdjacentElement('afterend', spacer);
-  function pinSize(){
-    if (still) return;
-    if (mode !== 'wheel') { spacer.style.height = '0px'; wrap.style.position = ''; wrap.style.top = ''; travel = 0; lastSp = null; return; }
-    var vh = window.innerHeight, small = window.innerWidth <= 768;
-    wrap.style.position = 'sticky';
-    stickTop = Math.max(small ? 64 : 76, Math.round((vh - wrap.offsetHeight) / 2));        // the wheel sits in the middle of the screen while it turns
-    wrap.style.top = stickTop + 'px';
-    travel = Math.round(n * (small ? 62 : 92)); spacer.style.height = travel + 'px';          // one full turn of however many films are on the ring
-    lastSp = null; pinScroll();
-  }
-  function pinScroll(){
-    st2 = 0; if (mode !== 'wheel' || !travel) return;
-    var p = Math.max(0, Math.min(1, (stickTop + wrap.offsetHeight - spacer.getBoundingClientRect().top) / travel)), sp = p * n;
-    if (lastSp !== null && !down && !busy) { var d = sp - lastSp;
-      if (d) { target += d; kick(); clearTimeout(snapT); snapT = setTimeout(function(){ if (!down && mode === 'wheel') goTo(Math.round(target)); }, 170); } }   // comes to rest on a film when the scrolling stops
-    lastSp = sp;
-  }
-  window.addEventListener('scroll', function(){ if (!st2) st2 = requestAnimationFrame(pinScroll); }, { passive: true });
   size();
   setTimeout(function(){ if (front >= 0) { var rgb = slots[front].tile.dataset.glowRGB; if (rgb) slots[front].el.style.setProperty('--tile', rgb); count(); } }, 1200);
   window.__wheel = { goTo: goTo, unfurl: unfurl, furl: furl, filter: setFilter, state: function(){ return { pos: pos, target: target, front: front, n: n, W: W, mode: mode, busy: busy }; } };
