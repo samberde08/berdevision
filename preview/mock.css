@@ -493,3 +493,10 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 
 /* a film on the ring is never hidden when it turns its back for a moment at the two side turns (that read as a flicker while the wheel moved) */
 .work-strip.m-wheel .m-slot { -webkit-backface-visibility:visible; backface-visibility:visible; }
+
+/* the colour pools are one small canvas stretched over the page (cheap to recolour); the old page-sized pool layers are off */
+.m-amb { background: none !important; }
+.m-blob { display:none !important; animation:none !important; }
+.m-amb-cv { position:absolute; inset:0; width:100%; height:100%; display:block; }
+/* the client logos keep a soft white glow instead of one tinted by the page colour (52 filtered images re-drawn on every colour change) */
+.m-amb-stick .m-clients .logo-track img { filter: grayscale(1) brightness(0) invert(1) drop-shadow(0 0 10px rgba(255,255,255,.35)) !important; }

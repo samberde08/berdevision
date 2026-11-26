@@ -74,9 +74,36 @@
     var e = 1 - Math.exp(-dt / (useReel ? 110 : hover ? 170 : 240));     // timed, so it eases the same at any frame rate
     cur[0] += (t[0] - cur[0]) * e; cur[1] += (t[1] - cur[1]) * e; cur[2] += (t[2] - cur[2]) * e; curK += (k - curK) * e;
     var s = rgbOf(cur) + '|' + curK.toFixed(2);
-    if (s !== last) { last = s; root.style.setProperty('--amb', s.split('|')[0]); root.style.setProperty('--amb-k', curK.toFixed(2));
+    var nowT = performance.now();
+    if (s !== last && nowT - lastVarT > 70) { last = s; lastVarT = nowT; root.style.setProperty('--amb', s.split('|')[0]); root.style.setProperty('--amb-k', curK.toFixed(2));
       root.style.setProperty('--amb2', rgbOf(rot(cur, 34))); root.style.setProperty('--amb3', rgbOf(rot(cur, -30))); }   // neighbouring hues for the other pools
+    if (nowT - lastDrawT > 45) { lastDrawT = nowT; drawAmb(nowT / 1000); }
     requestAnimationFrame(tick);
+  }
+  // The four drifting pools of colour are painted into one very small picture that the browser stretches over the page.
+  // (As four page-sized layers they had to be repainted at full size on every colour change, which stalled the page.)
+  var lastVarT = 0, lastDrawT = 0, ac = document.createElement('canvas'), actx = ac.getContext('2d');
+  ac.className = 'm-amb-cv'; amb.appendChild(ac);
+  function sizeAmb(){ ac.width = 128; ac.height = Math.max(40, Math.round(128 * window.innerHeight / Math.max(1, window.innerWidth))); }
+  sizeAmb(); window.addEventListener('resize', sizeAmb);
+  function pool(cx0, cy0, rx, ry, rgb, al){
+    actx.save(); actx.translate(cx0, cy0); actx.scale(rx, ry);
+    var g = actx.createRadialGradient(0, 0, 0, 0, 0, 1);
+    g.addColorStop(0, 'rgba(' + rgb + ',' + (.95 * al).toFixed(3) + ')'); g.addColorStop(.38, 'rgba(' + rgb + ',' + (.5 * al).toFixed(3) + ')'); g.addColorStop(1, 'rgba(' + rgb + ',0)');
+    actx.fillStyle = g; actx.fillRect(-1, -1, 2, 2); actx.restore();
+  }
+  function drawAmb(t){
+    var W = ac.width, H = ac.height, vw = window.innerWidth, vh = window.innerHeight, u = W / vw, vmax = Math.max(vw, vh) * u, k = curK;
+    var c1 = rgbOf(cur), c2 = rgbOf(rot(cur, 34)), c3 = rgbOf(rot(cur, -30)), al = Math.min(1, .42 * k);
+    actx.clearRect(0, 0, W, H);
+    var base = actx.createLinearGradient(0, 0, 0, H); base.addColorStop(0, 'rgba(' + c1 + ',' + Math.min(1, .07 * k).toFixed(3) + ')'); base.addColorStop(1, 'rgba(' + c1 + ',' + Math.min(1, .045 * k).toFixed(3) + ')');
+    actx.fillStyle = base; actx.fillRect(0, 0, W, H);
+    var w = function(period, ph){ return .5 - .5 * Math.cos(Math.PI * 2 * t / period + ph); };     // slow drift, each pool on its own clock
+    var vwu = vw * u / 100, vhu = vh * u / 100;
+    pool(W / 2 + (-9 + 21 * w(74, 0)) * vwu, -34 * vmax / 100 + 45 * vmax / 100 + (-2 + 7 * w(37, 1)) * vhu, 60 * vmax / 100 * (1 + .1 * w(74, 2)), 45 * vmax / 100 * (1 + .1 * w(74, 2)), c1, al);
+    pool(-38 * vmax / 100 + 42.5 * vmax / 100 + 16 * w(92, .6) * vwu, 22 * vhu + 42.5 * vmax / 100 + (-8 + 26 * w(92, 2.1)) * vhu, 42.5 * vmax / 100 * (1 + .15 * w(46, 0)), 42.5 * vmax / 100 * (1 + .15 * w(46, 0)), c2, al);
+    pool(W + 40 * vmax / 100 - 45 * vmax / 100 - 14 * w(106, 1.2) * vwu, 38 * vhu + 45 * vmax / 100 + (-10 + 18 * w(106, .3)) * vhu, 45 * vmax / 100 * (1 + .12 * w(53, 1)), 45 * vmax / 100 * (1 + .12 * w(53, 1)), c3, al);
+    pool(W / 2 + (-12 + 22 * w(82, 2.4)) * vwu, H + 40 * vmax / 100 - 35 * vmax / 100 + (-6 + 10 * w(41, .9)) * vhu, 55 * vmax / 100 * (1 + .1 * w(82, 0)), 35 * vmax / 100 * (1 + .1 * w(82, 0)), c1, al);
   }
   requestAnimationFrame(tick);
 
