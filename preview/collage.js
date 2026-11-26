@@ -304,7 +304,10 @@
       } else {
         var g=clamp((gp-0.04-0.38*q.rank)/0.5), ge=1-Math.pow(1-g,4), far=1-ge;   // each figure rushes in from behind the camera and brakes into place
         op=clamp(g*5); fl = g>=1 ? 'none' : 'brightness('+(1+Math.round(far*2.4*5)/5)+')';
-        tf = g>=1 ? 'rotate('+q.rot+'deg)' : 'translate3d('+((q.bx-C.CX)*2.6*far).toFixed(1)+'px,'+((q.by-HP.VY)*2.6*far+120*far).toFixed(1)+'px,0) scale('+(1+5*far).toFixed(4)+') rotate('+(q.rot*ge).toFixed(2)+'deg)';
+        if (g>=1) tf='rotate('+q.rot+'deg)';
+        else { // a tornado: every figure spirals in around the light, the layers at different rates, each one turning as it comes, then it unwinds into place
+          var th=Math.pow(far,1.25)*(2.6+0.95*q.gi), cs=Math.cos(th), sn=Math.sin(th), vx=(q.bx-C.CX)*(1+2.6*far), vy=(q.by-HP.VY)*(1+2.6*far)+120*far;
+          tf='translate3d('+(C.CX+vx*cs-vy*sn-q.bx).toFixed(1)+'px,'+(HP.VY+vx*sn+vy*cs-q.by).toFixed(1)+'px,0) scale('+(1+5*far).toFixed(4)+') rotate('+(q.rot*ge+th*38).toFixed(2)+'deg)'; }
       }
       if (q.tf!==tf) { q.tf=tf; el.style.transform=tf; }
       op=op.toFixed(2); if (q.op!==op) { q.op=op; el.style.opacity=op; }
