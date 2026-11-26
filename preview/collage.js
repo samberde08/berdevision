@@ -199,7 +199,7 @@
   }
 
   // ---------------- the hallway ----------------
-  var hc=null, hx=null, orb=null, og=null, OS=220, hallSeq=[], HP=null, orbOn=false, orbT=0, starsEl=null, dpr=1;
+  var hc=null, hx=null, orb=null, og=null, OS=320, hallSeq=[], HP=null, orbOn=false, orbT=0, starsEl=null, dpr=1;
   function clamp(v){ return v<0?0:(v>1?1:v); }
   function hallInit(sh){
     if (hc) hc.remove();
@@ -232,8 +232,10 @@
   for (var oj=0; oj<13; oj++) OFL.push([oj*0.49, 0.4+0.5*((oj*13)%7)/7, 0.2+0.6*((oj*5)%9)/9, oj*2.1]);
   function orbNoise(){ var c=document.createElement('canvas'); c.width=c.height=OS; var g=c.getContext('2d'), sd=7;
     function rnd(){ sd=(sd*16807)%2147483647; return sd/2147483647; }
-    for (var i=0;i<1500;i++){ var x=rnd()*OS, y=rnd()*OS, r=0.7+rnd()*3.2, dark=rnd()<0.62;
-      g.fillStyle = dark ? 'rgba(52,92,178,'+(0.10+rnd()*0.2)+')' : 'rgba(255,255,255,'+(0.2+rnd()*0.4)+')'; g.beginPath(); g.arc(x,y,r,0,6.2832); g.fill(); }
+    g.lineCap='round';                                              // fine wisps, not dots: short curved strokes that follow the sphere
+    for (var i=0;i<3200;i++){ var an=rnd()*6.2832, rr=Math.sqrt(rnd())*OS/2, x=OS/2+rr*Math.cos(an), y=OS/2+rr*Math.sin(an), dir=an+1.5708+(rnd()-0.5)*1.4, len=2+rnd()*9, dark=rnd()<0.6;
+      g.strokeStyle = dark ? 'rgba(60,100,186,'+(0.05+rnd()*0.13)+')' : 'rgba(255,255,255,'+(0.12+rnd()*0.3)+')'; g.lineWidth=0.4+rnd()*0.9;
+      g.beginPath(); g.moveTo(x,y); g.quadraticCurveTo(x+Math.cos(dir+0.5)*len*0.5, y+Math.sin(dir+0.5)*len*0.5, x+Math.cos(dir)*len, y+Math.sin(dir)*len); g.stroke(); }
     return c; }
   function orbDraw(t){
     var g=og, R=OS/2, c=R, i; g.clearRect(0,0,OS,OS); if (!ON) ON=orbNoise();
