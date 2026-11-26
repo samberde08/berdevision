@@ -95,7 +95,20 @@
     '1204586020': [['Role','Editing'],['Artist','Madison Beer']],
     '1204680193': [['Role','VFX · Animated intro'],['Client','Dallas Wings']],
     '1203340055': [['Role','Director · Writer · Voice'],['Client','Mississippi State Men\'s Basketball']],
-    '1204398806': [['Role','3D · Edit · Comp'],['Tools','Blender · Premiere · After Effects']]
+    '1204398806': [['Role','3D · Edit · Comp'],['Tools','Blender · Premiere · After Effects']],
+    // roles below are as Sam gave them (Nov 26)
+    '1204561560': [['Role','Edit']],
+    '1203337382': [['Role','Edit · VFX'],['Client','Seattle Seahawks']],
+    '1204409147': [['Role','Co-director · Edit · VFX'],['Athlete','Noah Lyles']],
+    '1204548410': [['Role','Edit · VFX'],['Artist','2Hollis']],
+    '1204579585': [['Role','Edit'],['Artist','Molly Santana']],
+    '1203344844': [['Role','Shot · Edit'],['Client','Mississippi State Football']],
+    '1204416675': [['Role','VFX'],['Client','Hoka']],
+    '1204403981': [['Role','Shot · Edit · VFX'],['Client','Mississippi State']],
+    '1204407984': [['Role','Shot · Edit · VFX'],['Client','Mississippi State Football']],
+    '1203256076': [['Role','Director · Shot · Edit · VFX'],['On screen','Sam Berde']],
+    '1204401806': [['Role','Director · Shot · Edit · VFX'],['On screen','Sam Berde']],
+    '1204593129': [['Role','Director · Shot · Edit · VFX'],['On screen','Sam Berde']]
   };
   var inner = document.querySelector('.lightbox-inner');
   var panel = document.createElement('div'); panel.className = 'm-credits'; inner.appendChild(panel);
