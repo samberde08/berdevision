@@ -11,7 +11,11 @@
       { id: 'sf2', title: 'Charged fists', note: 'Electric charge built onto both hands, shown at half speed' },
       { id: 'sf3', title: 'Power up', note: 'Fists catch fire as the fighter squares up, shown at half speed' } ] },
     { h: 'Arran Studios · Black Friday', sub: 'Left is the plate as it was shot, right is the finished frame.', ar: '4 / 3', tall: false, narrow: true, shots: [
-      { id: 'ar1', title: 'The wide', note: 'A roadside with power poles becomes open desert, a windmill and a new sky' } ] }
+      { id: 'ar1', title: 'The wide', note: 'A roadside with power poles becomes open desert, a windmill and a new sky' } ] },
+    { h: 'Lady Bird · Follow the Fizz', sub: 'Left is the plate as it was shot, right is what aired.', ar: '1280 / 694', tall: false, shots: [
+      { id: 'lb1', title: 'Can shockwave', note: 'After Effects displacement shockwave and vapour' },
+      { id: 'lb2', title: 'Door to keyhole zoom', note: 'After Effects comp: the room rebuilt for one continuous push-in' },
+      { id: 'lb3', title: 'Sunset end card', note: 'Shot clean-up and the animated logo' } ] }
   ];
   var anchor = ab.querySelector('.services-grid'), items = [];
   SETS.forEach(function(SET, si){
