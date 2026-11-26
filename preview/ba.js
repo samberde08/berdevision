@@ -11,7 +11,7 @@
       { id: 'sf2', title: 'Charged fists', note: 'Electric charge built onto both hands, shown at half speed' },
       { id: 'sf3', title: 'Power up', note: 'Fists catch fire as the fighter squares up, shown at half speed' } ] },
     { h: 'Arran Studios · Black Friday', sub: 'Left is the plate as it was shot, right is the finished frame.', ar: '4 / 3', tall: false, narrow: true, shots: [
-      { id: 'ar1', title: 'The wide', note: 'A roadside with power poles becomes open desert, a windmill and a new sky' } ] },
+      { id: 'ar2', title: 'The light post', note: 'A street light, the car wrapped around it and the man on its roof, added to an empty roadside, then the grade' } ] },
     { h: 'Lady Bird · Follow the Fizz', sub: 'Left is the drone shot as it came off the camera, right is what aired.', ar: '1280 / 694', tall: false, shots: [
       { id: 'lbd', title: 'Drone end card', note: 'Parked cars and fencing painted out, a sunset sky and grade added, then the animated logo' } ] }
   ];
