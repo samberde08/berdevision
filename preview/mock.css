@@ -449,3 +449,5 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-ba-nav svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 .m-ba-count { font-family:'DM Sans',sans-serif; font-weight:500; font-size:.7rem; letter-spacing:.24em; color:rgba(255,255,255,.8); min-width:4.2em; text-align:center; }
 @media (max-width:768px){ .m-ba-list.m-ba-tall, .m-ba-list.m-ba-tall.m-ba-one { max-width: 300px; } }
+.m-ba-list.m-ba-tall, .m-ba-list.m-ba-tall.m-ba-one { max-width: 330px; }
+@media (max-width:768px){ .m-ba-list.m-ba-tall, .m-ba-list.m-ba-tall.m-ba-one { max-width: 270px; } }
