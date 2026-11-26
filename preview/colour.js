@@ -28,23 +28,35 @@
     var s = 210 / Math.max(r, g, b, 1);
     return [Math.min(255, r * s), Math.min(255, g * s), Math.min(255, b * s)];
   }
+  // Reading the reel's colour means pulling a video frame back from the graphics card, which stalled the page for 50-90 ms each time
+  // when done directly, 14 times a second. Now: only while the hero is the colour source, 4 times a second, and through an
+  // off-thread bitmap where the browser has one, so a spin of the wheel is never interrupted by it.
+  var sampling = false;
+  function readPixels(){
+    var d = cx.getImageData(0, 0, 16, 12).data, r = 0, g = 0, b = 0, n = 0, lumAll = 0;
+    for (var i = 0; i < d.length; i += 4) {
+      var l = d[i] * 0.3 + d[i+1] * 0.59 + d[i+2] * 0.11; lumAll += l;
+      if (l > 22 && l < 236) { var w = 1 + (Math.max(d[i], d[i+1], d[i+2]) - Math.min(d[i], d[i+1], d[i+2])) / 40; r += d[i] * w; g += d[i+1] * w; b += d[i+2] * w; n += w; }
+    }
+    lumAll /= (d.length / 4);
+    if (n < 8) { reel = NEUTRAL.slice(); reelK = 0.4; return; }
+    reel = grade(r / n, g / n, b / n, 2.1);
+    reelK = Math.max(0.45, Math.min(1, lumAll / 70));      // dark shots glow less, never off
+  }
   function sample(){
     var sv = window.__reelLive || v;                       // the light intro clip while it is on screen, then the full reel
-    if (!ok || !sv || sv.readyState < 2 || sv.paused || document.hidden) return;
+    if (!ok || sampling || below || !sv || sv.readyState < 2 || sv.paused || document.hidden) return;
     try {
-      cx.drawImage(sv, 0, 0, 16, 12);
-      var d = cx.getImageData(0, 0, 16, 12).data, r = 0, g = 0, b = 0, n = 0, lumAll = 0;
-      for (var i = 0; i < d.length; i += 4) {
-        var l = d[i] * 0.3 + d[i+1] * 0.59 + d[i+2] * 0.11; lumAll += l;
-        if (l > 22 && l < 236) { var w = 1 + (Math.max(d[i], d[i+1], d[i+2]) - Math.min(d[i], d[i+1], d[i+2])) / 40; r += d[i] * w; g += d[i+1] * w; b += d[i+2] * w; n += w; }
-      }
-      lumAll /= (d.length / 4);
-      if (n < 8) { reel = NEUTRAL.slice(); reelK = 0.4; return; }
-      reel = grade(r / n, g / n, b / n, 2.1);
-      reelK = Math.max(0.45, Math.min(1, lumAll / 70));      // dark shots glow less, never off
-    } catch (e) { ok = false; }                                // canvas blocked: stay neutral
+      if (window.createImageBitmap) {
+        sampling = true;
+        createImageBitmap(sv, { resizeWidth: 16, resizeHeight: 12, resizeQuality: 'low' }).then(function(bm){
+          try { cx.drawImage(bm, 0, 0, 16, 12); if (bm.close) bm.close(); readPixels(); } catch (e) { ok = false; }
+          sampling = false;
+        }, function(){ sampling = false; });
+      } else { cx.drawImage(sv, 0, 0, 16, 12); readPixels(); }
+    } catch (e) { ok = false; sampling = false; }          // canvas blocked: stay neutral
   }
-  setInterval(sample, 70);
+  setInterval(sample, 240);
 
   function rgbOf(c){ return Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]); }
   var prev = 0;
@@ -77,7 +89,15 @@
   var tiles = Array.prototype.slice.call(document.querySelectorAll('.work-item'));
   // where we are on the page, and which film is at the front of the wheel
   var heroEl = document.querySelector('.reel-wrap'), stripEl = document.querySelector('.work-strip');
-  function where(){ below = !!heroEl && heroEl.getBoundingClientRect().bottom < window.innerHeight * 0.42; }
+  var heroOut = false;
+  function where(){
+    if (!heroEl) { below = false; return; }
+    var bot = heroEl.getBoundingClientRect().bottom;
+    below = bot < window.innerHeight * 0.42;
+    // the hero reel stops decoding once it has scrolled fully out of view, and picks up again when it comes back
+    var out = bot < -60;
+    if (out !== heroOut) { heroOut = out; var live = window.__reelLive; if (live && live === v) { if (out) v.pause(); else { var q = v.play(); if (q && q.catch) q.catch(function(){}); } } }
+  }
   function spun(){ var f = stripEl && stripEl.querySelector('.m-slot.m-front .work-item'); if (f && f !== frontTile) { frontTile = f; wheelAt = performance.now(); } }
   window.addEventListener('scroll', where, { passive: true }); window.addEventListener('resize', where); where();
   if (stripEl) { stripEl.addEventListener('m-spin', spun); spun(); }
