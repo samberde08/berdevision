@@ -77,13 +77,17 @@
       strip.appendChild(el); ghosts.push({ el: el, veil: el.lastChild, i: i });
     }
   }
+  // Called for every film on every frame of a turn, so it only touches what actually changed: the position always, the stacking
+  // order, shadow depth and click-through only when their value moves. (Rewriting them all each frame made the browser repaint
+  // every film's picture every frame, which is what held a spin to about 30 frames a second.)
   function put(el, veil, d, real){
     var ad = Math.abs(d), depth = (1 - Math.cos(d * STEP)) / 2;                                                   // 0 at the front, 1 at the very back
     el.style.transform = wheelT(d);
-    el.style.zIndex = String(100 - Math.round(depth * 90));
-    veil.style.opacity = (ad < .5 ? ad * .12 : Math.min(.7, .06 + .68 * depth)).toFixed(3);                     // further round = deeper in shadow
-    el.style.opacity = '1';
-    if (real) el.style.pointerEvents = depth > .42 ? 'none' : '';                                                 // only the near side can be clicked or hovered
+    var z = 100 - Math.round(depth * 90); if (el._z !== z) { el._z = z; el.style.zIndex = String(z); }
+    var vo = Math.round((ad < .5 ? ad * .12 : Math.min(.7, .06 + .68 * depth)) * 25) / 25;                       // further round = deeper in shadow (in 4% steps)
+    if (veil._o !== vo) { veil._o = vo; veil.style.opacity = vo.toFixed(2); }
+    if (el._op !== 1) { el._op = 1; el.style.opacity = '1'; }
+    if (real) { var pe = depth > .42 ? 'none' : ''; if (el._pe !== pe) { el._pe = pe; el.style.pointerEvents = pe; } }   // only the near side can be clicked or hovered
   }
   // The whole wheel is drawn: a ring tipped slightly towards you, so the films on the far side are seen small, above and behind, travelling round.
   function wheelT(d){
@@ -196,7 +200,8 @@
       var x = c.x + c.w / 2 - G.SW / 2, y = c.y + c.h / 2 - CY;
       s.el.style.transform = 'translate(-50%,-50%) translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + sc.toFixed(4) + ')';
       s.el.style.setProperty('--inv', (1 / sc).toFixed(4)); s.el.classList.remove('m-big');
-      s.el.style.opacity = '1'; s.veil.style.opacity = '0'; s.el.style.zIndex = '1'; s.el.style.pointerEvents = ''; }
+      s.el.style.opacity = '1'; s.veil.style.opacity = '0'; s.el.style.zIndex = '1'; s.el.style.pointerEvents = '';
+      s.el._z = s.el._op = s.el._pe = s.veil._o = undefined; }      // the wheel's remembered values no longer hold after the grid has set its own
     strip.style.height = G.H.toFixed(0) + 'px';
   }
   function stagger(){ var f = front < 0 ? 0 : front;

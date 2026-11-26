@@ -505,3 +505,6 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 /* only the film at the front carries the colour boost; a filter on every film in a moving 3D ring is costly on the graphics card for little gain (the others sit under a shadow veil anyway) */
 .work-strip.m-wheel .m-slot:not(.m-front) .work-item img, .work-strip.m-wheel .m-slot:not(.m-front) .work-item video.m-loop, .work-strip.m-wheel .m-slot:not(.m-front) .work-item iframe.m-emb { filter:none !important; }
 .m-slot.m-ghost .work-item { box-shadow:none !important; }
+
+/* the shadow veil over each film is its own layer, so deepening it never repaints the film underneath */
+.m-veil { will-change: opacity; }
