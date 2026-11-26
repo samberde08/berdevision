@@ -35,3 +35,7 @@
 @keyframes bvc-glow { 0%,100% { filter: drop-shadow(0 0 16px rgba(255,255,255,.45)) drop-shadow(0 8px 18px rgba(0,0,0,.45)); } 50% { filter: drop-shadow(0 0 34px rgba(255,255,255,.85)) drop-shadow(0 8px 18px rgba(0,0,0,.45)); } }
 .bvc.shim .jl { background: linear-gradient(105deg, #e4dfd3 0%, #e4dfd3 34%, #ffffff 50%, #e4dfd3 66%, #e4dfd3 100%); background-size:270% 100%; -webkit-background-clip:text; background-clip:text;
   color:transparent; -webkit-text-fill-color:transparent; text-shadow:none; animation: bvc-shim 4.4s linear infinite, bvc-glow 3.6s ease-in-out infinite; }
+
+/* things flying past in the torrent */
+.bvc-fly { position:fixed; inset:0; z-index:91; pointer-events:none; overflow:hidden; }
+.bvc-fly img { position:absolute; left:50%; top:50%; height:26vh; width:auto; opacity:0; will-change:transform,opacity; filter: brightness(1.18) drop-shadow(0 0 16px rgba(255,255,255,.55)); }

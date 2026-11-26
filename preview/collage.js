@@ -379,6 +379,22 @@
     + 'float core=.085/(r+.03);col+=vec3(1.,.96,.9)*core*core*(.5+3.2*P*P);'                                      // the light we are being pulled into
     + 'float wr=smoothstep(.52,.9,P);col*=.75+2.2*P*P+18.*wr*wr;col+=vec3(1.,.97,.93)*wr*wr*1.1*smoothstep(1.5,0.,r);col=1.-exp(-col*1.35);'   // it over-exposes: colour blooms to white from the centre out
     + 'col=mix(col,vec3(1.),smoothstep(.82,.92,P));gl_FragColor=vec4(col,1.);}';
+  // things from the films fly out of the light and past the camera: each starts tiny down the throat, spirals outward with the torrent, turns, and is gone
+  var FLYK=['ai_pegasus','st_ball','ai_trophy','ai_ye_run','ai_bear','es_dog','ai_cal_shoot','ai_kaiju','ai_hoka','ai_st_serve','es_eye','ai_ice','ai_pegasus','st_ball'], fly=null, flyO=[];
+  function flyInit(){
+    if (fly) return; fly=document.createElement('div'); fly.className='bvc-fly';
+    FLYK.forEach(function(k,i){ var im=document.createElement('img'); im.alt=''; im.decoding='async'; im.src='collage2/'+k+'.webp'; fly.appendChild(im);
+      flyO.push({el:im, s:0.05+0.6*i/FLYK.length, a:(i*2.39996)%6.2832, spin:(i%2?1:-1)*(0.5+((i*7)%5)/5), big:/ball|eye|trophy/.test(k)?0.6:1, o:''}); });
+  }
+  function flyFrame(P){
+    var W=window.innerWidth, H=window.innerHeight, M=Math.max(W,H), wr=1-clamp((P-0.62)/0.2);
+    for (var i=0;i<flyO.length;i++){ var q=flyO[i], u=(P-q.s)/0.2, op;
+      if (u<=0 || u>=1 || wr<=0) op='0';
+      else { var e=u*u*u, ang=q.a+1.7*u, rad=(0.02+0.92*e)*M*0.62, sc=(0.04+3.4*e)*q.big;
+        q.el.style.transform='translate3d('+(Math.cos(ang)*rad).toFixed(1)+'px,'+(Math.sin(ang)*rad).toFixed(1)+'px,0) translate(-50%,-50%) scale('+sc.toFixed(3)+') rotate('+(q.spin*150*u).toFixed(1)+'deg)';
+        op=(clamp(u*7)*clamp((1-u)*5)*wr).toFixed(2); }
+      if (q.o!==op) { q.o=op; q.el.style.opacity=op; } }
+  }
   var tor=null, tgl=null, tprog=null, tU=null, tRaf=0, TDUR=5600, tFast=false;
   function torrentInit(){
     if (tor) return true;
@@ -395,19 +411,20 @@
     var k=Math.min(1, 900/Math.max(window.innerWidth, window.innerHeight)) * 0.75, w=Math.max(2,Math.round(window.innerWidth*k)), h=Math.max(2,Math.round(window.innerHeight*k));
     if (tor.width!==w || tor.height!==h) { tor.width=w; tor.height=h; tgl.viewport(0,0,w,h); }
     tgl.uniform2f(tU.R,w,h); tgl.uniform1f(tU.T,secs); tgl.uniform1f(tU.P,P); tgl.drawArrays(tgl.TRIANGLES,0,3);
+    flyFrame(P);
     tor.style.opacity = P<0.05 ? (P/0.05).toFixed(3) : (P>0.9 ? Math.max(0,(1-P)/0.1).toFixed(3) : '1');
   }
   function torrentRun(){
     if (reduce || HALL) return;
     var fp=(qs.match(/[?&]tp=([0-9.]+)/)||[])[1];
     if (!torrentInit()) return;
-    cancelAnimationFrame(tRaf); if (!tor.parentNode) document.body.appendChild(tor);
+    cancelAnimationFrame(tRaf); flyInit(); if (!tor.parentNode) document.body.appendChild(tor); if (!fly.parentNode) document.body.appendChild(fly);
     if (fp!==undefined) { torrentFrame(parseFloat(fp), parseFloat(fp)*TDUR/1000); return; }                     // ?tp=0.5 holds one frame, for checking
     var t0=performance.now(), el=0, last=t0; tFast=false;
     var hurry=function(){ tFast=true; }; window.addEventListener('wheel',hurry,{passive:true,once:true}); window.addEventListener('touchmove',hurry,{passive:true,once:true}); window.addEventListener('keydown',hurry,{once:true});
     (function step(){ tRaf=requestAnimationFrame(function(now){ el+=(now-last)*(tFast?5:1); last=now; var P=Math.min(1,el/TDUR);
       torrentFrame(P, (now-t0)/1000);
-      if (P<1 && page && page.classList.contains('active')) step(); else if (tor.parentNode) tor.parentNode.removeChild(tor); }); })();   // anyone who starts scrolling is let through quickly
+      if (P<1 && page && page.classList.contains('active')) step(); else { if (tor.parentNode) tor.parentNode.removeChild(tor); if (fly.parentNode) fly.parentNode.removeChild(fly); } }); })();   // anyone who starts scrolling is let through quickly
   }
   var raf=0; function tick(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; update(); }); }
   window.addEventListener('scroll', tick, {passive:true});
