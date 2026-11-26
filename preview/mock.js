@@ -2,7 +2,7 @@
   var tiles = Array.prototype.slice.call(document.querySelectorAll('.work-item'));
   // ---- hover loops ----
   var loops = ['1249151789','1249151605','1249151719','1249151866','1249151733','1249151670','1249151833',
-    '1204589600','1204398806','1204401806','1204409147','1204586020','1204561560', 'ladybird', 'something-special'];   // + older films cut from their masters (DANNA, Embrace the Madness, Underwater, Noah Lyles, Madison Beer, Bronco)
+    '1204589600','1204398806','1204401806','1204409147','1204586020','1204561560', 'ladybird', 'something-special', 'distant-lover'];   // + older films cut from their masters (DANNA, Embrace the Madness, Underwater, Noah Lyles, Madison Beer, Bronco)
   tiles.forEach(function(t){
     var lid = t.dataset.vimeo || t.dataset.key; if (loops.indexOf(lid) === -1) return;
     var v = document.createElement('video');
