@@ -7,6 +7,7 @@
     var lid = t.dataset.vimeo || t.dataset.key; if (loops.indexOf(lid) === -1) return;
     var v = document.createElement('video');
     v.className = 'm-loop'; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', ''); v.disableRemotePlayback = true;   // iPhone only autoplays inline when these are attributes
     v.src = 'loops/' + lid + '.mp4';
     t.insertBefore(v, t.querySelector('.work-overlay'));
     function on(){ t.classList.add('m-playing'); var p = v.play(); if (p && p.catch) p.catch(function(){}); }
