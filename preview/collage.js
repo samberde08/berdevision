@@ -99,7 +99,7 @@
     pin = 0;   // no scroll-driven reveal: Sam rejected the slide-up, the camera pull-back and the point cloud. The collage simply fades in, complete.
     // the collage holds for a short scroll while the figures arrive (see SIL above)
     if (SIL) pin = Math.round(vh * (mobile ? 0.55 : 0.7));
-    if (HALL) pin = Math.round(vh * (mobile ? 1.0 : 1.15));   // (Nov 26, Sam) much shorter
+    if (HALL) pin = 0;   // (Nov 26, Sam) the entrance plays by itself when About opens; nothing is tied to scrolling   // (Nov 26, Sam) much shorter
     stage.style.height=sh+'px'; wrap.style.height=(sh+pin)+'px';
     stage.querySelectorAll('.bvc-fade').forEach(function(f){ f.remove(); });
     var bg = pageBg(), clear = bg.replace('rgb(','rgba(').replace(')',',0)');
@@ -162,7 +162,7 @@
     if (forceP!==undefined) prog=parseFloat(forceP); else if (reduce || !pin) prog=1; else {
       prog = Math.max(0, Math.min(pin, anchor - wrap.getBoundingClientRect().top))/pin;
     }
-    if (HALL && hc) { hallUpdate(prog); hint.style.opacity = prog > 0.03 ? 0 : 1; reveal(); return; }
+    if (HALL && hc) { hallUpdate(forceP!==undefined ? prog : introT); hint.style.opacity = prog > 0.03 ? 0 : 1; reveal(); return; }
     reveal();
     // the figures stand still in their final places; dots gather into them, then the real pictures come up through the dots
     var cloud = !!(pc && PT), dom = cloud ? Math.max(0, Math.min(1, (prog - 0.80)/0.13)) : 1;
@@ -281,7 +281,7 @@
       hx.strokeStyle='rgba(255,255,255,'+(0.75*a).toFixed(3)+')'; hx.lineWidth=Math.max(1, 3*k*sc); hx.beginPath(); hx.moveTo(cx-rw, bot); hx.lineTo(cx+rw, bot); hx.stroke(); }
   }
   function hallUpdate(prog){
-    var hp=0, gp=clamp((prog-0.16)/0.84), it=clamp(prog/0.16), fa=0, F=HP.F, cam=hp*HP.END, E=C.earth, i, q;
+    var hp=0, gp=clamp(prog), it=1, fa=0, F=HP.F, cam=hp*HP.END, E=C.earth, i, q;
     var go = gp*gp*(3-2*gp);
     // the orb: far down the corridor, growing as we approach; then it sinks and swells into the earth
     var k0=F/(HP.ZO-cam), rh=Math.max(mobile?20:28, HP.RO*k0), ie=it*it*(3-2*it), r0=HP.RO*(1.2 + 0.14*ie),   // the orb is there first, close; then it draws away down the corridor
@@ -290,7 +290,7 @@
     orb.style.transform='translate3d('+(ox-200).toFixed(1)+'px,'+(oy-200).toFixed(1)+'px,0) scale('+(orr/200).toFixed(4)+')';
     var oo = 1 - clamp((gp-0.5)/0.3); orb.style.opacity=oo.toFixed(3); orb.style.zIndex = gp>0 ? 29 : 2; orbVis = oo>0.01;
     earthEl.style.transform='translate3d('+(mx*8)+'px,'+(my*3)+'px,0)'; earthEl.style.opacity=clamp((gp-0.42)/0.3).toFixed(3);
-    hallDraw(cam, 1-clamp(gp/0.35), fa*(1-clamp(gp/0.35)), r0);
+    introDraw(gp, r0);
     for (i=0;i<plates.length;i++){ var o=plates[i]; o.el.style.transform = gp>=1 ? 'translate3d('+(mx*o.depth*16)+'px,'+(my*o.depth*6)+'px,0)' : 'none'; }
     for (i=0;i<hallSeq.length;i++){ q=hallSeq[i]; var el=q.el, tf, op, fl='none';
       if (gp<=0) {
@@ -302,9 +302,9 @@
           var br=Math.round(clamp(1-(d-1000)/2000)*10)/10;                         // lit from behind by the orb: a dark shape far away, its own colours up close
           fl = br>=1 ? 'none' : 'brightness('+Math.max(0.2,br)+')'; }
       } else {
-        var g=clamp((gp-0.16-0.34*q.rank)/0.46), ge=1-Math.pow(1-g,3);
-        op=clamp(g*3.2);
-        tf = g>=1 ? 'rotate('+q.rot+'deg)' : 'translate3d('+((q.bx-C.CX)*1.15*(1-ge)).toFixed(1)+'px,'+(300*(1-ge)).toFixed(1)+'px,0) scale('+(1+1.5*(1-ge)).toFixed(4)+') rotate('+(q.rot*ge).toFixed(2)+'deg)';
+        var g=clamp((gp-0.04-0.38*q.rank)/0.5), ge=1-Math.pow(1-g,4), far=1-ge;   // each figure rushes in from behind the camera and brakes into place
+        op=clamp(g*5); fl = g>=1 ? 'none' : 'brightness('+(1+Math.round(far*2.4*5)/5)+')';
+        tf = g>=1 ? 'rotate('+q.rot+'deg)' : 'translate3d('+((q.bx-C.CX)*2.6*far).toFixed(1)+'px,'+((q.by-HP.VY)*2.6*far+120*far).toFixed(1)+'px,0) scale('+(1+5*far).toFixed(4)+') rotate('+(q.rot*ge).toFixed(2)+'deg)';
       }
       if (q.tf!==tf) { q.tf=tf; el.style.transform=tf; }
       op=op.toFixed(2); if (q.op!==op) { q.op=op; el.style.opacity=op; }
@@ -315,6 +315,34 @@
       q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+((1-lo)*40+my*q.depth*7).toFixed(1)+'px,0) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }
     if (starsEl) starsEl.style.opacity=(0.5*lo).toFixed(3);
     col.style.transform='scale('+s.toFixed(4)+')';
+  }
+  // ---------------- the entrance: it plays once, by itself, each time About opens ----------------
+  var introT=1, introRaf=0, introT0=0, IDUR=2300, WS=null;
+  function introRun(){
+    if (!HALL || forceP!==undefined) return;
+    stage.style.transition='none'; stage.classList.add('m-in');             // no slow fade-in: the entrance itself is the reveal
+    cancelAnimationFrame(introRaf); introT0=performance.now(); introT=0; update();
+    (function step(){ introRaf=requestAnimationFrame(function(now){ introT=clamp((now-introT0)/IDUR); update(); if (introT<1) step(); }); })();
+    setTimeout(function(){ if (introT<1 && performance.now()-introT0 > IDUR+900) { cancelAnimationFrame(introRaf); introT=1; update(); } }, IDUR+1000);   // never left half-way
+  }
+  // light-speed streaks that spiral out of the light, a ring of swirling sparks, and a white flash at the start
+  function introDraw(gp, orbR){
+    var w=hc.width, h=hc.height, sc=s*dpr, cx=w/2, cy=HP.VY*sc, i; hx.clearRect(0,0,w,h);
+    var bgA=1-clamp((gp-0.5)/0.4); if (bgA<=0.004) return;
+    hx.globalCompositeOperation='source-over'; hx.fillStyle='rgba(4,6,11,'+(0.96*bgA).toFixed(3)+')'; hx.fillRect(0,0,w,h);
+    var gr=hx.createRadialGradient(cx,cy,0,cx,cy,Math.max(w,h)*0.62); gr.addColorStop(0,'rgba(232,242,255,'+(0.62*bgA)+')'); gr.addColorStop(0.3,'rgba(190,215,255,'+(0.2*bgA)+')'); gr.addColorStop(1,'rgba(190,215,255,0)'); hx.fillStyle=gr; hx.fillRect(0,0,w,h);
+    var a=clamp(gp/0.06)*(1-clamp((gp-0.5)/0.4)); if (a<=0.004) return;
+    if (!WS) { WS=[]; var sd=11; var rnd=function(){ sd=(sd*16807)%2147483647; return sd/2147483647; }; for (i=0;i<230;i++) WS.push([rnd()*6.2832, 0.6+rnd()*0.9, rnd(), rnd(), rnd()<0.5?1:-1]); }
+    var maxR=Math.sqrt(w*w+h*h)*0.56, sp=1-0.75*gp;                      // everything brakes as the collage lands
+    hx.globalCompositeOperation='lighter'; hx.lineCap='round';
+    for (i=0;i<170;i++){ var q=WS[i], u=(gp*2.6*q[1]+q[2])%1, r1=(0.03+u*u*1.05)*maxR, len=(0.02+0.3*u)*maxR*sp, ang=q[0]+0.75*(1-u)*sp;
+      hx.strokeStyle='rgba('+(q[3]<0.3?'170,205,255':'255,255,255')+','+(a*(0.15+0.75*u)).toFixed(3)+')'; hx.lineWidth=(0.6+2.2*u*q[3])*dpr;
+      hx.beginPath(); hx.moveTo(cx+Math.cos(ang)*r1, cy+Math.sin(ang)*r1); hx.lineTo(cx+Math.cos(ang+0.05*sp)*(r1+len), cy+Math.sin(ang+0.05*sp)*(r1+len)); hx.stroke(); }
+    for (i=170;i<WS.length;i++){ var k=WS[i], rr=(0.1+0.5*k[2])*maxR*(1-0.35*gp), an=k[0]+k[4]*(gp*5.5*k[1]), tl=0.5*sp*k[4];
+      hx.strokeStyle='rgba(255,255,255,'+(a*(0.35+0.5*k[3])).toFixed(3)+')'; hx.lineWidth=(1+1.6*k[3])*dpr;
+      hx.beginPath(); hx.arc(cx, cy, rr, Math.min(an, an-tl), Math.max(an, an-tl)); hx.stroke(); }
+    var fl=1-clamp(gp/0.14); if (fl>0) { hx.fillStyle='rgba(255,255,255,'+(0.55*fl).toFixed(3)+')'; hx.fillRect(0,0,w,h); }
+    hx.globalCompositeOperation='source-over';
   }
   // ---------------- after the hallway: the statement lights line by line, then the copy and each service arrive in turn ----------------
   var rv=null;
@@ -334,7 +362,7 @@
     wrap.addEventListener('mouseleave', function(){ mx=0; my=0; tick(); });
   }
   var page=document.getElementById('page-about');
-  if (page) new MutationObserver(function(){ if (page.classList.contains('active')) build(); }).observe(page, {attributes:true, attributeFilter:['class']});
+  if (page) new MutationObserver(function(){ if (page.classList.contains('active')) { build(); introRun(); } }).observe(page, {attributes:true, attributeFilter:['class']});
   build();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ build(); });
   if (/[?&]page=about/.test(qs)) { var a2=document.querySelector('a[data-page="about"]'); if (a2) setTimeout(function(){ a2.click(); setTimeout(function(){ window.scrollTo(0, wrap.getBoundingClientRect().top + window.scrollY - anchor); document.documentElement.setAttribute('data-bvc-ready','1'); }, 900); }, 300); }
