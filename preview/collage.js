@@ -373,12 +373,12 @@
     + 'float fil=pow(smoothstep(.42,.80,n),2.2)+.55*pow(smoothstep(.55,.9,n2),3.);'
     + 'float depth=smoothstep(.0,.28,r)*(1.-.55*smoothstep(.5,1.3,r));'                                           // dim far down the throat and at the rim: the wall curves away
     + 'col+=pal(n*.55+d*.035+fi*.19+T*.04)*fil*depth*(.5+.28*fi);}'
-    + 'float sid=floor((a+3.14159)/6.2832*110.);float h1=hash(vec2(sid,3.));float cell=fract((a+3.14159)/6.2832*110.);'
-    + 'float f=fract(log(r+.0001)*.9-z*(.35+.6*h1)+h1*9.);float st=smoothstep(.0,.06,f)*smoothstep(.5,.06,f)*step(.55,h1)*smoothstep(.5,.15,abs(cell-.5));'
+    + 'float sid=floor((a+3.14159)/6.2832*170.);float h1=hash(vec2(sid,3.));float cell=fract((a+3.14159)/6.2832*170.);'
+    + 'float f=fract(log(r+.0001)*.9-z*(.35+.6*h1)+h1*9.);float st=smoothstep(.0,.06,f)*smoothstep(.5,.06,f)*step(.6,h1)*smoothstep(.34,.05,abs(cell-.5))*(.35+.65*hash(vec2(sid,7.)));'
     + 'col+=vec3(.85,.93,1.)*st*smoothstep(.03,.4,r)*(.35+1.3*P);'                                                // sparks streaking past
     + 'float core=.085/(r+.03);col+=vec3(1.,.96,.9)*core*core*(.5+3.2*P*P);'                                      // the light we are being pulled into
-    + 'col*=.75+2.2*P*P;col=1.-exp(-col*1.35);'
-    + 'float wr=smoothstep(.58,.92,P);col=mix(col,vec3(1.),clamp(wr*(1.25-.5*r),0.,1.));gl_FragColor=vec4(col,1.);}';
+    + 'float wr=smoothstep(.52,.9,P);col*=.75+2.2*P*P+18.*wr*wr;col+=vec3(1.,.97,.93)*wr*wr*1.1*smoothstep(1.5,0.,r);col=1.-exp(-col*1.35);'   // it over-exposes: colour blooms to white from the centre out
+    + 'col=mix(col,vec3(1.),smoothstep(.82,.92,P));gl_FragColor=vec4(col,1.);}';
   var tor=null, tgl=null, tprog=null, tU=null, tRaf=0, TDUR=5600, tFast=false;
   function torrentInit(){
     if (tor) return true;
