@@ -218,7 +218,8 @@
       q.bx = c[1] + c[2]*c[6]/2; q.by = (C.H - (c[3]-PAD) - eh) + eh*0.92; q.eh = eh;
       q.hz = HP.Z0 + i*HP.DZ; q.hs = (i%2 ? 1 : -1); q.hxw = HP.XW*(0.9 + 0.25*(((i*37)%11)/11));
       q.hh = Math.min(face ? HP.HF*0.62 : HP.HF, (mobile ? 300 : 520)/c[6]);   // wide cut-outs are held to a sensible width
-      q.hxw = Math.max(q.hxw, q.hh*c[6]/2 + (mobile ? 36 : 100));                 // and nobody stands in front of the orb q.hy = face ? HP.FH - HP.HF*0.5 : HP.FH;      // portraits hang at eye level, bodies stand on the floor
+      q.hxw = Math.max(q.hxw, q.hh*c[6]/2 + (mobile ? 36 : 100));                 // and nobody stands in front of the orb
+      q.hy = face ? HP.FH - HP.HF*0.5 : HP.FH;      // portraits hang at eye level, bodies stand on the floor
       q.rank = Math.min(1, Math.abs(q.bx - C.CX)/(C.W/2)); q.f = null; });
     HP.END = HP.Z0 + (hallSeq.length-1)*HP.DZ + 140; HP.ZO = HP.END + HP.F;
     if (!orbOn) { orbOn = true; requestAnimationFrame(orbLoop); }
