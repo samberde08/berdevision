@@ -18,7 +18,7 @@
     var gn = document.createElement('div'); gn.className = 'm-gc-name'; gn.textContent = gt('.work-name'); gc.appendChild(gn);
     var gg = document.createElement('div'); gg.className = 'm-gc-tag'; gg.textContent = gt('.work-subtitle') || gt('.work-tag'); gc.appendChild(gg);
     s.appendChild(gc);
-    return { el: s, tile: t, veil: veil, shown: true, cat: (CATS[t.dataset.vimeo || t.dataset.key] || '').split(' ') };
+    return { el: s, tile: t, veil: veil, shown: true, cat: (CATS[t.dataset.vimeo || t.dataset.key] || '').split(' ').concat(window.__SEL && window.__SEL.indexOf(t.dataset.vimeo || t.dataset.key) >= 0 ? ['selected'] : []) };
   });
   var slots = allSlots.slice();          // the films currently on the wheel (all of them, or one kind)
   var cap = document.createElement('div'); cap.className = 'm-wheel-cap';
@@ -32,7 +32,7 @@
   // (the section title is hidden on this page, so the switch gets its own slim line directly above the films)
   // a small sorter: show every film, or one kind of work
   var cats = document.createElement('div'); cats.className = 'm-cats'; cats.setAttribute('role', 'group'); cats.setAttribute('aria-label', 'Kind of work');
-  cats.innerHTML = [['all','All'],['music','Music'],['sports','Sports'],['brand','Brand'],['personal','Personal']].map(function(c, i){ return '<button type="button" data-c="' + c[0] + '"' + (i ? '' : ' class="m-on"') + '>' + c[1] + '</button>'; }).join('');
+  cats.innerHTML = (window.__SEL ? [['selected','Selected']] : []).concat([['all','All'],['music','Music'],['sports','Sports'],['brand','Brand'],['personal','Personal']]).map(function(c, i){ return '<button type="button" data-c="' + c[0] + '"' + (i ? '' : ' class="m-on"') + '>' + c[1] + '</button>'; }).join('');
   var vbar = document.createElement('div'); vbar.className = 'm-viewbar'; vbar.appendChild(cats); vbar.appendChild(tog); strip.insertAdjacentElement('beforebegin', vbar); hdr = vbar;
   function togState(){ Array.prototype.forEach.call(tog.querySelectorAll('button'), function(b){ b.classList.toggle('m-on', b.dataset.v === mode); b.setAttribute('aria-pressed', b.dataset.v === mode ? 'true' : 'false'); }); }
   var counter = document.getElementById('workNavCounter'), prevB = document.getElementById('workPrev'), nextB = document.getElementById('workNext');
@@ -262,6 +262,7 @@
   window.addEventListener('scroll', function(){ if (!tr) tr = requestAnimationFrame(tip); }, { passive: true });
   var rt = 0; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ size(); count(); }, 120); });
   size();
+  if (window.__SEL) setFilter('selected');      // (idea preview) the wheel opens on a short list; All is one tap away
   setTimeout(function(){ if (front >= 0) { var rgb = slots[front].tile.dataset.glowRGB; if (rgb) slots[front].el.style.setProperty('--tile', rgb); count(); } }, 1200);
   window.__wheel = { goTo: goTo, unfurl: unfurl, furl: furl, filter: setFilter, state: function(){ return { pos: pos, target: target, front: front, n: n, W: W, mode: mode, busy: busy }; } };
 })();

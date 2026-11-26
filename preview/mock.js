@@ -2,7 +2,7 @@
   var tiles = Array.prototype.slice.call(document.querySelectorAll('.work-item'));
   // ---- hover loops ----
   var loops = ['1249151789','1249151605','1249151719','1249151866','1249151733','1249151670','1249151833',
-    '1204589600','1204398806','1204401806','1204409147','1204586020','1204561560', 'ladybird', 'something-special', 'distant-lover',
+    '1204589600','1204398806','1204401806','1204409147','1204586020','1204561560', 'ladybird', 'something-special', 'distant-lover', 'breakdown',
     '1204418162','1203337382','1204680193','1204548410','1203340055','1204579585','1203344844','1204416675','1204403981','1204407984','1203256076','1204593129'];   // + the last 12, cut from Sam's own Vimeo files: every film now has a local clip   // + older films cut from their masters (DANNA, Embrace the Madness, Underwater, Noah Lyles, Madison Beer, Bronco)
   tiles.forEach(function(t){
     var lid = t.dataset.vimeo || t.dataset.key; if (loops.indexOf(lid) === -1) return;
