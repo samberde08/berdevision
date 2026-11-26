@@ -7,7 +7,7 @@
     type:{lines:['BERDE','VISION'], x0:130, x1:1510, top:1080, bottom:440}};
   var MOB = {W:760, H:1340, CX:380, items:[["ai_pegasus",0,190,930,-10,9,1.028],["ai_bear",40,290,800,-6,8,0.508],["ai_kaiju",560,290,790,6,8,0.678],["ai_ye_face",135,480,600,0,14,1.028],["ai_paige",25,270,590,-4,16,0.637],["yachty_portrait",520,300,500,5,16,0.795],["ai_sf_face",-45,260,400,-8,17,1.14],["ai_danna",135,330,380,-3,18,0.774],["ai_noah",320,340,400,3,18,0.954],["arran",430,260,150,3,28,1.348],["st_ball",250,260,430,0,13,1.143],["esdee",-50,380,165,0,23,0.885],["cal",110,300,235,0,26,1.315],["es_eye",180,100,220,-6,25,1.416],["ai_ice",440,330,265,0,27,0.989],["es_dog",270,150,248,0,29,1.941]],
     earth:{x:-313, h:534, b:-274, R:722, cy:-462, s0:1.5, y0:-30},
-    type:{lines:['BERDE','VIS','ION'], x0:40, x1:720, top:1320, bottom:585}};
+    type:{lines:['BERDE','VISION'], x0:34, x1:726, top:1332, bottom:1000}};   // phone: the whole name on two straight lines above the crowd, only its lower edge tucked behind their heads
   // per-letter size jitter (cycled) and tilt: packed, uneven, still readable
   var TJ=[-5,4,-3,6,-4,3,-5,4,-2,5,-4], SJ=[1,.84,1.08,.9,1.12,.86,1.04,.92,1.1,.88,1];   // where each letter ends up once you scroll: tilted, mixed sizes
   var JIT=[1], TILT=[0];   // a clean stacked lockup: every line justified to the same width, tight leading
@@ -160,7 +160,7 @@
     if (cloud) { var fadeOut = Math.max(0, Math.min(1, (prog - 0.86)/0.11));
       pc.style.opacity=(1-fadeOut).toFixed(3);
       if (fadeOut < 1) pcDraw(ease(Math.min(1, prog/0.80))); else if (!pcClear) { pcCtx.clearRect(0,0,pcW,pcH); pcClear=true; } }
-    var jp = ease(prog/0.45);                                   // the wordmark starts straight and jumbles as you scroll
+    var jp = mobile ? 0 : ease(prog/0.45);                                   // the wordmark starts straight and jumbles as you scroll
     for (var j=0;j<letters.length;j++){ var q=letters[j];
       q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+(my*q.depth*7)+'px,0) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }
     hint.style.opacity = prog > 0.06 ? 0 : 1;
