@@ -4,8 +4,7 @@
   var q = new URLSearchParams(location.search), TRY = (q.get('try') || '').split(',').filter(Boolean);
   var has = function(k){ return TRY.indexOf(k) >= 0; };
   window.__TRY = TRY;
-  // the ten films the wheel opens on ("Selected", approved Nov 26; list is Claude's pick until Sam gives his own)
-  window.__SEL = ['1249151789', '1249151605', '1249151719', '1249151866', '1249151733', '1249151670', '1249151833', 'ladybird', 'something-special', 'distant-lover', 'breakdown'];
+  // (Nov 26) Sam: no "Selected" on the wheel; it opens on All. window.__SEL is left unset, so wheel.js adds no Selected chip.
 
   // ---- hire link (always on) ----
   var hire = document.createElement('a'); hire.className = 'm-hire'; hire.href = 'mailto:samberde@gmail.com?subject=Project%20enquiry';
