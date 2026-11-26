@@ -8,8 +8,8 @@
       { id: 'st3', title: 'Courtside', note: 'Storm clouds behind both athletes, then the film finish' } ] },
     { h: 'Street Fighter x Lids', sub: 'Left is the edit before effects, right is the delivered film.', ar: '9 / 16', tall: true, shots: [
       { id: 'sf1', title: 'Charge and logo', note: 'Energy in the car, then the jacket print lights up' },
-      { id: 'sf2', title: 'Hadouken', note: 'The fireball built into the hands and thrown at camera' },
-      { id: 'sf3', title: 'Power up', note: 'Fists catch fire as the fighter squares up' } ] }
+      { id: 'sf2', title: 'Charged fists', note: 'Electric charge built onto both hands, shown at half speed' },
+      { id: 'sf3', title: 'Power up', note: 'Fists catch fire as the fighter squares up, shown at half speed' } ] }
   ];
   var anchor = ab.querySelector('.services-grid'), items = [];
   SETS.forEach(function(SET, si){
@@ -20,8 +20,8 @@
     SET.shots.forEach(function(S){
       var card = document.createElement('figure'); card.className = 'm-ba';
       card.innerHTML = '<div class="m-ba-frame" tabindex="0" role="slider" aria-label="Before and after: ' + S.title + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">' +
-        '<video class="m-ba-a" muted loop playsinline preload="none" src="ba/' + S.id + '_after.mp4?v=1"></video>' +
-        '<div class="m-ba-clip"><video class="m-ba-b" muted loop playsinline preload="none" src="ba/' + S.id + '_before.mp4?v=1"></video></div>' +
+        '<video class="m-ba-a" muted loop playsinline preload="none" src="ba/' + S.id + '_after.mp4?v=2"></video>' +
+        '<div class="m-ba-clip"><video class="m-ba-b" muted loop playsinline preload="none" src="ba/' + S.id + '_before.mp4?v=2"></video></div>' +
         '<span class="m-ba-tag m-ba-tb">Before</span><span class="m-ba-tag m-ba-ta">After</span>' +
         '<div class="m-ba-line"><i></i></div></div>' +
         '<figcaption><b>' + S.title + '</b><span>' + S.note + '</span></figcaption>';
