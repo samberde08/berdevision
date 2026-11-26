@@ -24,7 +24,10 @@
     var o = getComputedStyle(a); if (/(hidden|auto|scroll)/.test(o.overflowX + o.overflowY)) { a.style.overflow = 'clip'; }
   }
   function pageBg(){ for (var e = wrap; e; e = e.parentElement) { var c = getComputedStyle(e).backgroundColor; if (c && !/rgba\(0, 0, 0, 0\)|transparent/.test(c)) return c; } return 'rgb(12,12,13)'; }
-  var SIL = !reduce && window.__TRY && window.__TRY.indexOf('sil') >= 0;
+  // The entrance (Nov 26, Sam): at first only the BERDEVISION wordmark is there. As the page scrolls, the collage holds in place and the
+  // figures arrive left to right, each as a white silhouette that then fills with its picture; the earth comes up under them.
+  var SIL = !reduce;
+  var extraEls = null;
   var C=DESK, mobile=false, plates=[], letters=[], cuts=[], dropAll=0, earthEl, s=1, pin=0, anchor=8, builtW=-1, mx=0, my=0;
   var meas = document.createElement('canvas').getContext('2d');
   function buildType(){
@@ -81,6 +84,7 @@
     });
     // the whole pyramid rises as ONE piece, so the arrangement (and its overlaps) is identical at every scroll position
     var dmax = Math.max.apply(null, plates.map(function(o){ return o.drop; })); plates.forEach(function(o){ o.drop = dmax; }); dropAll = dmax;
+    extraEls = null;
     earthEl=document.createElement('img'); earthEl.className='earth'; earthEl.alt=''; earthEl.src='collage2/ye_earth1.webp';
     earthEl.style.cssText='left:'+E.x+'px;bottom:'+E.b+'px;height:'+E.h+'px;z-index:30;transform-origin:50% 100%';
     col.appendChild(earthEl);
@@ -90,7 +94,7 @@
     anchor = Math.max(mobile ? 62 : 8, Math.round((vh - sh)/2));
     stage.style.top = anchor+'px';
     pin = 0;   // no scroll-driven reveal: Sam rejected the slide-up, the camera pull-back and the point cloud. The collage simply fades in, complete.
-    // (idea preview, ?try=sil) the figures stand as white silhouettes at first; the collage holds for a short scroll while they fill in, left to right
+    // the collage holds for a short scroll while the figures arrive (see SIL above)
     if (SIL) pin = Math.round(vh * (mobile ? 0.55 : 0.7));
     stage.style.height=sh+'px'; wrap.style.height=(sh+pin)+'px';
     stage.querySelectorAll('.bvc-fade').forEach(function(f){ f.remove(); });
@@ -158,13 +162,16 @@
     // (idea preview, ?try=c3d) the collage as a diorama: the three layers of figures, the wordmark and the earth sit at real depths,
     // and the whole scene turns a few degrees with the pointer and as it scrolls through the screen
     var D3 = !reduce && window.__TRY && window.__TRY.indexOf('c3d') >= 0, ZS = D3 ? 150 : 0;
-    earthEl.style.transform='translate3d('+(mx*8)+'px,'+(my*3)+'px,'+(D3 ? -260 : 0)+'px)'; earthEl.style.opacity=dom.toFixed(3);
+    var eo = SIL ? Math.max(0, Math.min(1, (prog - 0.10) / 0.32)) : 1;
+    earthEl.style.transform='translate3d('+(mx*8)+'px,'+(my*3)+'px,'+(D3 ? -260 : 0)+'px)'; earthEl.style.opacity=(dom*eo).toFixed(3);
+    if (SIL) { if (!extraEls) extraEls = col.querySelectorAll('.atmo, .gshadow'); for (var x9=0;x9<extraEls.length;x9++) extraEls[x9].style.opacity = eo.toFixed(3); }
     for (var i=0;i<plates.length;i++){ var o=plates[i];
       o.el.style.transform='translate3d('+(mx*o.depth*16)+'px,'+(my*o.depth*6)+'px,'+(o.depth*ZS).toFixed(0)+'px)'; }
     for (var k=0;k<cuts.length;k++){ var q2=cuts[k]; q2.el.style.transform='rotate('+q2.rot+'deg)'; q2.el.style.opacity=dom.toFixed(3); }
     if (SIL) for (var k2=0;k2<cuts.length;k2++){ var q3=cuts[k2], el3=q3.el;
       if (q3.xn === undefined) q3.xn = Math.max(0, Math.min(1, (el3.offsetLeft + el3.offsetWidth/2) / Math.max(1, C.W)));
-      var t3 = Math.max(0, Math.min(1, (prog - 0.04 - 0.5*q3.xn) / 0.38)), f3;
+      var t3 = Math.max(0, Math.min(1, (prog - 0.05 - 0.5*q3.xn) / 0.40)), f3;
+      el3.style.opacity = Math.min(1, t3 / 0.16).toFixed(3);                             // nothing at first, then the white shape
       if (t3 <= 0.3) f3 = 'brightness(0) invert(1)';                                   // a white cut-out
       else if (t3 >= 1) f3 = 'none';
       else { var u3 = (t3 - 0.3) / 0.7, e3 = u3*u3*(3-2*u3); f3 = 'brightness(' + (1 + 5*(1-e3)*(1-e3)).toFixed(2) + ') saturate(' + e3.toFixed(2) + ')'; }   // then the picture develops out of the white

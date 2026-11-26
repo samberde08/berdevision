@@ -36,7 +36,7 @@
 
   // ---- the panel that switches ideas on and off ----
   if (q.has('ideas') || TRY.length) {
-    var IDEAS = [['who', 'Who I am, up top'], ['reel', 'Breakdown reel first (draft)'], ['c3d', '3D collage on About'], ['sil', 'Silhouettes fill in on scroll (About)']];
+    var IDEAS = [['who', 'Who I am, up top'], ['reel', 'Breakdown reel first (draft)'], ['c3d', '3D collage on About']];
     var p = document.createElement('div'); p.className = 'm-ideas';
     p.innerHTML = '<p>Ideas · preview only</p>' + IDEAS.map(function(i){ return '<label><input type="checkbox" value="' + i[0] + '"' + (has(i[0]) ? ' checked' : '') + '><span>' + i[1] + '</span></label>'; }).join('');
     p.addEventListener('change', function(){ var on = [].slice.call(p.querySelectorAll('input:checked')).map(function(x){ return x.value; });
