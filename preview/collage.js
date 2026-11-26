@@ -99,7 +99,7 @@
     pin = 0;   // no scroll-driven reveal: Sam rejected the slide-up, the camera pull-back and the point cloud. The collage simply fades in, complete.
     // the collage holds for a short scroll while the figures arrive (see SIL above)
     if (SIL) pin = Math.round(vh * (mobile ? 0.55 : 0.7));
-    if (HALL) pin = Math.round(vh * (mobile ? 2.0 : 2.4));   // (Nov 26, Sam) much shorter
+    if (HALL) pin = Math.round(vh * (mobile ? 1.0 : 1.15));   // (Nov 26, Sam) much shorter
     stage.style.height=sh+'px'; wrap.style.height=(sh+pin)+'px';
     stage.querySelectorAll('.bvc-fade').forEach(function(f){ f.remove(); });
     var bg = pageBg(), clear = bg.replace('rgb(','rgba(').replace(')',',0)');
@@ -217,7 +217,8 @@
     var hStep = mobile ? 2 : 3, hN = 0;                                    // only some of the cast line the corridor; everyone is in the collage
     hallSeq.forEach(function(q,i){ var c=q.c, eh=c[2]+PAD*2, face=/face|portrait/.test(c[0]);
       q.bx = c[1] + c[2]*c[6]/2; q.by = (C.H - (c[3]-PAD) - eh) + eh*0.92; q.eh = eh;
-      if (i % hStep === 0) { q.hz = HP.Z0 + hN*HP.DZ; q.hs = (hN%2 ? 1 : -1); hN++; } else { q.hz = null; q.hs = 1; } q.hxw = HP.XW*(0.9 + 0.25*(((i*37)%11)/11));
+      if (false) {   // (Nov 26, Sam) corridor cut: nobody lines a hallway any more, the orb goes straight to the earth
+         q.hz = HP.Z0 + hN*HP.DZ; q.hs = (hN%2 ? 1 : -1); hN++; } else { q.hz = null; q.hs = 1; } q.hxw = HP.XW*(0.9 + 0.25*(((i*37)%11)/11));
       q.hh = Math.min(face ? HP.HF*0.62 : HP.HF, (mobile ? 300 : 520)/c[6]);   // wide cut-outs are held to a sensible width
       q.hxw = Math.max(q.hxw, q.hh*c[6]/2 + (mobile ? 36 : 100));                 // and nobody stands in front of the orb
       q.hy = face ? HP.FH - HP.HF*0.5 : HP.FH;      // portraits hang at eye level, bodies stand on the floor
@@ -280,10 +281,10 @@
       hx.strokeStyle='rgba(255,255,255,'+(0.75*a).toFixed(3)+')'; hx.lineWidth=Math.max(1, 3*k*sc); hx.beginPath(); hx.moveTo(cx-rw, bot); hx.lineTo(cx+rw, bot); hx.stroke(); }
   }
   function hallUpdate(prog){
-    var hp=clamp((prog-0.10)/0.52), gp=clamp((prog-0.62)/0.38), it=clamp(prog/0.16), fa=clamp((prog-0.04)/0.12), F=HP.F, cam=hp*HP.END, E=C.earth, i, q;
+    var hp=0, gp=clamp((prog-0.16)/0.84), it=clamp(prog/0.16), fa=0, F=HP.F, cam=hp*HP.END, E=C.earth, i, q;
     var go = gp*gp*(3-2*gp);
     // the orb: far down the corridor, growing as we approach; then it sinks and swells into the earth
-    var k0=F/(HP.ZO-cam), rh=Math.max(mobile?20:28, HP.RO*k0), ie=it*it*(3-2*it), r0=HP.RO*1.2 + (rh - HP.RO*1.2)*ie,   // the orb is there first, close; then it draws away down the corridor
+    var k0=F/(HP.ZO-cam), rh=Math.max(mobile?20:28, HP.RO*k0), ie=it*it*(3-2*it), r0=HP.RO*(1.2 + 0.14*ie),   // the orb is there first, close; then it draws away down the corridor
         sinkT=clamp(gp/0.62), se=sinkT*sinkT*(3-2*sinkT);
     var ox=C.CX, oy=HP.VY + ((C.H - E.cy) - HP.VY)*se, orr=r0 + (E.R - r0)*se;
     orb.style.transform='translate3d('+(ox-200).toFixed(1)+'px,'+(oy-200).toFixed(1)+'px,0) scale('+(orr/200).toFixed(4)+')';
