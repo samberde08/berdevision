@@ -12,7 +12,7 @@
     t.insertBefore(v, t.querySelector('.work-overlay'));
     function on(){ t.classList.add('m-playing'); var p = v.play(); if (p && p.catch) p.catch(function(){}); }
     function off(){ t.classList.remove('m-playing'); v.pause(); }
-    t.addEventListener('mouseenter', on); t.addEventListener('mouseleave', off);
+    if (!(window.matchMedia && matchMedia('(hover: none)').matches)) { t.addEventListener('mouseenter', on); t.addEventListener('mouseleave', off); }   // a phone has no hover: the wheel alone decides what plays
     t._mOn = on;
   });
   // ---- hover previews for the older tiles: the Vimeo film itself plays, muted, inside the tile ----

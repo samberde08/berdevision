@@ -104,14 +104,30 @@
     if ((d.event === 'playProgress' || d.event === 'timeupdate') && d.data && typeof d.data.seconds === 'number') {
       if (fr._t0 === null) fr._t0 = d.data.seconds; else if (d.data.seconds - fr._t0 > 0.04) showEmb(s, fr); }
   });
+  var TOUCH = !!(window.matchMedia && matchMedia('(hover: none)').matches);
   function play(s, on){ var t = s.tile, v = t.querySelector('video.m-loop'); if (!v) { embed(s, on); return; }
-    if (on) { t.classList.add('m-playing'); var p = v.play(); if (p && p.catch) p.catch(function(){}); }
-    else if (!t.matches(':hover')) { t.classList.remove('m-playing'); v.pause(); } }
+    if (on) {
+      v._want = 1;
+      if (!v._wired) { v._wired = 1;                                    // the still stays up until the clip is really moving, and a clip that was not ready starts as soon as it is
+        v.addEventListener('playing', function(){ if (v._want) t.classList.add('m-playing'); });
+        v.addEventListener('canplay', function(){ if (v._want && v.paused) { var q = v.play(); if (q && q.catch) q.catch(function(){}); } }); }
+      if (v.preload !== 'auto') v.preload = 'auto';
+      if (!v.paused && v.readyState > 2) t.classList.add('m-playing');
+      var p = v.play(); if (p && p.catch) p.catch(function(){}); }
+    else if (TOUCH || !t.matches(':hover')) { v._want = 0; t.classList.remove('m-playing'); v.pause(); } }   // a finger leaves no hover behind, so on a phone the clip always stops
+  // previews start once the wheel has come to rest on a film, not on every film that passes the front
+  var pt = 0, lp = NaN;
+  function playSoon(){ clearTimeout(pt); lp = NaN; pt = setTimeout(function chk(){
+      if (mode !== 'wheel' || front < 0) return;
+      var moving = !(Math.abs(pos - lp) < 0.012); lp = pos;
+      if (moving) { pt = setTimeout(chk, 90); return; }
+      play(slots[front], true); }, 30); }
+  function warm(i){ var s = slots[((i % n) + n) % n], v = s && s.tile.querySelector('video.m-loop'); if (v && v.preload !== 'auto') v.preload = 'auto'; }   // the films either side load ahead
   function setFront(f){
     if (front >= 0) { slots[front].el.classList.remove('m-front'); play(slots[front], false); }
     front = f; var s = slots[f], t = s.tile; s.el.classList.add('m-front');
     var rgb = t.dataset.glowRGB; if (rgb) s.el.style.setProperty('--tile', rgb);
-    if (mode === 'wheel') play(s, true);
+    if (mode === 'wheel') { playSoon(); warm(f - 1); warm(f + 1); }
     var g = function(q){ var e = t.querySelector(q); return e ? e.textContent : ''; };
     cap.classList.remove('m-in'); void cap.offsetWidth;
     cap.children[0].textContent = g('.work-tag'); cap.children[1].textContent = g('.work-name'); cap.children[2].textContent = g('.work-subtitle');
@@ -198,8 +214,9 @@
       if (Math.abs(dy) > Math.abs(dx) * 1.2) { down = false; return; }                      // an up-and-down swipe scrolls the page instead
       moved = true; strip.classList.add('m-drag'); try { strip.setPointerCapture(pid); } catch (x) {} }
     var now = performance.now(), ddt = Math.max(1, now - lt);
-    vel = vel * .6 + ((lx - e.clientX) / (W * 1.04)) / ddt * .4; lx = e.clientX; lt = now;
-    pos = target = sp - dx / (W * 1.04); render();                      // the film under your finger stays under your finger
+    var DR = W * (window.innerWidth <= 768 ? 1.34 : 1.04);              // on a phone the finger is on the big front film, which covers more ground per place
+    vel = vel * .6 + ((lx - e.clientX) / DR) / ddt * .4; lx = e.clientX; lt = now;
+    pos = target = sp - dx / DR; render();                              // the film under your finger stays under your finger
   });
   function up(e){
     if (!down || (e && e.pointerId !== pid)) return; down = false; strip.classList.remove('m-drag');
