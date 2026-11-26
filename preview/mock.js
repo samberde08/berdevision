@@ -106,9 +106,9 @@
     '1204416675': [['Role','VFX'],['Client','Hoka']],
     '1204403981': [['Role','Shot · Edit · VFX'],['Client','Mississippi State']],
     '1204407984': [['Role','Shot · Edit · VFX'],['Client','Mississippi State Football']],
-    '1203256076': [['Role','Director · Shot · Edit · VFX'],['On screen','Sam Berde']],
-    '1204401806': [['Role','Director · Shot · Edit · VFX'],['On screen','Sam Berde']],
-    '1204593129': [['Role','Director · Shot · Edit · VFX'],['On screen','Sam Berde']]
+    '1203256076': [['Role','Director · Actor · Shot · Edit · VFX']],
+    '1204401806': [['Role','Director · Actor · Shot · Edit · VFX']],
+    '1204593129': [['Role','Director · Actor · Shot · Edit · VFX']]
   };
   var inner = document.querySelector('.lightbox-inner');
   var panel = document.createElement('div'); panel.className = 'm-credits'; inner.appendChild(panel);
