@@ -436,3 +436,4 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-ba-tall figcaption { flex-direction:column; gap:.25rem; align-items:center; }
 .m-ba-sec + .m-ba-sec { margin-top: 1rem; }
 @media (max-width:768px){ .m-ba-list.m-ba-tall { grid-template-columns: 1fr; max-width: 340px; gap:1.8rem; } }
+.m-ba-list.m-ba-narrow { max-width: 880px; margin: 0 auto; }

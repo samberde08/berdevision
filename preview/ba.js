@@ -9,12 +9,14 @@
     { h: 'Street Fighter x Lids', sub: 'Left is the edit before effects, right is the delivered film.', ar: '9 / 16', tall: true, shots: [
       { id: 'sf1', title: 'Charge and logo', note: 'Energy in the car, then the jacket print lights up' },
       { id: 'sf2', title: 'Charged fists', note: 'Electric charge built onto both hands, shown at half speed' },
-      { id: 'sf3', title: 'Power up', note: 'Fists catch fire as the fighter squares up, shown at half speed' } ] }
+      { id: 'sf3', title: 'Power up', note: 'Fists catch fire as the fighter squares up, shown at half speed' } ] },
+    { h: 'Arran Studios · Black Friday', sub: 'Left is the plate as it was shot, right is the finished frame.', ar: '4 / 3', tall: false, narrow: true, shots: [
+      { id: 'ar1', title: 'The wide', note: 'A roadside with power poles becomes open desert, a windmill and a new sky' } ] }
   ];
   var anchor = ab.querySelector('.services-grid'), items = [];
   SETS.forEach(function(SET, si){
     var sec = document.createElement('section'); sec.className = 'm-ba-sec';
-    sec.innerHTML = (si ? '' : '<p class="m-ba-kicker">Before / After</p>') + '<h3 class="m-ba-h">' + SET.h + '</h3><p class="m-ba-sub">' + SET.sub + '</p><div class="m-ba-list' + (SET.tall ? ' m-ba-tall' : '') + '"></div>';
+    sec.innerHTML = (si ? '' : '<p class="m-ba-kicker">Before / After</p>') + '<h3 class="m-ba-h">' + SET.h + '</h3><p class="m-ba-sub">' + SET.sub + '</p><div class="m-ba-list' + (SET.tall ? ' m-ba-tall' : '') + (SET.narrow ? ' m-ba-narrow' : '') + '"></div>';
     var list = sec.querySelector('.m-ba-list');
     if (anchor) { anchor.insertAdjacentElement('afterend', sec); anchor = sec; } else ab.appendChild(sec);
     SET.shots.forEach(function(S){
