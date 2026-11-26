@@ -36,18 +36,20 @@
   function size(){
     var vw = window.innerWidth, small = vw <= 768;
     W = small ? vw * 0.40 : Math.min(vw * 0.22, 430);                 // each film's width on the ring; the one at the front is pulled forward and reads larger
-    H = W * 9 / 16; BUMP = small ? .30 : .22;
+    H = W * 9 / 16; BUMP = small ? .34 : .30;
     R = W / (2 * Math.tan(STEP / 2)) * 1.03;                           // the radius at which every film has its own place and none cuts into its neighbour
     CY = W * 0.30 + (small ? 10 : 14);                                 // the ring's centre line: the far side rises above it, the front hangs below
     strip.style.setProperty('--ww', W.toFixed(1) + 'px'); strip.style.setProperty('--wh', H.toFixed(1) + 'px'); strip.style.setProperty('--cy', CY.toFixed(1) + 'px');
-    strip.style.perspective = R.toFixed(0) + 'px'; strip.style.perspectiveOrigin = '50% ' + CY.toFixed(0) + 'px';
+    strip.style.perspective = (R * 0.7).toFixed(0) + 'px'; strip.style.perspectiveOrigin = '50% ' + CY.toFixed(0) + 'px';   // a closer viewpoint, so the ring's left and right turns fit inside the screen
     if (mode === 'wheel') { strip.style.height = (CY + W * (0.50 + 0.28 * (1 + BUMP)) + (small ? 10 : 16)).toFixed(0) + 'px'; render(); } else layGrid();
   }
   function wrapD(d){ return ((d + n / 2) % n + n) % n - n / 2; }
   // The whole wheel is drawn: a ring tipped slightly towards you, so the films on the far side are seen small, above and behind, travelling round.
   function wheelT(d){
     var a = d * STEP * 180 / Math.PI, far = Math.abs(a) > 90, k = Math.max(0, 1 - Math.abs(d)), sc = 1 + BUMP * k * k;
-    return 'translate(-50%,-50%) translateZ(' + (-R).toFixed(1) + 'px) rotateX(' + TILT + 'deg) rotateY(' + a.toFixed(2) + 'deg) translateZ(' + R.toFixed(1) + 'px)' +
+    // the ring is nudged towards you by a few pixels so the front film always sits in front of the wheel's own (invisible) plane and can be clicked
+    var tr = Math.abs(TILT) * Math.PI / 180, dz = R * (1 - Math.cos(tr)) + H * 0.7 * Math.sin(tr) + 3;
+    return 'translate(-50%,-50%) translateZ(' + (dz - R).toFixed(1) + 'px) rotateX(' + TILT + 'deg) rotateY(' + a.toFixed(2) + 'deg) translateZ(' + R.toFixed(1) + 'px)' +
       (far ? ' rotateY(180deg)' : '') + (sc > 1.001 ? ' scale(' + sc.toFixed(4) + ')' : '');          // films on the far side turn to face you
   }
   function render(){

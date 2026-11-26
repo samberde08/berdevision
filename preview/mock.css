@@ -355,3 +355,7 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .bvc .plate:nth-of-type(3n) { animation-duration: 13s; animation-delay: -6s; }
 @keyframes m-bob { from { translate: 0 -5px; } to { translate: 0 6px; } }
 @media (prefers-reduced-motion: reduce) { .bvc .plate { animation: none; } }
+
+/* the wheel's own box never takes the click; only the films do (drags still start on any film) */
+.work-strip.m-wheel { pointer-events:none; }
+.work-strip.m-wheel .m-slot { pointer-events:auto; }
