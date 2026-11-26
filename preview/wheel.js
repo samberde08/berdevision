@@ -41,7 +41,7 @@
   function count(){ if (counter && front >= 0) counter.textContent = (front < 9 ? '0' : '') + (front + 1) + ' / ' + n; }
   function size(){
     var vw = window.innerWidth, small = vw <= 768;
-    STEP = 2 * Math.PI / Math.max(n, 12);                               // a short list still sits on a 12-place ring, so the films keep their spacing
+    STEP = 2 * Math.PI / allSlots.length;                               // the ring never changes size: a shorter list fills an arc of it, so the films keep their size and spacing
     W = small ? vw * 0.40 : Math.min(vw * 0.22, 430);                 // each film's width on the ring; the one at the front is pulled forward and reads larger
     H = W * 9 / 16; BUMP = small ? .62 : .78;                            // the front film is much larger and sits over the edges of its neighbours
     R = W / (2 * Math.tan(STEP / 2)) * 1.03;                           // the radius at which every film has its own place and none cuts into its neighbour
@@ -67,7 +67,7 @@
       s.el.style.transform = wheelT(d);
       s.el.style.zIndex = String(100 - Math.round(depth * 90));
       s.veil.style.opacity = (ad < .5 ? ad * .12 : Math.min(.7, .06 + .68 * depth)).toFixed(3);                    // further round = deeper in shadow
-      var seam = n < 12 ? Math.max(0, Math.min(1, (n / 2 - ad) / 0.6)) : 1;                                       // on a short list, a film fades as it leaves one end and re-enters the other
+      var seam = n < allSlots.length ? Math.max(0, Math.min(1, (n / 2 - ad) / 0.6)) : 1;                                       // on a short list, a film fades as it leaves one end and re-enters the other
       s.el.style.opacity = seam.toFixed(3);
       s.el.style.pointerEvents = (depth > .42 || seam < .5) ? 'none' : '';                                                        // only the near side can be clicked or hovered
     }
