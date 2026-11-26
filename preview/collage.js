@@ -222,6 +222,7 @@
       q.hy = face ? HP.FH - HP.HF*0.5 : HP.FH;      // portraits hang at eye level, bodies stand on the floor
       q.rank = Math.min(1, Math.abs(q.bx - C.CX)/(C.W/2)); q.f = null; });
     HP.END = HP.Z0 + (hallSeq.length-1)*HP.DZ + 140; HP.ZO = HP.END + HP.F;
+    orbDraw(orbT);                                   // drawn once straight away, so the orb is never an empty ring
     if (!orbOn) { orbOn = true; requestAnimationFrame(orbLoop); }
   }
   // white plasma: a hot core, slow darker cells and bright moving filaments, drawn small and scaled up
