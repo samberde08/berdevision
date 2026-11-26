@@ -2081,6 +2081,7 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
   function applyTilt() {
     document.querySelectorAll('.work-item').forEach(function(tile) {
       tile.onmousemove = function(e) {
+        if (tile.closest('.m-slot')) return;      // (preview) no hover tilt on the wheel: films passing under the pointer wobbled as it turned
         var rect = tile.getBoundingClientRect();
         var rotateX = ((e.clientY - rect.top - rect.height / 2) / rect.height) * -8;
         var rotateY = ((e.clientX - rect.left - rect.width / 2) / rect.width) * 8;
@@ -2088,6 +2089,7 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
         tile.style.transition = 'transform 0.08s ease';
       };
       tile.onmouseleave = function() {
+        if (tile.closest('.m-slot')) return;
         tile.style.transform = '';
         tile.style.boxShadow = tile.dataset.glowShadow || '';
         tile.style.transition = 'transform 0.4s ease, box-shadow 0.4s ease';
@@ -2639,6 +2641,8 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
   var mobileQ = window.matchMedia('(max-width: 768px)');
 
   setInterval(function() {
+    // (preview) the old glow "tide" is off on the wheel: it rewrote a shadow on all 28 films 14 times a second, and the wheel draws its own glow
+    if (document.querySelector('.work-strip.m-wheel, .work-strip.m-grid')) return;
     var tiles = document.querySelectorAll('.work-item');
     if (!tiles.length) return;
     // skip when the strip is nowhere near the viewport
@@ -2761,5 +2765,5 @@ footer p { color: rgba(236,234,228,0.5); }
 })();
 </script>
 
-<link rel="stylesheet" href="mock.css?v=col34"><script src="ideas.js?v=2"></script><script src="mock.js?v=12"></script><script src="scrollfx.js?v=4"></script><script src="wheel.js?v=24"></script><script src="colour.js?v=17"></script><link rel="stylesheet" href="collage.css"><script src="collage.js?v=6"></script><script src="ba.js?v=12"></script></body>
+<link rel="stylesheet" href="mock.css?v=col34"><script src="ideas.js?v=2"></script><script src="mock.js?v=12"></script><script src="scrollfx.js?v=4"></script><script src="wheel.js?v=25"></script><script src="colour.js?v=17"></script><link rel="stylesheet" href="collage.css"><script src="collage.js?v=6"></script><script src="ba.js?v=12"></script></body>
 </html>
