@@ -408,3 +408,9 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-ba figcaption b { font-family:'Manrope',sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:.02em; color:#fff; font-size:.95rem; }
 .m-ba figcaption span { color:rgba(255,255,255,.68); font-size:.9rem; }
 @media (max-width:768px){ .m-ba-sec { margin:3rem auto 2.4rem; } .m-ba-list { gap:1.8rem; } .m-ba-line i { width:36px; height:36px; margin:-18px 0 0 -18px; } .m-ba figcaption { flex-direction:column; gap:.2rem; align-items:center; } }
+
+/* wide wordmarks sit lower so they don't out-shout the rest of the logo row */
+.m-clients .logo-track img[alt="Netflix"], .about-body .logo-track img[alt="Netflix"] { height:28px !important; }
+.m-clients .logo-track img[alt="Lids"], .about-body .logo-track img[alt="Lids"] { height:34px !important; }
+.m-clients .logo-track img[alt="Rolling Loud"], .about-body .logo-track img[alt="Rolling Loud"] { height:46px !important; }
+@media (max-width:768px){ .m-clients .logo-track img[alt="Netflix"], .about-body .logo-track img[alt="Netflix"] { height:20px !important; } .m-clients .logo-track img[alt="Lids"], .about-body .logo-track img[alt="Lids"] { height:24px !important; } .m-clients .logo-track img[alt="Rolling Loud"], .about-body .logo-track img[alt="Rolling Loud"] { height:32px !important; } }
