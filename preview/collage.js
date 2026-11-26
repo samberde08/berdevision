@@ -27,6 +27,9 @@
   // The entrance (Nov 26, Sam): at first only the BERDEVISION wordmark is there. As the page scrolls, the collage holds in place and the
   // figures arrive left to right, each as a white silhouette that then fills with its picture; the earth comes up under them.
   var SIL = !reduce;
+  // (Nov 26, Sam) the hallway: scroll flies down a corridor past every figure toward a white plasma orb; the orb then sinks and
+  // becomes the earth, and the figures land on it as the full collage. ?hall=0 shows the earlier entrance.
+  var HALL = !reduce && !/[?&]hall=0/.test(qs); if (HALL) SIL = false;
   var extraEls = null;
   var C=DESK, mobile=false, plates=[], letters=[], cuts=[], dropAll=0, earthEl, s=1, pin=0, anchor=8, builtW=-1, mx=0, my=0;
   var meas = document.createElement('canvas').getContext('2d');
@@ -77,7 +80,7 @@
         p.appendChild(im); maxTop=Math.max(maxTop, c[3]+c[2]);
         // each character rises on its own beat: centre first, edges later, with a little swing and its own speed
         var n=cuts.length, cxm=c[1]+c[2]*c[6]/2, jit=((n*37)%11)/11;
-        cuts.push({el:im, c:c, rot:c[4], d: inBack ? 0.07 : 0.05 + 0.17*Math.min(1,Math.abs(cxm-CX)/(C.W/2)) + 0.07*jit + gi*0.02,
+        cuts.push({el:im, c:c, gi:gi, rot:c[4], d: inBack ? 0.07 : 0.05 + 0.17*Math.min(1,Math.abs(cxm-CX)/(C.W/2)) + 0.07*jit + gi*0.02,
           dur: 0.5 + 0.16*(((n*53)%7)/7), sw: (n%2 ? 1 : -1)*(4 + 5*jit)});
       });
       plates.push({el:p, drop: maxTop - Math.min(topStart, 60) + 80, t:0.04, dur:0.82, depth:[-0.6,0.1,0.8][gi]});
@@ -96,12 +99,14 @@
     pin = 0;   // no scroll-driven reveal: Sam rejected the slide-up, the camera pull-back and the point cloud. The collage simply fades in, complete.
     // the collage holds for a short scroll while the figures arrive (see SIL above)
     if (SIL) pin = Math.round(vh * (mobile ? 0.55 : 0.7));
+    if (HALL) pin = Math.round(vh * (mobile ? 3.4 : 4.2));
     stage.style.height=sh+'px'; wrap.style.height=(sh+pin)+'px';
     stage.querySelectorAll('.bvc-fade').forEach(function(f){ f.remove(); });
     var bg = pageBg(), clear = bg.replace('rgb(','rgba(').replace(')',',0)');
     [['left:0;right:0;bottom:0;height:9%','to top'],['left:0;top:0;bottom:0;width:4%','to right'],['right:0;top:0;bottom:0;width:4%','to left']].forEach(function(f){
       var d=document.createElement('div'); d.className='bvc-fade'; d.style.cssText=f[0]+';background:linear-gradient('+f[1]+','+bg+','+clear+')'; stage.appendChild(d); });
     pcInit();
+    if (HALL) hallInit(sh);
     update();
   }
   function ease(t){ t=Math.max(0,Math.min(1,t)); return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
@@ -157,6 +162,8 @@
     if (forceP!==undefined) prog=parseFloat(forceP); else if (reduce || !pin) prog=1; else {
       prog = Math.max(0, Math.min(pin, anchor - wrap.getBoundingClientRect().top))/pin;
     }
+    if (HALL && hc) { hallUpdate(prog); hint.style.opacity = prog > 0.03 ? 0 : 1; reveal(); return; }
+    reveal();
     // the figures stand still in their final places; dots gather into them, then the real pictures come up through the dots
     var cloud = !!(pc && PT), dom = cloud ? Math.max(0, Math.min(1, (prog - 0.80)/0.13)) : 1;
     // (idea preview, ?try=c3d) the collage as a diorama: the three layers of figures, the wordmark and the earth sit at real depths,
@@ -189,6 +196,118 @@
     for (var j=0;j<letters.length;j++){ var q=letters[j];
       q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+(my*q.depth*7)+'px,'+(q.depth*ZS).toFixed(0)+'px) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }
     hint.style.opacity = prog > 0.06 ? 0 : 1;
+  }
+
+  // ---------------- the hallway ----------------
+  var hc=null, hx=null, orb=null, og=null, OS=220, hallSeq=[], HP=null, orbOn=false, orbT=0, starsEl=null, dpr=1;
+  function clamp(v){ return v<0?0:(v>1?1:v); }
+  function hallInit(sh){
+    if (hc) hc.remove();
+    dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    hc = document.createElement('canvas'); hc.className='bvc-hall'; hc.width=Math.round(stage.clientWidth*dpr); hc.height=Math.round(sh*dpr);
+    hc.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none';
+    stage.insertBefore(hc, col); hx = hc.getContext('2d');
+    orb = document.createElement('div'); orb.className='bvc-orb'; var oc=document.createElement('canvas'); oc.width=oc.height=OS; orb.appendChild(oc); og=oc.getContext('2d');
+    col.appendChild(orb); starsEl = col.querySelector('.stars');
+    // corridor measurements, in collage units
+    HP = mobile ? {F:900, VY:C.H*0.47, FH:400, CH:520, WW:330, XW:185, HF:560, DZ:560, Z0:1500, RO:150}
+                : {F:900, VY:C.H*0.50, FH:340, CH:380, WW:700, XW:430, HF:540, DZ:520, Z0:1500, RO:215};
+    // the nearest figure is always drawn on top: front plate first, then down the stacking order
+    hallSeq = cuts.slice().sort(function(a,b){ return (b.gi-a.gi) || (b.c[5]-a.c[5]); });
+    hallSeq.forEach(function(q,i){ var c=q.c, eh=c[2]+PAD*2, face=/face|portrait/.test(c[0]);
+      q.bx = c[1] + c[2]*c[6]/2; q.by = (C.H - (c[3]-PAD) - eh) + eh*0.92; q.eh = eh;
+      q.hz = HP.Z0 + i*HP.DZ; q.hs = (i%2 ? 1 : -1); q.hxw = HP.XW*(0.9 + 0.25*(((i*37)%11)/11));
+      q.hh = face ? HP.HF*0.62 : HP.HF; q.hy = face ? HP.FH - HP.HF*0.5 : HP.FH;      // portraits hang at eye level, bodies stand on the floor
+      q.rank = Math.min(1, Math.abs(q.bx - C.CX)/(C.W/2)); q.f = null; });
+    HP.END = HP.Z0 + (hallSeq.length-1)*HP.DZ + 140; HP.ZO = HP.END + HP.F;
+    if (!orbOn) { orbOn = true; requestAnimationFrame(orbLoop); }
+  }
+  // white plasma: a hot core, slow darker cells and bright moving filaments, drawn small and scaled up
+  var OB=[], OFL=[]; for (var oi=0; oi<14; oi++) OB.push([0.3+0.7*((oi*61)%17)/17, 0.3+0.7*((oi*29)%13)/13, oi*1.7, oi*2.9, 0.16+0.2*((oi*7)%5)/5]);
+  for (var oj=0; oj<9; oj++) OFL.push([oj*0.7, 0.4+0.5*((oj*13)%7)/7, 0.3+0.6*((oj*5)%9)/9, oj*2.1]);
+  function orbDraw(t){
+    var g=og, R=OS/2, c=R, i; g.clearRect(0,0,OS,OS);
+    var b=g.createRadialGradient(c,c,0,c,c,R); b.addColorStop(0,'#fff'); b.addColorStop(0.5,'#f2f7ff'); b.addColorStop(0.82,'#c3d9ff'); b.addColorStop(0.94,'rgba(170,200,255,.75)'); b.addColorStop(1,'rgba(150,190,255,0)');
+    g.globalCompositeOperation='source-over'; g.fillStyle=b; g.beginPath(); g.arc(c,c,R,0,6.2832); g.fill();
+    g.globalCompositeOperation='source-atop';
+    for (i=0;i<OB.length;i++){ var o=OB[i], x=c+R*0.66*Math.sin(t*0.5*o[0]+o[2]), y=c+R*0.66*Math.cos(t*0.42*o[1]+o[3]), r=R*(o[4]+0.05*Math.sin(t*0.8+i));
+      var d=g.createRadialGradient(x,y,0,x,y,r); d.addColorStop(0,'rgba(58,96,180,.42)'); d.addColorStop(0.6,'rgba(70,110,195,.16)'); d.addColorStop(1,'rgba(70,110,195,0)'); g.fillStyle=d; g.fillRect(x-r,y-r,r*2,r*2); }
+    g.lineCap='round'; g.shadowColor='#fff'; g.shadowBlur=5;
+    for (i=0;i<OFL.length;i++){ var f=OFL[i], a0=f[0]+t*0.22*f[1], a1=a0+2.2+Math.sin(t*0.5+f[3])*0.9;
+      g.strokeStyle='rgba(255,255,255,'+(0.55+0.35*Math.sin(t*1.3+f[3]))+')'; g.lineWidth=0.8+1.4*f[2];
+      g.beginPath(); g.moveTo(c+R*0.9*Math.cos(a0), c+R*0.9*Math.sin(a0));
+      g.bezierCurveTo(c+R*0.5*Math.cos(a0+0.9+Math.sin(t*0.7+i)), c+R*0.5*Math.sin(a0+0.9+Math.cos(t*0.6+i)), c+R*0.45*Math.cos(a1-0.8+Math.cos(t*0.5+i)), c+R*0.45*Math.sin(a1-0.8+Math.sin(t*0.8+i)), c+R*0.9*Math.cos(a1), c+R*0.9*Math.sin(a1)); g.stroke(); }
+    g.shadowBlur=0;
+    var h=g.createRadialGradient(c,c,0,c,c,R*0.5); h.addColorStop(0,'rgba(255,255,255,.95)'); h.addColorStop(1,'rgba(255,255,255,0)'); g.fillStyle=h; g.fillRect(0,0,OS,OS);
+    g.globalCompositeOperation='source-over';
+  }
+  var orbVis=true, orbLast=0;
+  function orbLoop(ts){
+    requestAnimationFrame(orbLoop);
+    if (!orb || !orbVis || ts-orbLast < 40 || document.hidden) return; orbLast=ts;
+    var r=stage.getBoundingClientRect(); if (r.bottom < 0 || r.top > window.innerHeight || !r.width) return;
+    orbT = ts/1000; orbDraw(orbT);
+  }
+  function hallDraw(cam, alpha, orbR){
+    var w=hc.width, h=hc.height, sc=s*dpr, cx=w/2, vy=HP.VY*sc, F=HP.F; hx.clearRect(0,0,w,h); if (alpha<=0.004) return;
+    // light spilling down the corridor from the orb
+    var gr=hx.createRadialGradient(cx,vy,0,cx,vy,Math.max(60,orbR*sc*5)); gr.addColorStop(0,'rgba(210,228,255,'+(0.34*alpha)+')'); gr.addColorStop(1,'rgba(210,228,255,0)'); hx.fillStyle=gr; hx.fillRect(0,0,w,h);
+    // the four edges of the corridor
+    var kn=F/90, ed=[[-1,-HP.CH],[1,-HP.CH],[-1,HP.FH],[1,HP.FH]];
+    for (var e=0;e<4;e++){ var x1=cx+ed[e][0]*HP.WW*kn*sc, y1=vy+ed[e][1]*kn*sc, lg=hx.createLinearGradient(x1,y1,cx,vy);
+      lg.addColorStop(0,'rgba(215,230,255,0)'); lg.addColorStop(0.75,'rgba(215,230,255,'+(0.2*alpha)+')'); lg.addColorStop(1,'rgba(215,230,255,0)');
+      hx.strokeStyle=lg; hx.lineWidth=1*dpr; hx.beginPath(); hx.moveTo(x1,y1); hx.lineTo(cx,vy); hx.stroke(); }
+    // frames of light, one between each pair of figures, sliding past as we move
+    var DZ=HP.DZ, FAR=DZ*9, z=Math.ceil((cam+70-DZ/2)/DZ)*DZ + DZ/2;
+    for (; z < cam+FAR; z+=DZ){ var d=z-cam, k=F/d, a=alpha*clamp(1-d/FAR)*clamp((d-70)/260); if (a<=0.01) continue;
+      var rw=HP.WW*k*sc, top=vy-HP.CH*k*sc, bot=vy+HP.FH*k*sc;
+      hx.strokeStyle='rgba(220,233,255,'+(0.5*a).toFixed(3)+')'; hx.lineWidth=Math.max(1, 1.6*k*sc); hx.strokeRect(cx-rw, top, rw*2, bot-top);
+      hx.strokeStyle='rgba(255,255,255,'+(0.75*a).toFixed(3)+')'; hx.lineWidth=Math.max(1, 3*k*sc); hx.beginPath(); hx.moveTo(cx-rw, bot); hx.lineTo(cx+rw, bot); hx.stroke(); }
+  }
+  function hallUpdate(prog){
+    var hp=clamp(prog/0.66), gp=clamp((prog-0.66)/0.34), F=HP.F, cam=hp*HP.END, E=C.earth, i, q;
+    var go = gp*gp*(3-2*gp);
+    // the orb: far down the corridor, growing as we approach; then it sinks and swells into the earth
+    var k0=F/(HP.ZO-cam), r0=Math.max(mobile?13:17, HP.RO*k0), sinkT=clamp(gp/0.62), se=sinkT*sinkT*(3-2*sinkT);
+    var ox=C.CX, oy=HP.VY + ((C.H - E.cy) - HP.VY)*se, orr=r0 + (E.R - r0)*se;
+    orb.style.transform='translate3d('+(ox-200).toFixed(1)+'px,'+(oy-200).toFixed(1)+'px,0) scale('+(orr/200).toFixed(4)+')';
+    var oo = 1 - clamp((gp-0.5)/0.3); orb.style.opacity=oo.toFixed(3); orb.style.zIndex = gp>0 ? 29 : 2; orbVis = oo>0.01;
+    earthEl.style.transform='translate3d('+(mx*8)+'px,'+(my*3)+'px,0)'; earthEl.style.opacity=clamp((gp-0.42)/0.3).toFixed(3);
+    hallDraw(cam, 1-clamp(gp/0.35), r0);
+    for (i=0;i<plates.length;i++){ var o=plates[i]; o.el.style.transform = gp>=1 ? 'translate3d('+(mx*o.depth*16)+'px,'+(my*o.depth*6)+'px,0)' : 'none'; }
+    for (i=0;i<hallSeq.length;i++){ q=hallSeq[i]; var el=q.el, tf, op, fl='none';
+      if (gp<=0) {
+        var d=q.hz-cam;
+        if (d<110 || d>HP.DZ*7.5) { op=0; tf=q.tf||'none'; }
+        else { var k=F/d, kk=k*q.hh/q.c[2], sx=C.CX+q.hs*q.hxw*k, sy=HP.VY+q.hy*k;
+          tf='translate3d('+(sx-q.bx).toFixed(1)+'px,'+(sy-q.by).toFixed(1)+'px,0) scale('+kk.toFixed(4)+')';
+          op=clamp((HP.DZ*7.5-d)/900)*clamp((d-110)/170);
+          var br=Math.round(clamp(1-(d-1000)/2000)*10)/10;                         // lit from behind by the orb: a dark shape far away, its own colours up close
+          fl = br>=1 ? 'none' : 'brightness('+Math.max(0.1,br)+')'; }
+      } else {
+        var g=clamp((gp-0.16-0.34*q.rank)/0.46), ge=1-Math.pow(1-g,3);
+        op=clamp(g*3.2);
+        tf = g>=1 ? 'rotate('+q.rot+'deg)' : 'translate3d('+((q.bx-C.CX)*1.15*(1-ge)).toFixed(1)+'px,'+(300*(1-ge)).toFixed(1)+'px,0) scale('+(1+1.5*(1-ge)).toFixed(4)+') rotate('+(q.rot*ge).toFixed(2)+'deg)';
+      }
+      if (q.tf!==tf) { q.tf=tf; el.style.transform=tf; }
+      op=op.toFixed(2); if (q.op!==op) { q.op=op; el.style.opacity=op; }
+      if (q.f!==fl) { q.f=fl; el.style.filter=fl; }
+    }
+    var lo=clamp((gp-0.6)/0.34), jp=mobile?0:1;
+    for (i=0;i<letters.length;i++){ q=letters[i]; q.el.style.opacity=lo.toFixed(3);
+      q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+((1-lo)*40+my*q.depth*7).toFixed(1)+'px,0) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }
+    if (starsEl) starsEl.style.opacity=(0.5*lo).toFixed(3);
+    col.style.transform='scale('+s.toFixed(4)+')';
+  }
+  // ---------------- after the hallway: the statement lights line by line, then the copy and each service arrive in turn ----------------
+  var rv=null;
+  function reveal(){
+    if (reduce) return;
+    if (!rv) { rv=[]; var add=function(list, lag){ [].forEach.call(list, function(el,i){ rv.push({el:el, lag:(lag||0)*i, t:-1}); }); };
+      add(ab.querySelectorAll('.m-statement > *'), 0.07); add(ab.querySelectorAll(':scope > p'), 0); add(ab.querySelectorAll('.service-item'), 0.09); }
+    var vh=window.innerHeight; if (!ab.offsetParent) return;
+    for (var i=0;i<rv.length;i++){ var r=rv[i], top=r.el.getBoundingClientRect().top, t=clamp((vh*(0.9-r.lag) - top)/(vh*0.2)); t=Math.round(t*50)/50;
+      if (t===r.t) continue; r.t=t; r.el.style.opacity=(0.08+0.92*t).toFixed(2); r.el.style.transform = t>=1 ? 'none' : 'translate3d(0,'+((1-t)*26).toFixed(1)+'px,0)'; }
   }
   var raf=0; function tick(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; update(); }); }
   window.addEventListener('scroll', tick, {passive:true});
