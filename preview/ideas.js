@@ -32,9 +32,22 @@
   // ---- the before/afters on the home page, under the wheel (approved Nov 26) ----
   window.addEventListener('load', function(){ if (window.__baHome) window.__baHome(); });
 
+  // ---- idea: on the About page the collage figures arrive as white silhouettes, sweeping in from the left, then fill with their pictures ----
+  if (has('sil')) {
+    var silDone = false, silT = setInterval(function(){
+      var stage = document.querySelector('.bvc-stage'), col = document.querySelector('.bvc'); if (!stage || !col || silDone) return;
+      var imgs = col.querySelectorAll('img.c'); if (!imgs.length || !stage.offsetParent) return;
+      var sr = stage.getBoundingClientRect(); if (sr.bottom < 0 || sr.top > window.innerHeight) return;      // wait until the collage is on screen
+      silDone = true; clearInterval(silT);
+      [].forEach.call(imgs, function(im){ var r = im.getBoundingClientRect(), x = Math.max(0, Math.min(1, (r.left + r.width / 2 - sr.left) / Math.max(1, sr.width)));
+        im.style.setProperty('--sd', Math.round(120 + x * 900 + Math.random() * 120) + 'ms'); });
+      col.classList.add('m-sil');
+    }, 150);
+  }
+
   // ---- the panel that switches ideas on and off ----
   if (q.has('ideas') || TRY.length) {
-    var IDEAS = [['who', 'Who I am, up top'], ['reel', 'Breakdown reel first (draft)'], ['c3d', '3D collage on About']];
+    var IDEAS = [['who', 'Who I am, up top'], ['reel', 'Breakdown reel first (draft)'], ['c3d', '3D collage on About'], ['sil', 'Silhouette entrance on About']];
     var p = document.createElement('div'); p.className = 'm-ideas';
     p.innerHTML = '<p>Ideas · preview only</p>' + IDEAS.map(function(i){ return '<label><input type="checkbox" value="' + i[0] + '"' + (has(i[0]) ? ' checked' : '') + '><span>' + i[1] + '</span></label>'; }).join('');
     p.addEventListener('change', function(){ var on = [].slice.call(p.querySelectorAll('input:checked')).map(function(x){ return x.value; });
