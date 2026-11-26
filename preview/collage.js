@@ -24,6 +24,7 @@
     var o = getComputedStyle(a); if (/(hidden|auto|scroll)/.test(o.overflowX + o.overflowY)) { a.style.overflow = 'clip'; }
   }
   function pageBg(){ for (var e = wrap; e; e = e.parentElement) { var c = getComputedStyle(e).backgroundColor; if (c && !/rgba\(0, 0, 0, 0\)|transparent/.test(c)) return c; } return 'rgb(12,12,13)'; }
+  var SIL = !reduce && window.__TRY && window.__TRY.indexOf('sil') >= 0;
   var C=DESK, mobile=false, plates=[], letters=[], cuts=[], dropAll=0, earthEl, s=1, pin=0, anchor=8, builtW=-1, mx=0, my=0;
   var meas = document.createElement('canvas').getContext('2d');
   function buildType(){
@@ -89,6 +90,8 @@
     anchor = Math.max(mobile ? 62 : 8, Math.round((vh - sh)/2));
     stage.style.top = anchor+'px';
     pin = 0;   // no scroll-driven reveal: Sam rejected the slide-up, the camera pull-back and the point cloud. The collage simply fades in, complete.
+    // (idea preview, ?try=sil) the figures stand as white silhouettes at first; the collage holds for a short scroll while they fill in, left to right
+    if (SIL) pin = Math.round(vh * (mobile ? 0.55 : 0.7));
     stage.style.height=sh+'px'; wrap.style.height=(sh+pin)+'px';
     stage.querySelectorAll('.bvc-fade').forEach(function(f){ f.remove(); });
     var bg = pageBg(), clear = bg.replace('rgb(','rgba(').replace(')',',0)');
@@ -102,7 +105,7 @@
   var pc=null, pcCtx=null, pcTok=0, PT=null, pcW=0, pcH=0, pcImg=null, pcBuf=null, pcClear=true;
   function pcInit(){
     var tok=++pcTok; PT=null; if (pc) { pc.remove(); pc=null; }
-    if (reduce || forceP!==undefined || !pin) return;
+    if (SIL || reduce || forceP!==undefined || !pin) return;
     var sw=Math.max(2,Math.round(C.W*s)), sh=Math.max(2,Math.round(C.H*s));
     pc=document.createElement('canvas'); pc.className='bvc-pc'; pc.width=sw; pc.height=sh;
     pc.style.cssText='position:absolute;left:50%;top:0;margin-left:'+(-sw/2)+'px;width:'+sw+'px;height:'+sh+'px;z-index:45;pointer-events:none';
@@ -159,6 +162,13 @@
     for (var i=0;i<plates.length;i++){ var o=plates[i];
       o.el.style.transform='translate3d('+(mx*o.depth*16)+'px,'+(my*o.depth*6)+'px,'+(o.depth*ZS).toFixed(0)+'px)'; }
     for (var k=0;k<cuts.length;k++){ var q2=cuts[k]; q2.el.style.transform='rotate('+q2.rot+'deg)'; q2.el.style.opacity=dom.toFixed(3); }
+    if (SIL) for (var k2=0;k2<cuts.length;k2++){ var q3=cuts[k2], el3=q3.el;
+      if (q3.xn === undefined) q3.xn = Math.max(0, Math.min(1, (el3.offsetLeft + el3.offsetWidth/2) / Math.max(1, C.W)));
+      var t3 = Math.max(0, Math.min(1, (prog - 0.04 - 0.5*q3.xn) / 0.38)), f3;
+      if (t3 <= 0.3) f3 = 'brightness(0) invert(1)';                                   // a white cut-out
+      else if (t3 >= 1) f3 = 'none';
+      else { var u3 = (t3 - 0.3) / 0.7, e3 = u3*u3*(3-2*u3); f3 = 'brightness(' + (1 + 5*(1-e3)*(1-e3)).toFixed(2) + ') saturate(' + e3.toFixed(2) + ')'; }   // then the picture develops out of the white
+      if (q3.f !== f3) { q3.f = f3; el3.style.filter = f3; } }
     if (D3) {
       var sr = stage.getBoundingClientRect(), sc3 = Math.max(-1, Math.min(1, ((sr.top + sr.height / 2) - window.innerHeight / 2) / window.innerHeight));
       var hh3 = (sr.height / 2 / s).toFixed(0);

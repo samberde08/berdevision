@@ -508,8 +508,3 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 
 /* the shadow veil over each film is its own layer, so deepening it never repaints the film underneath */
 .m-veil { will-change: opacity; }
-
-/* idea preview: silhouette entrance on the About collage */
-.bvc.m-sil img.c { animation: mSil 1.7s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--sd, 0ms); }
-@keyframes mSil { 0% { opacity:0; filter: brightness(0) invert(1); } 14% { opacity:1; filter: brightness(0) invert(1); } 52% { opacity:1; filter: brightness(0) invert(1); } 100% { opacity:1; filter: brightness(1) invert(0); } }
-@media (prefers-reduced-motion: reduce) { .bvc.m-sil img.c { animation:none; } }
