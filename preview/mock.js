@@ -2,12 +2,12 @@
   var tiles = Array.prototype.slice.call(document.querySelectorAll('.work-item'));
   // ---- hover loops ----
   var loops = ['1249151789','1249151605','1249151719','1249151866','1249151733','1249151670','1249151833',
-    '1204589600','1204398806','1204401806','1204409147','1204586020','1204561560'];   // + older films cut from their masters (DANNA, Embrace the Madness, Underwater, Noah Lyles, Madison Beer, Bronco)
+    '1204589600','1204398806','1204401806','1204409147','1204586020','1204561560', 'ladybird'];   // + older films cut from their masters (DANNA, Embrace the Madness, Underwater, Noah Lyles, Madison Beer, Bronco)
   tiles.forEach(function(t){
-    if (loops.indexOf(t.dataset.vimeo) === -1) return;
+    var lid = t.dataset.vimeo || t.dataset.key; if (loops.indexOf(lid) === -1) return;
     var v = document.createElement('video');
     v.className = 'm-loop'; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
-    v.src = 'loops/' + t.dataset.vimeo + '.mp4';
+    v.src = 'loops/' + lid + '.mp4';
     t.insertBefore(v, t.querySelector('.work-overlay'));
     function on(){ t.classList.add('m-playing'); var p = v.play(); if (p && p.catch) p.catch(function(){}); }
     function off(){ t.classList.remove('m-playing'); v.pause(); }
@@ -83,14 +83,17 @@
     '1249151866': [['Role','VFX'],['Creative Direction','Luke Abad']],
     '1249151733': [['Role','3D VFX'],['Director','Aficial Visuals'],['VFX Agency','This Was Major'],['EP','David Sosna']],
     '1249151670': [['Role','VFX'],['Director','Kiva Corshen'],['Production','BOUNDARY8'],['Client','Arran Studios']],
-    '1249151833': [['Role','Shot · Edited · VFX'],['Artist','Esdeekid']]
+    '1249151833': [['Role','Shot · Edited · VFX'],['Artist','Esdeekid']],
+    'ladybird': [['Client','Lady Bird']],
+    'something-special': [['Role','VFX'],['Artists','Khalid · Ahn Hyo-seop'],['Label','FANDOM']],
+    'distant-lover': [['Artists','JIHYO · Shenseea'],['Label','FANDOM']]
   };
   var inner = document.querySelector('.lightbox-inner');
   var panel = document.createElement('div'); panel.className = 'm-credits'; inner.appendChild(panel);
   tiles.forEach(function(t){
     t.addEventListener('click', function(){
       var g = function(s){ var e = t.querySelector(s); return e ? e.textContent : ''; };
-      var rows = credits[t.dataset.vimeo] || [];
+      var rows = credits[t.dataset.vimeo || t.dataset.key] || [];
       panel.innerHTML = '<div class="m-tag">' + g('.work-tag') + '</div><div class="m-title">' + g('.work-name') + '</div><div class="m-sub">' + g('.work-subtitle') + '</div><dl>' +
         rows.map(function(r){ return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('') + '</dl>';
     }, true);

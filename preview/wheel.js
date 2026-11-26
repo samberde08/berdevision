@@ -8,7 +8,7 @@
   strip.classList.add('m-wheel');
   // each film sits in its own slot; the slot is what moves, so the tile keeps its own hover behaviour
   // which kinds of work each film is (a film can be two)
-  var CATS = {'1249151789':'music','1249151605':'brand sports','1249151719':'brand','1249151866':'music','1249151733':'sports','1249151670':'brand','1249151833':'music','1204418162':'music','1204561560':'brand','1203337382':'sports','1204589600':'music','1204409147':'sports','1204586020':'music','1204680193':'sports','1204548410':'music','1203340055':'sports','1204579585':'music','1203344844':'sports','1204398806':'sports','1204416675':'brand sports','1204403981':'sports','1204407984':'sports','1203256076':'personal','1204401806':'personal','1204593129':'personal'};
+  var CATS = {'1249151789':'music','1249151605':'brand sports','1249151719':'brand','1249151866':'music','1249151733':'sports','1249151670':'brand','1249151833':'music','1204418162':'music','1204561560':'brand','1203337382':'sports','1204589600':'music','1204409147':'sports','1204586020':'music','1204680193':'sports','1204548410':'music','1203340055':'sports','1204579585':'music','1203344844':'sports','1204398806':'sports','1204416675':'brand sports','1204403981':'sports','1204407984':'sports','1203256076':'personal','1204401806':'personal','1204593129':'personal','ladybird':'brand','something-special':'music','distant-lover':'music'};
   var allSlots = tiles.map(function(t){
     var s = document.createElement('div'); s.className = 'm-slot'; strip.appendChild(s); s.appendChild(t);
     var veil = document.createElement('div'); veil.className = 'm-veil'; s.appendChild(veil);
@@ -18,7 +18,7 @@
     var gn = document.createElement('div'); gn.className = 'm-gc-name'; gn.textContent = gt('.work-name'); gc.appendChild(gn);
     var gg = document.createElement('div'); gg.className = 'm-gc-tag'; gg.textContent = gt('.work-subtitle') || gt('.work-tag'); gc.appendChild(gg);
     s.appendChild(gc);
-    return { el: s, tile: t, veil: veil, shown: true, cat: (CATS[t.dataset.vimeo] || '').split(' ') };
+    return { el: s, tile: t, veil: veil, shown: true, cat: (CATS[t.dataset.vimeo || t.dataset.key] || '').split(' ') };
   });
   var slots = allSlots.slice();          // the films currently on the wheel (all of them, or one kind)
   var cap = document.createElement('div'); cap.className = 'm-wheel-cap';

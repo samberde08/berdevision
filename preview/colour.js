@@ -137,11 +137,12 @@
       if (run !== fxRun) return;
       lb.classList.remove('m-mat'); landed = true; go();             // title, credits and close button come up around it
     };
-    setTimeout(function(){ if (run === fxRun) { playing = true; go(); } }, 5000 * SLOW);       // never wait on the player for ever
+    setTimeout(function(){ if (run === fxRun) { playing = true; go(); } }, (t.dataset.vimeo ? 5000 : 2200) * SLOW);       // never wait on the player for ever (YouTube does not report back, so it gets a short fixed wait)
   }
   // the player tells us when the film is really playing
   function listen(){ try { lbFrame.contentWindow.postMessage(JSON.stringify({ method: 'addEventListener', value: 'playProgress' }), 'https://player.vimeo.com'); } catch (e) {} }
   if (lbFrame) lbFrame.addEventListener('load', listen);
+  window.addEventListener('message', function(e){ if (e.origin === location.origin && e.data && e.data.bvPlaying && release) { var rl = release; release = null; rl(); } });   // a film hosted on the site says when it is playing
   window.addEventListener('message', function(e){
     if (!lbFrame || e.source !== lbFrame.contentWindow || !/player\.vimeo\.com$/.test(e.origin || '')) return;
     var d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (x) { return; }
