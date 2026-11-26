@@ -13,7 +13,7 @@
     { h: 'Arran Studios · Black Friday', sub: 'Left is the plate as it was shot, right is the finished frame.', ar: '4 / 3', tall: false, narrow: true, shots: [
       { id: 'ar2', title: 'The light post', note: 'A street light, the car wrapped around it and the man on its roof, added to an empty roadside, then the grade' } ] },
     { h: 'Lady Bird · Follow the Fizz', sub: 'Left is the drone shot as it came off the camera, right is what aired.', ar: '1280 / 694', tall: false, shots: [
-      { id: 'lbd', title: 'Drone end card', note: 'Parked cars and fencing painted out, a sunset sky and grade added, then the animated logo' } ] }
+      { id: 'lbd', title: 'Drone shot', note: 'Parked cars and fencing painted out, then a sunset sky and grade' } ] }
   ];
   var anchor = ab.querySelector('.services-grid'), items = [];
   SETS.forEach(function(SET, si){
@@ -24,7 +24,7 @@
     SET.shots.forEach(function(S){
       var card = document.createElement('figure'); card.className = 'm-ba';
       card.innerHTML = '<div class="m-ba-frame" tabindex="0" role="slider" aria-label="Before and after: ' + S.title + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">' +
-        '<video class="m-ba-a" muted loop playsinline preload="none" src="ba/' + S.id + '_after.mp4?v=2"></video>' +
+        '<video class="m-ba-a" muted loop playsinline preload="none" src="ba/' + S.id + '_after.mp4?v=3"></video>' +
         '<div class="m-ba-clip"><video class="m-ba-b" muted loop playsinline preload="none" src="ba/' + S.id + '_before.mp4?v=2"></video></div>' +
         '<span class="m-ba-tag m-ba-tb">Before</span><span class="m-ba-tag m-ba-ta">After</span>' +
         '<div class="m-ba-line"><i></i></div></div>' +
