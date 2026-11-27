@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Berdevision · agency layout study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#000; --ink:#e9f1f7; --dim:#a9b0b6; --line:rgba(255,255,255,.12); --acc:#3d6bff; }
+* { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--ink); font-family:'DM Sans',sans-serif; font-weight:300; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+a { color:inherit; text-decoration:none; }
+img, video { display:block; max-width:100%; }
+
+/* nav: four links spread across the top, mark in the centre */
+.nav { position:fixed; inset:0 0 auto 0; z-index:20; display:grid; grid-template-columns:1fr 1fr auto 1fr 1fr; align-items:center; padding:1.1rem 2rem; font-size:.78rem; color:var(--dim);
+  background:linear-gradient(to bottom, rgba(0,0,0,.85), rgba(0,0,0,0)); }
+.nav a:hover { color:var(--ink); }
+.nav a:nth-child(2), .nav a:nth-child(4) { text-align:center; }
+.nav a:nth-child(5) { text-align:right; }
+.nav .mark img { height:26px; width:auto; }
+
+/* hero: the name, huge; one line; watch reel */
+.hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:6rem 2rem 4rem; text-align:center; position:relative; }
+.word { font-family:'Manrope',sans-serif; font-weight:800; line-height:.8; letter-spacing:-.045em; color:var(--ink); white-space:nowrap; font-size:13.2vw; }
+.hero p { max-width:44rem; margin-top:2.2rem; font-size:1rem; line-height:1.6; color:var(--dim); }
+.hero p b { color:var(--ink); font-weight:500; }
+.pill { display:inline-flex; align-items:center; gap:.6rem; margin-top:1.8rem; padding:.7rem 1.2rem; border-radius:999px; font-size:.8rem; color:var(--ink); background:#0b1020; border:1px solid rgba(61,107,255,.45); box-shadow:0 0 28px rgba(61,107,255,.35); }
+.pill i { width:0; height:0; border-left:8px solid var(--ink); border-top:5px solid transparent; border-bottom:5px solid transparent; }
+
+/* reel */
+.reel { padding:0 2rem 6rem; }
+.reel video { width:100%; max-width:1280px; margin:0 auto; border-radius:18px; aspect-ratio:16/9; object-fit:cover; background:#0a0a0a; }
+
+/* about us: label left, two columns right */
+.about { display:grid; grid-template-columns:1fr 1.25fr 1.25fr; gap:3rem; padding:5rem 2rem 6rem; max-width:1320px; margin:0 auto; position:relative; }
+.about::before { content:''; position:absolute; left:-10vw; right:-10vw; top:-6rem; height:9rem; background:radial-gradient(ellipse at 50% 0%, rgba(61,107,255,.5), transparent 70%); pointer-events:none; }
+.about h2 { font-family:'Manrope',sans-serif; font-weight:500; font-size:1.7rem; }
+.about p { font-size:.95rem; line-height:1.75; color:var(--dim); }
+
+/* marquee */
+.mq { overflow:hidden; padding:1.5rem 0 5rem; }
+.mq div { display:flex; width:max-content; gap:2.2rem; align-items:center; animation:mq 38s linear infinite; font-family:'Manrope',sans-serif; font-weight:500; font-size:clamp(3rem, 7.4vw, 6.6rem); letter-spacing:-.03em; white-space:nowrap; }
+.mq span:nth-child(3n+2) { color:var(--acc); }
+.mq em { flex:none; width:.9em; height:.9em; border-radius:50%; background:var(--acc); display:grid; place-items:center; box-shadow:0 0 40px rgba(61,107,255,.6); }
+.mq em img { width:58%; }
+@keyframes mq { to { transform:translateX(-50%); } }
+
+/* services: cards with an image on top, title, paragraph, two-column checklist */
+.sv { padding:0 2rem 6rem; }
+.sv .row { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:1.2rem; max-width:1320px; margin:0 auto; }
+.card { border:1px solid var(--line); border-radius:20px; padding:1.4rem 1.6rem 2rem; background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,0)); }
+.card .im { aspect-ratio:16/10; border-radius:12px; overflow:hidden; margin-bottom:1.6rem; }
+.card .im img { width:100%; height:100%; object-fit:cover; }
+.card h3 { font-family:'Manrope',sans-serif; font-weight:500; font-size:1.5rem; margin-bottom:.8rem; }
+.card p { font-size:.9rem; line-height:1.65; color:var(--dim); min-height:3.2em; }
+.card ul { list-style:none; margin-top:1.4rem; display:grid; grid-template-columns:1fr 1fr; gap:.75rem 1rem; font-size:.82rem; color:var(--ink); }
+.card li { display:flex; gap:.55rem; align-items:flex-start; }
+.card li::before { content:''; flex:none; width:.7rem; height:.38rem; margin-top:.3rem; border-left:2px solid var(--acc); border-bottom:2px solid var(--acc); transform:rotate(-45deg); }
+
+/* big section title, like their BEHIND-THE-SCENES */
+.big { font-family:'Manrope',sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:-.04em; line-height:.86; font-size:clamp(3.4rem, 11vw, 10rem); text-align:center; padding:2rem 1rem 2.4rem; }
+.sub { text-align:center; color:var(--dim); font-size:.95rem; margin:-1.4rem 0 2.4rem; }
+.grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:6px; padding:0 6px 6rem; }
+.grid a { position:relative; aspect-ratio:1/1; overflow:hidden; border-radius:4px; }
+.grid img { width:100%; height:100%; object-fit:cover; transition:transform .5s ease; }
+.grid a:hover img { transform:scale(1.05); }
+
+/* clients: one row with dividers */
+.cl { display:grid; grid-template-columns:repeat(6, 1fr); border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin-bottom:0; }
+.cl div { display:grid; place-items:center; height:150px; border-right:1px solid var(--line); padding:0 1.4rem; }
+.cl div:last-child { border-right:0; }
+.cl img { max-height:54px; max-width:100%; width:auto; filter:brightness(0) invert(1); opacity:.92; }
+
+/* call to action, where their testimonials sit */
+.cta { text-align:center; padding:8rem 2rem 7rem; position:relative; overflow:hidden; }
+.cta::before { content:''; position:absolute; left:8%; right:8%; top:0; height:7rem; background:radial-gradient(ellipse at 50% 0%, rgba(61,107,255,.55), transparent 70%); pointer-events:none; }
+.cta small { display:block; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); margin-bottom:1rem; }
+.cta h2 { font-family:'Manrope',sans-serif; font-weight:500; font-size:clamp(1.8rem, 3.4vw, 2.8rem); line-height:1.15; }
+.cta h2 span { color:var(--acc); }
+
+/* footer */
+.ft { position:relative; padding:5rem 2rem 2rem; overflow:hidden; }
+.ft::after { content:''; position:absolute; left:-20%; right:-20%; bottom:-45%; height:90%; background:radial-gradient(ellipse at 50% 100%, rgba(61,107,255,.95), rgba(61,107,255,.25) 45%, transparent 70%); pointer-events:none; }
+.ft .in { position:relative; z-index:1; display:flex; justify-content:space-between; gap:3rem; max-width:1320px; margin:0 auto; padding-bottom:16rem; }
+.ft .w2 { font-family:'Manrope',sans-serif; font-weight:800; font-size:2.6rem; letter-spacing:-.04em; line-height:.9; }
+.ft .meta { margin-top:1rem; font-size:.8rem; color:var(--dim); line-height:1.9; }
+.ft .meta b { color:var(--ink); font-weight:500; border:1px solid rgba(61,107,255,.7); border-radius:999px; padding:.05rem .55rem; margin-left:.5rem; font-size:.7rem; }
+.ft nav { display:grid; grid-template-columns:auto auto; gap:.5rem 4rem; font-size:.82rem; color:var(--dim); align-content:start; }
+.ft .legal { position:relative; z-index:1; max-width:1320px; margin:0 auto; font-size:.68rem; color:rgba(255,255,255,.75); }
+.note { position:fixed; left:12px; bottom:12px; z-index:30; font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:#000; background:#ffd84a; padding:.35rem .6rem; border-radius:6px; }
+
+@media (max-width:860px){
+  .nav { grid-template-columns:auto 1fr auto; padding:1rem 1.1rem; } .nav a:nth-child(1), .nav a:nth-child(2) { display:none; } .nav a:nth-child(4) { text-align:right; padding-right:1.2rem; }
+  .hero { min-height:78vh; padding:6rem 1.1rem 3rem; } .word { font-size:14.6vw; }
+  .reel { padding:0 1.1rem 4rem; }
+  .about { grid-template-columns:1fr; gap:1.4rem; padding:3rem 1.1rem 4rem; }
+  .sv { padding:0 1.1rem 4rem; } .sv .row { grid-template-columns:1fr; }
+  .grid { grid-template-columns:repeat(3, 1fr); }
+  .cl { grid-template-columns:repeat(3, 1fr); } .cl div { height:110px; border-bottom:1px solid var(--line); } .cl div:nth-child(3n) { border-right:0; }
+  .ft .in { flex-direction:column; padding-bottom:11rem; }
+}
+@media (prefers-reduced-motion: reduce){ .mq div { animation:none; } html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+<div class="note">Layout study · not the live site</div>
+
+<header class="nav">
+  <a href="#work">Featured work</a>
+  <a href="#reel">Reel</a>
+  <a class="mark" href="#top"><img src="../../assets/im-02-1f70df57dd.png" alt="Berdevision"></a>
+  <a href="#about">About</a>
+  <a href="#contact">Contact</a>
+</header>
+
+<section class="hero" id="top">
+  <h1 class="word">BERDEVISION</h1>
+  <p><b>A creative studio specializing in video, VFX, and post-production.</b> Every cut, every frame, every decision is made with intention.</p>
+  <a class="pill" href="#reel"><i></i>Watch reel</a>
+</section>
+
+<section class="reel" id="reel">
+  <video src="../hero/reel_clean_720.mp4?v=1" poster="../hero/poster_clean_wide.jpg?v=1" muted loop playsinline autoplay preload="metadata"></video>
+</section>
+
+<section class="about" id="about">
+  <h2>About us</h2>
+  <p>A creative studio specializing in video, VFX, and post-production. Driven by a passion for world-building, rhythm, and visual storytelling — we bring a distinctive edge to every project large or small. Every cut, every frame, every decision is made with intention.</p>
+  <p>From live events to commercial campaigns to VFX-heavy productions, Berdevision operates where traditional filmmaking meets creative technology.</p>
+</section>
+
+<div class="mq" aria-hidden="true"><div>
+  <span>Every frame</span><span>Every cut</span><span>Every vision</span><em><img src="../../assets/im-02-1f70df57dd.png" alt=""></em>
+  <span>Every frame</span><span>Every cut</span><span>Every vision</span><em><img src="../../assets/im-02-1f70df57dd.png" alt=""></em>
+  <span>Every frame</span><span>Every cut</span><span>Every vision</span><em><img src="../../assets/im-02-1f70df57dd.png" alt=""></em>
+  <span>Every frame</span><span>Every cut</span><span>Every vision</span><em><img src="../../assets/im-02-1f70df57dd.png" alt=""></em>
+</div></div>
+
+<section class="sv" id="services">
+  <div class="row">
+    <article class="card">
+      <div class="im"><img src="../thumbs/w_im-41-9eb5d9445b.jpg" alt="" loading="lazy"></div>
+      <h3>Direction &amp; Cinematography</h3>
+      <p>Creative lead on set — concept to camera.</p>
+      <ul><li>Music videos</li><li>Campaign spots</li><li>Live show coverage</li><li>Tour films</li><li>Sports hype videos</li><li>Show recaps</li></ul>
+    </article>
+    <article class="card">
+      <div class="im"><img src="../thumbs/w_im-47-3f39cd2c6a.jpg" alt="" loading="lazy"></div>
+      <h3>VFX &amp; Compositing</h3>
+      <p>Visual effects and motion work built to hold up on any screen.</p>
+      <ul><li>3D animation</li><li>Compositing</li><li>Campaign VFX</li><li>Team intros</li><li>Cover animation</li><li>Title work</li></ul>
+    </article>
+    <article class="card">
+      <div class="im"><img src="../thumbs/w_im-05-c21f2a61ed.jpg" alt="" loading="lazy"></div>
+      <h3>Editing &amp; Post</h3>
+      <p>Cutting, finishing, and color built around your vision.</p>
+      <ul><li>Edit</li><li>Color grading</li><li>Cutdowns</li><li>Alternate versions</li><li>Finishing</li><li>Delivery</li></ul>
+    </article>
+  </div>
+</section>
+
+<section id="work">
+  <h2 class="big">Featured work</h2>
+  <p class="sub">Their page has a behind-the-scenes wall here. Yours would start as the work, with BTS photos mixed in as you collect them.</p>
+  <div class="grid">
+    <a href="../"><img src="../thumbs/w_im-41-9eb5d9445b.jpg" alt="Ye - AT&amp;T Stadium" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-42-11579a7927.jpg" alt="Storm x US Open" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-43-0c717c5fa8.jpg" alt="Street Fighter x Lids" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-44-78ffed9376.jpg" alt="Little Miles and Ice Spice" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-47-3f39cd2c6a.jpg" alt="Cal WBB" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-50-13043198f7.jpg" alt="Arran Studios" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-51-a750fa17cd.jpg" alt="Esdeekid Dallas" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_ladybird.jpg" alt="Lady Bird" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_something-special.jpg" alt="Khalid x Ahn Hyo-seop" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_distant-lover.jpg" alt="JIHYO x Shenseea" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-05-c21f2a61ed.jpg" alt="For Seattle." loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-06-8cf7ce02d6.jpg" alt="DANNA - Lucid Dreams" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-07-d3af408b1b.jpg" alt="Noah Lyles, World Champion." loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-08-015e5d2ce1.jpg" alt="Madison Beer - The Locket Tour" loading="lazy"></a>
+    <a href="../"><img src="../thumbs/w_im-09-9189bb0d4b.jpg" alt="Dallas Wings" loading="lazy"></a>
+  </div>
+</section>
+
+<section class="cl" aria-label="Clients">
+  <div><img src="../logos/netflix.svg" alt="Netflix"></div>
+  <div><img src="../logos/gatorade.svg" alt="Gatorade"></div>
+  <div><img src="../logos/rolling-loud.png" alt="Rolling Loud"></div>
+  <div><img src="../logos/amazon.png" alt="Amazon"></div>
+  <div><img src="../logos/adidas.png" alt="Adidas"></div>
+  <div><img src="../logos/under-armour.png" alt="Under Armour"></div>
+</section>
+
+<section class="cta" id="contact">
+  <small>Start a project</small>
+  <h2>Tell us what you're making,<br><span>we'll take it from there</span></h2>
+  <a class="pill" href="../?page=about">Start a project</a>
+</section>
+
+<footer class="ft">
+  <div class="in">
+    <div>
+      <div class="w2">BERDEVISION</div>
+      <div class="meta">Based in <b>Dallas</b><br>Available worldwide</div>
+    </div>
+    <nav><a href="#top">Home</a><a href="https://www.instagram.com/berdevision/">Instagram</a><a href="#work">Work</a><a href="#about">About us</a><a href="#contact">Contact</a></nav>
+  </div>
+  <div class="legal">© 2026 Berdevision LLC</div>
+</footer>
+</body>
+</html>
