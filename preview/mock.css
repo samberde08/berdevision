@@ -546,3 +546,6 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 @keyframes m-typebg-l { from { transform:translate3d(0,0,0); } to { transform:translate3d(-50%,0,0); } }
 @keyframes m-typebg-r { from { transform:translate3d(-50%,0,0); } to { transform:translate3d(0,0,0); } }
 @media (prefers-reduced-motion: reduce) { .m-typebg-row { animation:none; } }
+
+/* (Nov 26, Sam) CLIENTS heading matches SERVICES: same Manrope 800 */
+.about-page .about-body p.work-label, .about-page .about-body .work-label { font-family:'Manrope',sans-serif !important; font-weight:800 !important; }
