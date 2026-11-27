@@ -648,3 +648,7 @@ footer.m-footer::after { content:''; position:absolute; left:-20%; right:-20%; b
 .work-side-arrow.m-placed { opacity:.88; }
 .work-side-arrow svg { width:26px; height:26px; }
 .work-side-arrow svg path { stroke-width:2.4; }
+
+/* (Nov 27, Sam: "fix the storm logo") the Storm mark is a tall stacked logo, so at the shared height it shrank to a speck; it gets its own height */
+.m-cl img[alt="Storm"] { max-height:84px; }
+@media (max-width:860px){ .m-cl img[alt="Storm"] { max-height:70px; } }
