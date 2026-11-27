@@ -635,3 +635,11 @@ footer.m-footer::after { content:''; position:absolute; left:-20%; right:-20%; b
 .m-cl div:nth-child(6n) { border-right:0; }
 .m-cl img { max-height:46px; max-width:78%; }
 @media (max-width:860px){ .m-cl div { height:96px; } .m-cl div:nth-child(6n) { border-right:0; } .m-cl img { max-height:38px; } }
+
+/* (Nov 27, Sam) wheel arrows: two plain chevrons hugging the front film. No bubble, no border, no blur. */
+.work-side-arrow { width:30px !important; height:46px !important; border:0 !important; border-radius:0 !important; background:none !important; box-shadow:none !important;
+  -webkit-backdrop-filter:none !important; backdrop-filter:none !important; color:#f1eee8 !important; opacity:0; filter:drop-shadow(0 1px 5px rgba(0,0,0,.65)); transition:opacity .25s ease, transform .2s ease !important; }
+.work-side-arrow.m-placed { opacity:.6; }
+.work-side-arrow svg { width:22px; height:22px; }
+.work-side-arrow:hover { background:none !important; opacity:1; transform:translateY(-50%) scale(1.12) !important; }
+.work-side-arrow:disabled { opacity:.15 !important; }

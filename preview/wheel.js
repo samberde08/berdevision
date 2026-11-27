@@ -283,6 +283,18 @@
   function step(dir){ return function(e){ e.preventDefault(); e.stopImmediatePropagation(); goTo(Math.round(target) + dir); }; }
   if (prevB) prevB.addEventListener('click', step(-1), true);
   if (nextB) nextB.addEventListener('click', step(1), true);
+  /* (Nov 27, Sam) the arrows sit right beside the front film, not at the far edges of the page: placed from the front film's own box whenever the wheel comes to rest */
+  function placeArrows(){
+    if (!prevB || !nextB || mode !== 'wheel' || front < 0 || !slots[front]) return;
+    var r = slots[front].tile.getBoundingClientRect(), op = prevB.offsetParent; if (!op || !r.width) return;
+    var pr = op.getBoundingClientRect(), gap = window.innerWidth <= 768 ? 2 : 12, aw = prevB.offsetWidth || 30, y = (r.top - pr.top + r.height / 2).toFixed(0) + 'px';
+    prevB.style.left = Math.max(2, r.left - pr.left - gap - aw).toFixed(0) + 'px'; prevB.style.right = 'auto'; prevB.style.top = y;
+    nextB.style.left = Math.min(pr.width - aw - 2, r.right - pr.left + gap).toFixed(0) + 'px'; nextB.style.right = 'auto'; nextB.style.top = y;
+    prevB.classList.add('m-placed'); nextB.classList.add('m-placed');
+  }
+  strip.addEventListener('m-spin', function(){ setTimeout(placeArrows, 60); });
+  window.addEventListener('resize', function(){ setTimeout(placeArrows, 450); });
+  setTimeout(placeArrows, 1200); setTimeout(placeArrows, 3200);
   strip.setAttribute('tabindex', '0'); strip.setAttribute('aria-label', 'Projects');
   strip.addEventListener('keydown', function(e){ if (e.key === 'ArrowRight') { goTo(Math.round(target) + 1); e.preventDefault(); } if (e.key === 'ArrowLeft') { goTo(Math.round(target) - 1); e.preventDefault(); } });
   strip.addEventListener('dragstart', function(e){ e.preventDefault(); });
