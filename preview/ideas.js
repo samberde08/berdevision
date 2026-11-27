@@ -8,8 +8,8 @@
 
   // ---- hire link (always on) ----
   var hire = document.createElement('a'); hire.className = 'm-hire'; hire.href = 'mailto:samberde@gmail.com?subject=Project%20enquiry';
-  hire.innerHTML = '<i aria-hidden="true"></i><span>Available for work</span><b aria-hidden="true">Email Sam</b>';
-  hire.setAttribute('aria-label', 'Available for work: email Sam');
+  hire.innerHTML = '<i aria-hidden="true"></i><span>Available for work</span><b aria-hidden="true">Start a project</b>';
+  hire.setAttribute('aria-label', 'Available for work: start a project');
   document.body.appendChild(hire);
   var contact = document.getElementById('contact') || document.querySelector('.contact-grid');
   if (contact && 'IntersectionObserver' in window) new IntersectionObserver(function(en){ hire.classList.toggle('m-off', en[0].isIntersecting); }, { threshold: 0.2 }).observe(contact);
