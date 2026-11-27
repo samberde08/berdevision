@@ -568,3 +568,10 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 .m-inds b { font-family:'Manrope',sans-serif; font-weight:800; font-size:1.05rem; letter-spacing:.02em; text-transform:uppercase; color:#f1eee8; }
 .m-inds span { font-family:'DM Sans',sans-serif; font-weight:300; font-size:.9rem; line-height:1.6; color:rgba(236,234,228,.75); }
 @media (max-width:719px){ .m-facts { grid-template-columns:repeat(2, minmax(0,1fr)); gap:1.8rem 1rem; } .m-inds { grid-template-columns:minmax(0,1fr); gap:1.5rem; } }
+
+/* (Nov 27, Sam removed AI Creative) three services sit in one row of three on desktop */
+@media (min-width:720px){
+  .about-page .services-grid { grid-template-columns:repeat(3, minmax(0,1fr)) !important; }
+  .about-page .services-grid .service-item { padding:1.4rem 1.6rem !important; border-right:1px solid rgba(255,255,255,.1) !important; }
+  .about-page .services-grid .service-item:last-child { border-right:0 !important; }
+}
