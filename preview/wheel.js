@@ -287,6 +287,8 @@
   function placeArrows(){
     if (!prevB || !nextB || mode !== 'wheel' || front < 0 || !slots[front]) return;
     var r = slots[front].tile.getBoundingClientRect(), op = prevB.offsetParent; if (!op || !r.width) return;
+    var sr = strip.getBoundingClientRect();     /* only trust the box once the front film is actually at rest in the middle; otherwise look again shortly */
+    if (Math.abs(pos - target) > 0.004 || Math.abs((r.left + r.right) / 2 - (sr.left + sr.width / 2)) > 6) { clearTimeout(placeArrows.t); placeArrows.t = setTimeout(placeArrows, 260); return; }
     var pr = op.getBoundingClientRect(), gap = window.innerWidth <= 768 ? 2 : 12, aw = prevB.offsetWidth || 30, y = (r.top - pr.top + r.height / 2).toFixed(0) + 'px';
     prevB.style.left = Math.max(2, r.left - pr.left - gap - aw).toFixed(0) + 'px'; prevB.style.right = 'auto'; prevB.style.top = y;
     nextB.style.left = Math.min(pr.width - aw - 2, r.right - pr.left + gap).toFixed(0) + 'px'; nextB.style.right = 'auto'; nextB.style.top = y;
