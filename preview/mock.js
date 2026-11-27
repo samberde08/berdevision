@@ -138,7 +138,12 @@
       /* (Nov 26, Sam) the lines fade in one by one; VISION is singled out: it stays the brightest word and flares as it arrives */
       st.lastChild.innerHTML = 'EVERY <span class="m-vis">VISION</span>';
       if ('IntersectionObserver' in window) new IntersectionObserver(function(en){ st.classList.toggle('m-go', en[0].isIntersecting); }, { threshold: 0.35 }).observe(st);
-      else st.classList.add('m-go'); } }
+      else st.classList.add('m-go');
+      /* (Nov 26, Sam) type as the background: huge outlined rows of the tagline drifting slowly behind the top of About; ?typebg=0 hides it */
+      if (!/[?&]typebg=0/.test(location.search)) { var tb = document.createElement('div'); tb.className = 'm-typebg'; tb.setAttribute('aria-hidden', 'true');
+        var run = 'EVERY FRAME \u00b7 EVERY CUT \u00b7 EVERY VISION \u00b7 ', h4 = '';
+        for (var ri = 0; ri < 4; ri++) h4 += '<div class="m-typebg-row"><span>' + run + run + '</span><span>' + run + run + '</span></div>';
+        tb.innerHTML = h4; ab.insertBefore(tb, ab.firstChild); } } }
   // ---- client strip straight under the hero ----
   var tr = document.querySelector('#work .logo-track'), reel = document.querySelector('.reel-wrap');
   if (tr && reel) { var blk = tr.parentElement.parentElement; blk.classList.add('m-clients'); blk.removeAttribute('style');

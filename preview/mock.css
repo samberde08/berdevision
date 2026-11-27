@@ -531,3 +531,18 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
   100% { text-shadow: 0 0 .16em rgba(255,255,255,.5); } }
 @keyframes m-vis-streak { 0% { opacity:0; transform:scaleX(.1); } 22% { opacity:1; transform:scaleX(1); } 100% { opacity:0; transform:scaleX(1.12); } }
 @media (prefers-reduced-motion: reduce) { .m-statement > span { opacity:1; transform:none; } .m-statement.m-go .m-vis, .m-statement.m-go .m-vis::after { animation:none; } }
+
+/* (Nov 26, Sam) About: type as the background. Outlined, very faint, drifting; fades out before Services. Transform-only motion. */
+.about-page .about-body { position:relative; isolation:isolate; }
+.m-typebg { position:absolute; z-index:-1; top:-1.5rem; left:50%; width:100vw; height:min(640px, 82vh); transform:translateX(-50%); overflow:hidden; pointer-events:none;
+  display:flex; flex-direction:column; justify-content:center; gap:.02em; font-size:clamp(104px, 14.5vw, 220px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 62%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 62%, transparent 100%); }
+.m-typebg-row { display:flex; width:max-content; white-space:nowrap; font-family:'Manrope',sans-serif; font-weight:800; line-height:.86; letter-spacing:-.01em;
+  color:transparent; -webkit-text-stroke:1px rgba(255,255,255,.085); animation: m-typebg-l 120s linear infinite; will-change:transform; }
+.m-typebg-row:nth-child(2n) { animation-name: m-typebg-r; animation-duration:150s; }
+.m-typebg-row:nth-child(3) { animation-duration:170s; animation-delay:-40s; }
+.m-typebg-row:nth-child(4) { animation-delay:-70s; }
+.m-typebg-row span { display:block; flex:none; }
+@keyframes m-typebg-l { from { transform:translate3d(0,0,0); } to { transform:translate3d(-50%,0,0); } }
+@keyframes m-typebg-r { from { transform:translate3d(-50%,0,0); } to { transform:translate3d(0,0,0); } }
+@media (prefers-reduced-motion: reduce) { .m-typebg-row { animation:none; } }
