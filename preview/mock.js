@@ -152,13 +152,15 @@
   // ---- footer + contact block ----
   var ft = document.querySelector('footer');
   if (ft) { ft.classList.add('m-footer');
-    ft.innerHTML = '<div class="m-f-mark"></div>' +
+    /* (Nov 27, Sam) footer laid out like the agency reference: name + location left, links right, colour glow rising from the bottom */
+    ft.innerHTML = '<div class="m-f-top"><div class="m-f-left"><div class="m-f-mark"></div>' +
+        '<div class="m-f-loc"><span>Video · VFX · Post-production</span><span>Based in <b>Dallas</b></span><span>Available worldwide</span></div></div>' +
       '<div class="m-f-cols">' +
-        '<div><div class="m-f-h">Contact</div><a href="mailto:samberde@gmail.com">samberde@gmail.com</a><a href="https://www.instagram.com/berdevision/" target="_blank" rel="noopener">Instagram · @berdevision</a></div>' +
-        '<div><div class="m-f-h">Studio</div><span>Video · VFX · Post-production</span><span>Based in Dallas — Available worldwide</span></div>' +
         '<div><div class="m-f-h">Site</div><a href="#" data-page="home">Work</a><a href="#" data-page="about">About</a></div>' +
-      '</div><div class="m-f-base">© 2026 Berdevision. All rights reserved.</div>';
-    lockup(ft.querySelector('.m-f-mark'), ['BERDE','VISION'], function(){ return Math.min(ft.clientWidth - 48, 620); });
+        '<div><div class="m-f-h">Contact</div><a href="mailto:samberde@gmail.com">samberde@gmail.com</a><a href="https://www.instagram.com/berdevision/" target="_blank" rel="noopener">Instagram · @berdevision</a></div>' +
+      '</div></div><div class="m-f-base">© 2026 Berdevision. All rights reserved.</div>';
+    lockup(ft.querySelector('.m-f-mark'), ['BERDE','VISION'], function(){ return Math.min(ft.clientWidth - 48, 300); });
+    document.querySelectorAll('.m-wall a').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault(); var n = document.querySelector('nav a[data-page="home"]'); if (n) n.click(); }); });
     ft.querySelectorAll('a[data-page]').forEach(function(a){ a.addEventListener('click', function(e){ e.preventDefault();
       var n = document.querySelector('nav a[data-page="' + a.dataset.page + '"]'); if (n) n.click(); window.scrollTo(0,0); }); });
   }
