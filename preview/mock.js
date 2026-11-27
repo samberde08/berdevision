@@ -139,6 +139,11 @@
       st.lastChild.innerHTML = 'EVERY <span class="m-vis">VISION</span>';
       if ('IntersectionObserver' in window) new IntersectionObserver(function(en, io){ if (en[0].isIntersecting) { st.classList.add('m-go'); io.disconnect(); } }, { threshold: 0.2 }).observe(st);   /* once it has arrived it stays (Sam: make sure it doesn't disappear) */
       else st.classList.add('m-go');
+      /* (Nov 27, Sam) the tagline sequence replays every time About is opened, even if it has been seen; within a visit it still stays put */
+      var pa0 = document.getElementById('page-about'), wasOn = !!(pa0 && pa0.classList.contains('active'));
+      if (pa0) new MutationObserver(function(){ var on = pa0.classList.contains('active');
+        if (on && !wasOn) { st.classList.remove('m-go'); void st.offsetWidth; setTimeout(function(){ st.classList.add('m-go'); }, 160); }
+        wasOn = on; }).observe(pa0, { attributes:true, attributeFilter:['class'] });
       /* (Nov 26, Sam) type as the background: huge outlined rows of the tagline drifting slowly behind the top of About; ?typebg=0 hides it */
       if (!/[?&]typebg=0/.test(location.search)) { var tb = document.createElement('div'); tb.className = 'm-typebg'; tb.setAttribute('aria-hidden', 'true');
         var run = 'EVERY FRAME \u00b7 EVERY CUT \u00b7 EVERY VISION \u00b7 ', h4 = '';
