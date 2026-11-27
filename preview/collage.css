@@ -42,3 +42,9 @@
 
 /* (Nov 26, Sam: "large gap") the statement tucks up under the earth's fade instead of sitting a band below it */
 @media (min-width:720px){ .bvc-wrap { margin-bottom:-3rem; } }
+
+/* (Nov 26, Sam: "still a bit awkward on phone") phone: full-bleed. The collage runs to the real screen edges (no inset box cutting the figures, no side fade on the earth) and the tagline tucks up under it. */
+@media (max-width:719px){
+  .bvc-wrap { width:100vw; margin-left:calc(50% - 50vw); margin-bottom:-1.25rem; }
+  .bvc-stage { -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 84%, transparent 100%) !important; mask-image: linear-gradient(to bottom, #000 0%, #000 84%, transparent 100%) !important; -webkit-mask-composite: source-over !important; mask-composite: add !important; }
+}
