@@ -137,7 +137,7 @@
       lockup(st, ['EVERY FRAME','EVERY CUT','EVERY VISION'], function(){ return Math.min(ab.clientWidth*0.86, 560); });
       /* (Nov 26, Sam) the lines fade in one by one; VISION is singled out: it stays the brightest word and flares as it arrives */
       st.lastChild.innerHTML = 'EVERY <span class="m-vis">VISION</span>';
-      if ('IntersectionObserver' in window) new IntersectionObserver(function(en){ st.classList.toggle('m-go', en[0].isIntersecting); }, { threshold: 0.35 }).observe(st);
+      if ('IntersectionObserver' in window) new IntersectionObserver(function(en, io){ if (en[0].isIntersecting) { st.classList.add('m-go'); io.disconnect(); } }, { threshold: 0.2 }).observe(st);   /* once it has arrived it stays (Sam: make sure it doesn't disappear) */
       else st.classList.add('m-go');
       /* (Nov 26, Sam) type as the background: huge outlined rows of the tagline drifting slowly behind the top of About; ?typebg=0 hides it */
       if (!/[?&]typebg=0/.test(location.search)) { var tb = document.createElement('div'); tb.className = 'm-typebg'; tb.setAttribute('aria-hidden', 'true');
