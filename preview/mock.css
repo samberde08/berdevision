@@ -643,3 +643,8 @@ footer.m-footer::after { content:''; position:absolute; left:-20%; right:-20%; b
 .work-side-arrow svg { width:22px; height:22px; }
 .work-side-arrow:hover { background:none !important; opacity:1; transform:translateY(-50%) scale(1.12) !important; }
 .work-side-arrow:disabled { opacity:.15 !important; }
+
+/* arrows readable over the neighbouring films: a little stronger than first pass, still no bubble */
+.work-side-arrow.m-placed { opacity:.88; }
+.work-side-arrow svg { width:26px; height:26px; }
+.work-side-arrow svg path { stroke-width:2.4; }
