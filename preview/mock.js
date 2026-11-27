@@ -132,9 +132,9 @@
   // ---- about: stacked statement replaces the small BERDEVISION heading ----
   var ab = document.querySelector('.about-page .about-body');
   if (ab) { var lab = ab.querySelector('.work-label');
-    if (lab) { var st = document.createElement('div'); st.className = 'm-statement'; st.setAttribute('aria-label','Filmmaking meets creative technology');
+    if (lab) { var st = document.createElement('div'); st.className = 'm-statement'; st.setAttribute('aria-label','Every frame, every cut');
       lab.parentNode.replaceChild(st, lab);
-      lockup(st, ['FILMMAKING','MEETS CREATIVE','TECHNOLOGY'], function(){ return Math.min(ab.clientWidth*0.86, 560); }); } }
+      lockup(st, ['EVERY FRAME','EVERY CUT'], function(){ return Math.min(ab.clientWidth*0.86, 560); }); } }
   // ---- client strip straight under the hero ----
   var tr = document.querySelector('#work .logo-track'), reel = document.querySelector('.reel-wrap');
   if (tr && reel) { var blk = tr.parentElement.parentElement; blk.classList.add('m-clients'); blk.removeAttribute('style');
