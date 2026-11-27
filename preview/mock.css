@@ -549,3 +549,12 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 
 /* (Nov 26, Sam) CLIENTS heading matches SERVICES: same Manrope 800 */
 .about-page .about-body p.work-label, .about-page .about-body .work-label { font-family:'Manrope',sans-serif !important; font-weight:800 !important; }
+
+/* (Nov 26, Sam) the spark turns lightly as it fires: the long streak swings a few degrees, and a short crossing ray spins with it */
+.m-statement.m-go .m-vis::after { animation: m-vis-spin 1.9s 1.3s ease-out both; }
+.m-vis::before { content:''; position:absolute; left:38%; right:38%; top:46%; height:.04em; border-radius:50%; pointer-events:none; opacity:0;
+  background: linear-gradient(90deg, transparent, #fff 50%, transparent); box-shadow: 0 0 .2em .04em rgba(255,255,255,.7); }
+.m-statement.m-go .m-vis::before { animation: m-vis-spin2 1.9s 1.3s ease-out both; }
+@keyframes m-vis-spin { 0% { opacity:0; transform:rotate(-14deg) scaleX(.1); } 22% { opacity:1; transform:rotate(-4deg) scaleX(1); } 100% { opacity:0; transform:rotate(7deg) scaleX(1.12); } }
+@keyframes m-vis-spin2 { 0% { opacity:0; transform:rotate(60deg) scaleX(.2); } 22% { opacity:.9; transform:rotate(86deg) scaleX(1); } 100% { opacity:0; transform:rotate(128deg) scaleX(1.2); } }
+@media (prefers-reduced-motion: reduce) { .m-statement.m-go .m-vis::before { animation:none; } }
