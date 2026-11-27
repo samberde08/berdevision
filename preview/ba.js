@@ -91,7 +91,8 @@
   if ('IntersectionObserver' in window) io = new IntersectionObserver(function(en){ en.forEach(function(x){ var it = items.filter(function(i){ return i.fr === x.target; })[0]; if (it) run(it, x.isIntersecting); }); }, { threshold: 0.25 });
 
   var ab = document.querySelector('.about-page .about-body');
-  if (ab) { var anchor = ab.querySelector('.services-grid'); if (anchor) mount(anchor, SETS, 'Before / After'); }
+  /* About no longer shows Before / After (Sam, Nov 26); ?ba=1 brings it back */
+  if (ab && /[?&]ba=1/.test(location.search)) { var anchor = ab.querySelector('.services-grid'); if (anchor) mount(anchor, SETS, 'Before / After'); }
   // (idea preview) the same pairs as one strip on the home page, under the wheel: every example in one place, stepped through with the arrows
   window.__baHome = function(){
     var work = document.getElementById('work'); if (!work || document.querySelector('.m-ba-home')) return;
