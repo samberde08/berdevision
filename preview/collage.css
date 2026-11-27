@@ -39,3 +39,6 @@
 /* things flying past in the torrent */
 .bvc-fly { position:fixed; inset:0; z-index:91; pointer-events:none; overflow:hidden; }
 .bvc-fly img { position:absolute; left:50%; top:50%; height:26vh; width:auto; opacity:0; will-change:transform,opacity; filter: brightness(1.18) drop-shadow(0 0 16px rgba(255,255,255,.55)); }
+
+/* (Nov 26, Sam: "large gap") the statement tucks up under the earth's fade instead of sitting a band below it */
+@media (min-width:720px){ .bvc-wrap { margin-bottom:-3rem; } }

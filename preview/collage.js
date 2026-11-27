@@ -198,8 +198,9 @@
       pc.style.opacity=(1-fadeOut).toFixed(3);
       if (fadeOut < 1) pcDraw(ease(Math.min(1, prog/0.80))); else if (!pcClear) { pcCtx.clearRect(0,0,pcW,pcH); pcClear=true; } }
     var jp = mobile ? 0 : ease(prog/0.45);                                   // the wordmark starts straight and jumbles as you scroll
+    var jx = ease(prog/0.28), jy = ease((prog-0.12)/0.33);   /* each line first shrinks to its half of the row, then the lower one rises: the letters never cross */
     for (var j=0;j<letters.length;j++){ var q=letters[j];
-      if (q.k !== undefined) q.el.style.transform='translate3d('+(mx*q.depth*18 + q.dx*jp).toFixed(1)+'px,'+(my*q.depth*7 + q.dy*jp).toFixed(1)+'px,'+(q.depth*ZS).toFixed(0)+'px) scale('+(1+(q.k-1)*jp).toFixed(4)+')';
+      if (q.k !== undefined) q.el.style.transform='translate3d('+(mx*q.depth*18 + q.dx*jx).toFixed(1)+'px,'+(my*q.depth*7 + q.dy*jy).toFixed(1)+'px,'+(q.depth*ZS).toFixed(0)+'px) scale('+(1+(q.k-1)*jx).toFixed(4)+')';
       else q.el.style.transform='translate3d('+(mx*q.depth*18)+'px,'+(my*q.depth*7)+'px,'+(q.depth*ZS).toFixed(0)+'px) rotate('+(q.rot*jp).toFixed(2)+'deg) scale('+(1+(q.sc-1)*jp).toFixed(3)+')'; }
     hint.style.opacity = prog > 0.06 ? 0 : 1;
   }
