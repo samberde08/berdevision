@@ -2,10 +2,10 @@
   var ab = document.querySelector('.about-page .about-body'); if (!ab) return;
   var PAD=24;
   // name, x, height, bottom, rotate(deg), z, aspect (w/h of the un-padded cut-out)
-  var DESK = {W:1640, H:1190, CX:820, items:[["ai_bear",495,335,540,-6,15,0.508],["ai_kaiju",975,330,540,6,8,0.678],["ai_ye_face",580,490,560,0,14,1.028],["ai_sf_face",292,225,550,-8,12,1.14],["ai_im03",398,215,470,-4,11,0.944],["yachty_portrait",212,275,395,-5,13,0.795],["ai_pegasus",105,250,490,-10,15,1.028],["ai_paige",415,300,395,-4,16,0.637],["ai_danna",615,290,445,-3,18,0.774],["ai_noah",815,310,445,3,18,0.954],["ai_trophy",1112,285,545,8,10,0.652],["storm",1040,250,420,4,16,1.144],["ai_im13",1205,225,420,5,15,0.697],["ai_ye_stance",1250,215,560,7,9,0.84],["ar_guy",1260,190,395,5,17,1.032],["im-12",1285,235,250,6,18,0.709],["ai_im10",1200,260,300,3,18,0.59],["ai_sf_jacket",1335,225,430,9,11,0.614],["esdee",200,370,155,0,23,0.885],["cal",365,320,273,0,26,1.315],["ai_ice",892,440,180,0,27,0.989],["st_ball",725,240,440,0,17,1.143],["es_eye",440,150,262,-6,25,1.416],["arran",1040,250,120,0,28,1.348],["es_dog",585,228,283,0,29,1.941],["ai_cal_shoot",160,320,330,-5,9,0.352],["im-16",95,320,60,-4,20,1.182],["ai_st_serve",70,300,240,-7,8,0.608],["ai_ye_run",-25,235,-8,-6,21,0.891],["im-09",1370,255,235,6,19,0.769],["cal_16",1250,330,20,4,20,1.057],["ai_hoka",1425,280,150,7,8,0.653],["ai_hubbard_small",1540,250,-5,8,21,0.396]],
+  var DESK = {W:1640, H:1190, Hn:1100, CX:820, items:[["ai_bear",495,335,540,-6,15,0.508],["ai_kaiju",975,330,540,6,8,0.678],["ai_ye_face",580,490,560,0,14,1.028],["ai_sf_face",292,225,550,-8,12,1.14],["ai_im03",398,215,470,-4,11,0.944],["yachty_portrait",212,275,395,-5,13,0.795],["ai_pegasus",105,250,490,-10,15,1.028],["ai_paige",415,300,395,-4,16,0.637],["ai_danna",615,290,445,-3,18,0.774],["ai_noah",815,310,445,3,18,0.954],["ai_trophy",1112,285,545,8,10,0.652],["storm",1040,250,420,4,16,1.144],["ai_im13",1205,225,420,5,15,0.697],["ai_ye_stance",1250,215,560,7,9,0.84],["ar_guy",1260,190,395,5,17,1.032],["im-12",1285,235,250,6,18,0.709],["ai_im10",1200,260,300,3,18,0.59],["ai_sf_jacket",1335,225,430,9,11,0.614],["esdee",200,370,155,0,23,0.885],["cal",365,320,273,0,26,1.315],["ai_ice",892,440,180,0,27,0.989],["st_ball",725,240,440,0,17,1.143],["es_eye",440,150,262,-6,25,1.416],["arran",1040,250,120,0,28,1.348],["es_dog",585,228,283,0,29,1.941],["ai_cal_shoot",160,320,330,-5,9,0.352],["im-16",95,320,60,-4,20,1.182],["ai_st_serve",70,300,240,-7,8,0.608],["ai_ye_run",-25,235,-8,-6,21,0.891],["im-09",1370,255,235,6,19,0.769],["cal_16",1250,330,20,4,20,1.057],["ai_hoka",1425,280,150,7,8,0.653],["ai_hubbard_small",1540,250,-5,8,21,0.396]],
     earth:{x:-33, h:658, b:-338, R:889, cy:-569, s0:1.35, y0:164},
     type:{lines:['BERDE','VISION'], x0:60, x1:1580, top:1172, bottom:500, end:{lines:['BERDEVISION'], x0:130, x1:1510, top:1168, bottom:1020}}};
-  var MOB = {W:760, H:1340, CX:380, items:[["ai_pegasus",0,190,930,-10,9,1.028],["ai_bear",40,290,800,-6,8,0.508],["ai_kaiju",560,290,790,6,8,0.678],["ai_ye_face",135,480,600,0,14,1.028],["ai_paige",25,270,590,-4,16,0.637],["yachty_portrait",520,300,500,5,16,0.795],["ai_sf_face",-45,260,400,-8,17,1.14],["ai_danna",135,330,380,-3,18,0.774],["ai_noah",320,340,400,3,18,0.954],["arran",430,260,150,3,28,1.348],["st_ball",250,260,430,0,13,1.143],["esdee",-50,380,165,0,23,0.885],["cal",110,300,235,0,26,1.315],["es_eye",180,100,220,-6,25,1.416],["ai_ice",440,330,265,0,27,0.989],["es_dog",270,150,248,0,29,1.941]],
+  var MOB = {W:760, H:1340, Hn:1170, CX:380, items:[["ai_pegasus",0,190,930,-10,9,1.028],["ai_bear",40,290,800,-6,8,0.508],["ai_kaiju",560,290,790,6,8,0.678],["ai_ye_face",135,480,600,0,14,1.028],["ai_paige",25,270,590,-4,16,0.637],["yachty_portrait",520,300,500,5,16,0.795],["ai_sf_face",-45,260,400,-8,17,1.14],["ai_danna",135,330,380,-3,18,0.774],["ai_noah",320,340,400,3,18,0.954],["arran",430,260,150,3,28,1.348],["st_ball",250,260,430,0,13,1.143],["esdee",-50,380,165,0,23,0.885],["cal",110,300,235,0,26,1.315],["es_eye",180,100,220,-6,25,1.416],["ai_ice",440,330,265,0,27,0.989],["es_dog",270,150,248,0,29,1.941]],
     earth:{x:-313, h:534, b:-274, R:722, cy:-462, s0:1.5, y0:-30},
     type:{lines:['BERDE','VISION'], x0:34, x1:726, top:1332, bottom:1000}};   // phone: the whole name on two straight lines above the crowd, only its lower edge tucked behind their heads
   // per-letter size jitter (cycled) and tilt: packed, uneven, still readable
@@ -32,6 +32,8 @@
   // becomes the earth, and the figures land on it as the full collage. ?hall=0 shows the earlier entrance.
   var HALL = !reduce && /[?&]hall=1/.test(qs);   // (Nov 26) rejected by Sam; kept only behind ?hall=1 if (HALL) SIL = false;
   var extraEls = null;
+  /* (Nov 26 night, Sam) no BERDEVISION name on the About collage; ?word=1 brings it back */
+  var WORD = /[?&]word=1/.test(qs);
   var C=DESK, mobile=false, plates=[], letters=[], cuts=[], dropAll=0, earthEl, s=1, pin=0, anchor=8, builtW=-1, mx=0, my=0;
   var meas = document.createElement('canvas').getContext('2d');
   // (Nov 26, Sam: "vision is cut off") the name opens as two big lines; as the crowd arrives it draws up into ONE line that sits
@@ -67,12 +69,12 @@
   function build(){
     builtW = wrap.clientWidth; if (!builtW) return;
     mobile = builtW < 720; C = mobile ? MOB : DESK;
-    var H=C.H, CX=C.CX, E=C.earth;
+    var H=WORD ? C.H : C.Hn, CX=C.CX, E=C.earth;   /* without the name the canvas loses the headroom it needed */
     col.innerHTML=''; plates=[]; letters=[]; cuts=[];
     col.classList.toggle('shim', !reduce && !HALL && !mobile);
     col.style.width=C.W+'px'; col.style.height=H+'px'; col.style.marginLeft=(-C.W/2)+'px';
     var stars=document.createElement('div'); stars.className='stars'; stars.style.zIndex=1; col.appendChild(stars);
-    buildType();
+    if (WORD) buildType();
     // three plates (back / middle / front): each rises as ONE piece, so nobody floats on their own
     var topStart = E.b + E.h*E.s0 - E.y0;                        // where the horizon sits before you scroll
     [[0,10,8],[11,19,15],[20,99,24]].forEach(function(g, gi){

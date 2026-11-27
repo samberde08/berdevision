@@ -511,3 +511,6 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 
 /* (Nov 26, Sam's phone screenshot) services ran off the right edge on phones: one column there */
 @media (max-width:719px){ .services-grid { grid-template-columns:minmax(0,1fr) !important; } .service-item { min-width:0; border-right:0 !important; padding-left:0 !important; padding-right:0 !important; } }
+
+/* (Nov 26 night, Sam) no BERDEVISION name over the home reel */
+.reel-slogan { display:none !important; }
