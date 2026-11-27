@@ -26,7 +26,8 @@
   function pageBg(){ for (var e = wrap; e; e = e.parentElement) { var c = getComputedStyle(e).backgroundColor; if (c && !/rgba\(0, 0, 0, 0\)|transparent/.test(c)) return c; } return 'rgb(12,12,13)'; }
   // The entrance (Nov 26, Sam): at first only the BERDEVISION wordmark is there. As the page scrolls, the collage holds in place and the
   // figures arrive left to right, each as a white silhouette that then fills with its picture; the earth comes up under them.
-  var SIL = !reduce;
+  /* (Nov 26 eve, Sam) the collage is simply there when About opens; the scroll reveal only runs with ?sil2=1 */
+  var SIL = !reduce && /[?&]sil2=1/.test(qs);
   // (Nov 26, Sam) the hallway: scroll flies down a corridor past every figure toward a white plasma orb; the orb then sinks and
   // becomes the earth, and the figures land on it as the full collage. ?hall=0 shows the earlier entrance.
   var HALL = !reduce && /[?&]hall=1/.test(qs);   // (Nov 26) rejected by Sam; kept only behind ?hall=1 if (HALL) SIL = false;
@@ -68,7 +69,7 @@
     mobile = builtW < 720; C = mobile ? MOB : DESK;
     var H=C.H, CX=C.CX, E=C.earth;
     col.innerHTML=''; plates=[]; letters=[]; cuts=[];
-    col.classList.toggle('shim', !reduce && !HALL);
+    col.classList.toggle('shim', !reduce && !HALL && !mobile);
     col.style.width=C.W+'px'; col.style.height=H+'px'; col.style.marginLeft=(-C.W/2)+'px';
     var stars=document.createElement('div'); stars.className='stars'; stars.style.zIndex=1; col.appendChild(stars);
     buildType();
