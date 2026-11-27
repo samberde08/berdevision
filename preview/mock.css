@@ -628,3 +628,10 @@ footer.m-footer::after { content:''; position:absolute; left:-20%; right:-20%; b
   .m-f-top { flex-direction:column; gap:2.2rem; } .m-f-top .m-f-cols { grid-template-columns:minmax(0,1fr); gap:1.6rem; }
   footer.m-footer { padding-bottom:10rem !important; }
 }
+
+/* (Nov 27, Sam: "there could be more") client wall: 24 logos, four divided rows of six on desktop, eight rows of three on phone */
+.m-cl { border-bottom:0; }
+.m-cl div { height:118px; border-bottom:1px solid rgba(255,255,255,.14); }
+.m-cl div:nth-child(6n) { border-right:0; }
+.m-cl img { max-height:46px; max-width:78%; }
+@media (max-width:860px){ .m-cl div { height:96px; } .m-cl div:nth-child(6n) { border-right:0; } .m-cl img { max-height:38px; } }
