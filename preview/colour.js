@@ -159,7 +159,7 @@
     // behind the player the page is not a frozen dark sheet: the film's own loop (or the reel) keeps moving, soft and dim
     var bd = document.getElementById('lightboxBackdrop'), lp0 = t.querySelector('video.m-loop');
     if (bd) { var bg = document.createElement('video'); bg.className = 'm-lb-bg'; bg.muted = true; bg.loop = true; bg.playsInline = true; bg.setAttribute('playsinline', ''); bg.setAttribute('aria-hidden', 'true');
-      bg.src = (lp0 && lp0.currentSrc) || 'hero/reel_roto_lit_720.mp4?v=10';
+      bg.src = (lp0 && lp0.currentSrc) || 'hero/reel_clean_720.mp4?v=1';
       bg.addEventListener('loadeddata', function(){ if (!lp0 && v && v.currentTime) { try { bg.currentTime = v.currentTime; } catch (e) {} } var p = bg.play(); if (p && p.catch) p.catch(function(){}); bg.classList.add('m-on'); });
       bd.appendChild(bg); }
     var f = fr.getBoundingClientRect();

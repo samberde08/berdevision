@@ -1600,11 +1600,11 @@ footer p { font-size: 0.65rem; font-family: 'DM Sans', sans-serif; font-style: n
   // Instant start: a still of the first frame shows at once, a ~1 MB clip of the first 5 seconds starts playing, and the full reel takes over underneath as soon as enough of it has arrived.
   var v=document.getElementById("reelVideo"),w=v.parentNode;v.muted=true;v.defaultMuted=true;
   var tall=window.innerWidth<=768&&window.innerHeight>window.innerWidth;if(tall)w.classList.add("tall");
-  var kind=tall?"45":"wide",full="hero/reel_roto_lit_"+(tall?"45":window.innerWidth<=768?"720":"1080")+".mp4?v=10";
-  v.poster="hero/poster_"+kind+".jpg?v=1";
+  var kind=tall?"45":"wide",full="hero/reel_clean_"+(tall?"45":window.innerWidth<=768?"720":"1080")+".mp4?v=1";
+  v.poster="hero/poster_clean_"+kind+".jpg?v=1";
   var iv=document.createElement("video");iv.id="reelIntro";iv.className="reel-video reel-intro";iv.muted=true;iv.defaultMuted=true;iv.playsInline=true;iv.autoplay=true;iv.preload="auto";
   iv.setAttribute("muted","");iv.setAttribute("playsinline","");iv.setAttribute("webkit-playsinline","");iv.setAttribute("disableremoteplayback","");iv.setAttribute("aria-hidden","true");
-  iv.poster=v.poster;iv.src="hero/intro_"+kind+".mp4?v=1";v.insertAdjacentElement("afterend",iv);window.__reelLive=iv;
+  iv.poster=v.poster;iv.src="hero/intro_clean_"+kind+".mp4?v=1";v.insertAdjacentElement("afterend",iv);window.__reelLive=iv;
   var p=iv.play();if(p&&p.catch)p.catch(function(){});
   v.preload="auto";v.src=full;var p2=v.play();if(p2&&p2.catch)p2.catch(function(){});
   var done=false,tm=setInterval(function(){
@@ -2764,5 +2764,5 @@ footer p { color: rgba(236,234,228,0.5); }
 })();
 </script>
 
-<link rel="stylesheet" href="mock.css?v=col42"><script src="ideas.js?v=8"></script><script src="mock.js?v=15"></script><script src="scrollfx.js?v=4"></script><script src="wheel.js?v=26"></script><script src="colour.js?v=20"></script><link rel="stylesheet" href="collage.css?v=8"><script src="collage.js?v=30"></script><script src="ba.js?v=12"></script></body>
+<link rel="stylesheet" href="mock.css?v=col42"><script src="ideas.js?v=8"></script><script src="mock.js?v=15"></script><script src="scrollfx.js?v=4"></script><script src="wheel.js?v=26"></script><script src="colour.js?v=21"></script><link rel="stylesheet" href="collage.css?v=8"><script src="collage.js?v=30"></script><script src="ba.js?v=12"></script></body>
 </html>
