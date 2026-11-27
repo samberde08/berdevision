@@ -38,7 +38,8 @@ img, video { display:block; max-width:100%; }
 
 /* about us: label left, two columns right */
 .about { display:grid; grid-template-columns:1fr 1.25fr 1.25fr; gap:3rem; padding:5rem 2rem 6rem; max-width:1320px; margin:0 auto; position:relative; }
-.about::before { content:''; position:absolute; left:-10vw; right:-10vw; top:-6rem; height:9rem; background:radial-gradient(ellipse at 50% 0%, rgba(61,107,255,.5), transparent 70%); pointer-events:none; }
+html, body { overflow-x:clip; }
+.about::before { content:''; position:absolute; left:0; right:0; top:-6rem; height:9rem; background:radial-gradient(ellipse at 50% 0%, rgba(61,107,255,.5), transparent 70%); pointer-events:none; }
 .about h2 { font-family:'Manrope',sans-serif; font-weight:500; font-size:1.7rem; }
 .about p { font-size:.95rem; line-height:1.75; color:var(--dim); }
 
