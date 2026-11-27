@@ -514,3 +514,20 @@ html.m-allwork-on .m-allwork-bar { margin-top:1.8rem; }
 
 /* (Nov 26 night, Sam) no BERDEVISION name over the home reel */
 .reel-slogan { display:none !important; }
+
+/* (Nov 26, Sam) tagline: lines fade in one by one, VISION flares as it lands and stays the brightest word. Only opacity, transform and text-shadow move (no animated filters: phone flicker). */
+.m-statement > span { opacity:0; transform:translateY(.2em); }
+.m-statement.m-go > span { opacity:1; transform:none; transition: opacity 1s ease, transform 1.2s cubic-bezier(.2,.8,.2,1); }
+.m-statement.m-go > span:nth-child(2) { transition-delay:.55s; }
+.m-statement.m-go > span:nth-child(3) { transition-delay:1.1s; }
+.m-stack span.m-vis { display:inline-block; position:relative; line-height:inherit; color:#fff !important; text-shadow:0 0 .16em rgba(255,255,255,.5); }
+.m-statement.m-go .m-vis { animation: m-vis-flare 2.6s 1.2s ease-out both; }
+.m-vis::after { content:''; position:absolute; left:-9%; right:-9%; top:46%; height:.05em; border-radius:50%; pointer-events:none; opacity:0; transform:scaleX(.1);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.95) 30%, #fff 50%, rgba(255,255,255,.95) 70%, transparent); box-shadow: 0 0 .22em .05em rgba(255,255,255,.75), 0 0 .7em .12em rgba(255,236,205,.45); }
+.m-statement.m-go .m-vis::after { animation: m-vis-streak 1.9s 1.3s ease-out both; }
+@keyframes m-vis-flare {
+  0%   { text-shadow: 0 0 .04em #fff, 0 0 .3em #fff, 0 0 .9em rgba(255,240,214,.95), 0 0 1.8em rgba(255,226,180,.7); }
+  30%  { text-shadow: 0 0 .04em #fff, 0 0 .4em #fff, 0 0 1.1em rgba(255,240,214,.95), 0 0 2.2em rgba(255,226,180,.75); }
+  100% { text-shadow: 0 0 .16em rgba(255,255,255,.5); } }
+@keyframes m-vis-streak { 0% { opacity:0; transform:scaleX(.1); } 22% { opacity:1; transform:scaleX(1); } 100% { opacity:0; transform:scaleX(1.12); } }
+@media (prefers-reduced-motion: reduce) { .m-statement > span { opacity:1; transform:none; } .m-statement.m-go .m-vis, .m-statement.m-go .m-vis::after { animation:none; } }

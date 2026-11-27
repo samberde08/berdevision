@@ -134,7 +134,11 @@
   if (ab) { var lab = ab.querySelector('.work-label');
     if (lab) { var st = document.createElement('div'); st.className = 'm-statement'; st.setAttribute('aria-label','Every frame, every cut, every vision');
       lab.parentNode.replaceChild(st, lab);
-      lockup(st, ['EVERY FRAME','EVERY CUT','EVERY VISION'], function(){ return Math.min(ab.clientWidth*0.86, 560); }); } }
+      lockup(st, ['EVERY FRAME','EVERY CUT','EVERY VISION'], function(){ return Math.min(ab.clientWidth*0.86, 560); });
+      /* (Nov 26, Sam) the lines fade in one by one; VISION is singled out: it stays the brightest word and flares as it arrives */
+      st.lastChild.innerHTML = 'EVERY <span class="m-vis">VISION</span>';
+      if ('IntersectionObserver' in window) new IntersectionObserver(function(en){ st.classList.toggle('m-go', en[0].isIntersecting); }, { threshold: 0.35 }).observe(st);
+      else st.classList.add('m-go'); } }
   // ---- client strip straight under the hero ----
   var tr = document.querySelector('#work .logo-track'), reel = document.querySelector('.reel-wrap');
   if (tr && reel) { var blk = tr.parentElement.parentElement; blk.classList.add('m-clients'); blk.removeAttribute('style');
