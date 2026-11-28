@@ -156,7 +156,7 @@
     var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     Array.prototype.forEach.call(objs, function(box){
       var v = box.querySelector('video'), name = box.getAttribute('data-obj'); if (!v) return;
-      var src = 'objects/' + name + (webkit ? '.mov' : '.webm') + '?v=3', loaded = false;
+      var src = 'objects/' + name + (webkit ? '.mov' : '.webm') + '?v=4', loaded = false;
       function go(on){ if (still) return; if (on) { if (!loaded) { v.src = src; loaded = true; } var p = v.play(); if (p && p.catch) p.catch(function(){}); } else if (loaded) v.pause(); }
       if ('IntersectionObserver' in window) new IntersectionObserver(function(en){ go(en[0].isIntersecting); }, { threshold: 0.3 }).observe(box);
       else go(true);
