@@ -149,6 +149,19 @@
         var run = 'EVERY FRAME \u00b7 EVERY CUT \u00b7 EVERY VISION \u00b7 ', h4 = '';
         for (var ri = 0; ri < 4; ri++) h4 += '<div class="m-typebg-row"><span>' + run + run + '</span><span>' + run + run + '</span></div>';
         tb.innerHTML = h4; ab.insertBefore(tb, ab.firstChild); } } }
+  // ---- (Nov 27, Sam) 3D objects on the service cards: a transparent looping video per card, playing only while its card is on screen ----
+  (function(){
+    var objs = document.querySelectorAll('.m-card-obj[data-obj]'); if (!objs.length) return;
+    var ua = navigator.userAgent, webkit = /iP(hone|ad|od)/.test(ua) || (/Safari/.test(ua) && !/Chrome|Chromium|Edg|OPR|Android/.test(ua));   // Safari and every iPhone browser need the HEVC file for transparency
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    Array.prototype.forEach.call(objs, function(box){
+      var v = box.querySelector('video'), name = box.getAttribute('data-obj'); if (!v) return;
+      var src = 'objects/' + name + (webkit ? '.mov' : '.webm') + '?v=1', loaded = false;
+      function go(on){ if (still) return; if (on) { if (!loaded) { v.src = src; loaded = true; } var p = v.play(); if (p && p.catch) p.catch(function(){}); } else if (loaded) v.pause(); }
+      if ('IntersectionObserver' in window) new IntersectionObserver(function(en){ go(en[0].isIntersecting); }, { threshold: 0.3 }).observe(box);
+      else go(true);
+    });
+  })();
   // ---- client strip straight under the hero ----
   var tr = document.querySelector('#work .logo-track'), reel = document.querySelector('.reel-wrap');
   if (tr && reel) { var blk = tr.parentElement.parentElement; blk.classList.add('m-clients'); blk.removeAttribute('style');
